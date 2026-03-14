@@ -1,6 +1,14 @@
 :root { --med-blue: #0056b3; --success: #28a745; --fail: #dc3545; --light: #f8f9fa; }
-body { font-family: 'Helvetica', sans-serif; background: #eef2f7; margin: 0; padding: 20px; }
-.container { max-width: 700px; margin: 0 auto; }
+body {
+    font-family: 'Helvetica', sans-serif;
+    background-image: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)), 
+                      url('your-image-name.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    margin: 0;
+    padding: 20px;
+}
 .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
 button { padding: 15px; border: none; border-radius: 8px; background: var(--med-blue); color: white; cursor: pointer; font-size: 16px; }
