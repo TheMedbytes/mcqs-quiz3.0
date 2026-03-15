@@ -9,6 +9,12 @@
     --text-light: #666;
 }
 
+/* --- GLOBAL RESPONSIVE FIXES --- */
+html, body {
+    overflow-x: hidden; /* Prevents side-scrolling */
+    width: 100%;
+}
+
 body {
     font-family: 'Helvetica', Arial, sans-serif;
     background-color: var(--light);
@@ -35,9 +41,10 @@ body.dark-mode nav { background: #1a1a1a; }
 .logo { display: flex; align-items: center; gap: 10px; font-weight: bold; }
 #nav-logo { height: 30px; width: auto; }
 
-/* Fix the Logo & Auth Scaling */
+/* --- HERO LOGO & AUTH FIXES --- */
 .hero-logo {
     max-width: 150px;
+    width: 100%; /* Allows it to scale down on small screens */
     height: auto;
     margin: 0 auto 20px auto;
     display: block;
@@ -47,7 +54,8 @@ body.dark-mode nav { background: #1a1a1a; }
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 80vh;
+    min-height: 85vh; /* Vertical center */
+    padding: 15px; /* Margin around the card on mobile */
 }
 
 .card {
@@ -56,12 +64,18 @@ body.dark-mode nav { background: #1a1a1a; }
     border-radius: 15px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     width: 100%;
-    max-width: 400px;
+    max-width: 400px; /* Limits size on PC */
     margin: 0 auto;
+    box-sizing: border-box; /* Includes padding in width calculation */
 }
 
 /* Dashboard & Subjects */
-.container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
+.container { 
+    max-width: 800px; 
+    margin: 20px auto; 
+    padding: 0 15px;
+    box-sizing: border-box;
+}
 
 .stats-grid {
     display: grid;
@@ -94,6 +108,7 @@ input, select, textarea {
     margin-bottom: 12px;
     border: 1px solid #ddd;
     border-radius: 8px;
+    font-size: 16px; /* Prevents iOS auto-zoom on focus */
 }
 
 button {
@@ -105,7 +120,10 @@ button {
     cursor: pointer;
     font-weight: bold;
     width: 100%;
+    transition: transform 0.1s ease;
 }
+
+button:active { transform: scale(0.98); }
 
 .btn-secondary { background: #6c757d; }
 
@@ -127,9 +145,29 @@ button {
     margin-bottom: 10px;
     border-radius: 8px;
     cursor: pointer;
+    box-sizing: border-box;
 }
 
 .option-btn.correct { background: var(--success) !important; color: white; border-color: var(--success); }
 .option-btn.wrong { background: var(--fail) !important; color: white; border-color: var(--fail); }
 
 .hidden { display: none !important; }
+
+/* --- MOBILE MEDIA QUERIES --- */
+@media (max-width: 600px) {
+    .hero-logo {
+        max-width: 110px; /* Smaller logo for mobile */
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr; /* Stack stats vertically */
+    }
+    
+    .subject-grid {
+        grid-template-columns: 1fr 1fr; /* Two columns for subjects */
+    }
+    
+    .card {
+        padding: 20px;
+    }
+}
