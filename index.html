@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MedBytes | MBBS MCQ Portal</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -11,12 +11,12 @@
     
     <nav>
         <div class="logo">
-            <img src="logo.png" alt="MedBytes Logo" id="nav-logo">
+            <img src="logo.png" alt="Logo" id="nav-logo">
             <span>MedBytes</span>
         </div>
         <div class="nav-actions">
-            <button onclick="showView('admin-screen')"><i class="fas fa-user-shield"></i></button>
-            <button id="theme-toggle"><i class="fas fa-moon"></i></button>
+            <button id="admin-btn" onclick="showView('admin-screen')" title="Admin Panel"><i class="fas fa-user-shield"></i></button>
+            <button id="theme-toggle" title="Toggle Dark Mode"><i class="fas fa-moon"></i></button>
             <button id="logout-btn" class="hidden" onclick="handleLogout()">Logout</button>
         </div>
     </nav>
@@ -47,8 +47,8 @@
                 <div class="stat-card"><h3>0</h3><p>Streak</p></div>
             </div>
 
-            <div class="card" style="margin-bottom: 20px;">
-                <h4>Select Quiz Mode</h4>
+            <div class="card" style="margin-bottom: 20px; max-width: 100%;">
+                <h4>Quiz Mode</h4>
                 <div class="mode-options">
                     <label><input type="radio" name="quiz-mode" value="practice" checked> Practice</label>
                     <label><input type="radio" name="quiz-mode" value="exam"> Exam (Timed)</label>
@@ -68,8 +68,8 @@
                 <h2 id="question-text">Loading...</h2>
                 <div id="options-list"></div>
                 <div id="explanation-box" class="hidden">
-                    <p id="explanation-text" style="background: #eef6ff; padding: 15px; border-radius: 8px;"></p>
-                    <button onclick="loadNextQuestion()">Next Question</button>
+                    <p id="explanation-text"></p>
+                    <button class="btn-primary" onclick="loadNextQuestion()">Next Question</button>
                 </div>
             </div>
         </section>
@@ -81,6 +81,12 @@
                     <option value="Pharmacology">Pharmacology</option>
                     <option value="Pathology">Pathology</option>
                     <option value="Forensic Medicine">Forensic Medicine</option>
+                    <option value="Community Medicine">Community Medicine</option>
+                    <option value="Medicine">Medicine</option>
+                    <option value="Surgery">Surgery</option>
+                    <option value="Behavioral Sciences">Behavioral Sciences</option>
+                    <option value="Patient Safety">Patient Safety</option>
+                    <option value="Family Medicine">Family Medicine</option>
                 </select>
                 <textarea id="admin-question" placeholder="Question Text"></textarea>
                 <input type="text" id="admin-optA" placeholder="Option A">
@@ -88,7 +94,7 @@
                 <input type="text" id="admin-optC" placeholder="Option C">
                 <input type="text" id="admin-optD" placeholder="Option D">
                 <input type="text" id="admin-optE" placeholder="Option E">
-                <input type="text" id="admin-correct" placeholder="Correct Letter (A, B, C, D, or E)">
+                <input type="text" id="admin-correct" placeholder="Correct Letter (A, B, C, D, E)">
                 <textarea id="admin-explanation" placeholder="Explanation"></textarea>
                 <button onclick="uploadMCQ()">Upload to Cloud</button>
                 <button onclick="showView('dashboard-screen')" class="btn-secondary">Back to Dashboard</button>
@@ -119,6 +125,19 @@
         let currentQuestions = [];
         let currentIndex = 0;
 
+        // --- THEME LOGIC ---
+        const themeBtn = document.getElementById('theme-toggle');
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            themeBtn.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+        themeBtn.onclick = () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            themeBtn.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        };
+
         window.showView = (id) => {
             document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
@@ -126,10 +145,14 @@
 
         // --- AUTH ---
         window.login = () => {
-            signInWithEmailAndPassword(auth, email.value, password.value).catch(e => alert(e.message));
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            signInWithEmailAndPassword(auth, email, password).catch(e => alert(e.message));
         };
         window.register = () => {
-            createUserWithEmailAndPassword(auth, email.value, password.value).catch(e => alert(e.message));
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            createUserWithEmailAndPassword(auth, email, password).catch(e => alert(e.message));
         };
         window.handleLogout = () => signOut(auth).then(() => location.reload());
 
@@ -141,10 +164,11 @@
                 renderSubjects();
             } else {
                 showView('auth-screen');
+                document.getElementById('logout-btn').classList.add('hidden');
             }
         });
 
-        // --- ADMIN UPLOADER ---
+        // --- ADMIN ---
         window.uploadMCQ = async () => {
             try {
                 await addDoc(collection(db, "mcqs"), {
@@ -155,33 +179,33 @@
                     optionC: document.getElementById('admin-optC').value,
                     optionD: document.getElementById('admin-optD').value,
                     optionE: document.getElementById('admin-optE').value,
-                    correctAnswer: document.getElementById('admin-correct').value.toUpperCase(),
+                    correctAnswer: document.getElementById('admin-correct').value.toUpperCase().trim(),
                     explanation: document.getElementById('admin-explanation').value
                 });
-                alert("MCQ Uploaded!");
+                alert("MCQ Uploaded Successfully!");
             } catch (e) { alert(e.message); }
         };
 
-        // --- QUIZ LOGIC ---
+        // --- QUIZ ---
         function renderSubjects() {
             const list = document.getElementById('subject-list');
             list.innerHTML = '';
             subjects.forEach(s => {
                 const div = document.createElement('div');
                 div.className = 'subject-card';
-                div.innerHTML = `<h4>${s}</h4><button onclick="startQuiz('${s}')">Practice</button>`;
+                div.innerHTML = `<h4>${s}</h4><button onclick="startQuiz('${s}')">Start Quiz</button>`;
                 list.appendChild(div);
             });
         }
 
         window.startQuiz = async (subject) => {
-            const selectedMode = document.querySelector('input[name="quiz-mode"]:checked').value;
+            const mode = document.querySelector('input[name="quiz-mode"]:checked').value;
             const q = query(collection(db, "mcqs"), where("subject", "==", subject));
             const snapshot = await getDocs(q);
             currentQuestions = snapshot.docs.map(doc => doc.data()).sort(() => Math.random() - 0.5);
             
-            if (selectedMode === 'exam') currentQuestions = currentQuestions.slice(0, 20);
-            if (currentQuestions.length === 0) return alert("No questions yet!");
+            if (mode === 'exam') currentQuestions = currentQuestions.slice(0, 20);
+            if (currentQuestions.length === 0) return alert("No questions found for this subject.");
 
             currentIndex = 0;
             showView('quiz-screen');
@@ -190,4 +214,35 @@
 
         function loadQuestion() {
             const data = currentQuestions[currentIndex];
-            document.getElementById('quiz-subject-title').innerText = data.subject
+            document.getElementById('quiz-subject-title').innerText = data.subject;
+            document.getElementById('quiz-progress').innerText = `${currentIndex + 1} / ${currentQuestions.length}`;
+            document.getElementById('question-text').innerText = data.question;
+            document.getElementById('explanation-box').classList.add('hidden');
+            const list = document.getElementById('options-list');
+            list.innerHTML = '';
+            ['A', 'B', 'C', 'D', 'E'].forEach(l => {
+                const b = document.createElement('button');
+                b.className = 'option-btn';
+                b.innerText = `${l}: ${data['option' + l]}`;
+                b.onclick = () => {
+                    const correct = data.correctAnswer;
+                    document.querySelectorAll('.option-btn').forEach(btn => {
+                        btn.disabled = true;
+                        if(btn.innerText.startsWith(correct)) btn.classList.add('correct');
+                        else if(btn.innerText.startsWith(l)) btn.classList.add('wrong');
+                    });
+                    document.getElementById('explanation-text').innerText = data.explanation;
+                    document.getElementById('explanation-box').classList.remove('hidden');
+                };
+                list.appendChild(b);
+            });
+        }
+
+        window.loadNextQuestion = () => {
+            currentIndex++;
+            if (currentIndex < currentQuestions.length) loadQuestion();
+            else { alert("Quiz Complete!"); showView('dashboard-screen'); }
+        };
+    </script>
+</body>
+</html>
