@@ -9,25 +9,56 @@
     --text-light: #666;
 }
 
-/* --- GLOBAL RESPONSIVE FIXES --- */
+/* --- GLOBAL RESET & SCALING --- */
 html, body {
-    overflow-x: hidden; /* Prevents side-scrolling */
+    overflow-x: hidden;
     width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
     font-family: 'Helvetica', Arial, sans-serif;
     background-color: var(--light);
     color: var(--text-main);
-    margin: 0;
-    padding: 0;
-    transition: background 0.3s ease;
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
-body.dark-mode { background-color: var(--dark-bg); color: #fff; }
-body.dark-mode .card, body.dark-mode .subject-card { background: var(--dark-card); color: #fff; border: 1px solid #333; }
+/* --- DARK MODE (STRICT OVERRIDES) --- */
+body.dark-mode { 
+    background-color: var(--dark-bg) !important; 
+    color: #ffffff !important; 
+}
 
-/* Navigation */
+body.dark-mode nav,
+body.dark-mode .card, 
+body.dark-mode .subject-card,
+body.dark-mode #explanation-box { 
+    background-color: var(--dark-card) !important; 
+    color: #ffffff !important; 
+    border-color: #444 !important;
+}
+
+body.dark-mode input, 
+body.dark-mode select, 
+body.dark-mode textarea {
+    background-color: #2c2c2c !important;
+    color: #ffffff !important;
+    border: 1px solid #444 !important;
+}
+
+body.dark-mode .option-btn {
+    background-color: #2c2c2c !important;
+    color: #ffffff !important;
+    border-color: #444 !important;
+}
+
+body.dark-mode .option-btn:hover {
+    background-color: #383838 !important;
+}
+
+/* --- NAVIGATION --- */
 nav {
     display: flex;
     justify-content: space-between;
@@ -35,27 +66,21 @@ nav {
     padding: 10px 5%;
     background: white;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
-body.dark-mode nav { background: #1a1a1a; }
 
 .logo { display: flex; align-items: center; gap: 10px; font-weight: bold; }
 #nav-logo { height: 30px; width: auto; }
+.nav-actions { display: flex; gap: 10px; }
 
-/* --- HERO LOGO & AUTH FIXES --- */
-.hero-logo {
-    max-width: 150px;
-    width: 100%; /* Allows it to scale down on small screens */
-    height: auto;
-    margin: 0 auto 20px auto;
-    display: block;
-}
-
-#auth-screen {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 85vh; /* Vertical center */
-    padding: 15px; /* Margin around the card on mobile */
+/* --- CONTAINERS & CARDS --- */
+.container { 
+    max-width: 800px; 
+    margin: 20px auto; 
+    padding: 0 15px;
+    box-sizing: border-box;
 }
 
 .card {
@@ -64,19 +89,29 @@ body.dark-mode nav { background: #1a1a1a; }
     border-radius: 15px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     width: 100%;
-    max-width: 400px; /* Limits size on PC */
+    max-width: 450px;
     margin: 0 auto;
-    box-sizing: border-box; /* Includes padding in width calculation */
-}
-
-/* Dashboard & Subjects */
-.container { 
-    max-width: 800px; 
-    margin: 20px auto; 
-    padding: 0 15px;
     box-sizing: border-box;
 }
 
+/* --- AUTH SCREEN --- */
+#auth-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 85vh;
+    padding: 15px;
+}
+
+.hero-logo {
+    max-width: 150px;
+    width: 100%;
+    height: auto;
+    margin: 0 auto 20px auto;
+    display: block;
+}
+
+/* --- DASHBOARD --- */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -84,7 +119,13 @@ body.dark-mode nav { background: #1a1a1a; }
     margin-bottom: 25px;
 }
 
-.stat-card { background: var(--med-blue); color: white; padding: 15px; border-radius: 10px; text-align: center; }
+.stat-card { 
+    background: var(--med-blue); 
+    color: white; 
+    padding: 15px; 
+    border-radius: 10px; 
+    text-align: center; 
+}
 
 .subject-grid {
     display: grid;
@@ -100,7 +141,7 @@ body.dark-mode nav { background: #1a1a1a; }
     text-align: center;
 }
 
-/* Form Styling */
+/* --- FORMS & BUTTONS --- */
 input, select, textarea {
     width: 100%;
     box-sizing: border-box;
@@ -108,7 +149,7 @@ input, select, textarea {
     margin-bottom: 12px;
     border: 1px solid #ddd;
     border-radius: 8px;
-    font-size: 16px; /* Prevents iOS auto-zoom on focus */
+    font-size: 16px;
 }
 
 button {
@@ -120,11 +161,11 @@ button {
     cursor: pointer;
     font-weight: bold;
     width: 100%;
-    transition: transform 0.1s ease;
+    transition: transform 0.1s ease, opacity 0.2s;
 }
 
+button:hover { opacity: 0.9; }
 button:active { transform: scale(0.98); }
-
 .btn-secondary { background: #6c757d; }
 
 .mode-options {
@@ -133,7 +174,15 @@ button:active { transform: scale(0.98); }
     margin: 15px 0;
 }
 
-/* Quiz UI */
+/* --- QUIZ UI --- */
+.quiz-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-weight: bold;
+    color: var(--med-blue);
+}
+
 .option-btn {
     display: block;
     width: 100%;
@@ -148,26 +197,24 @@ button:active { transform: scale(0.98); }
     box-sizing: border-box;
 }
 
-.option-btn.correct { background: var(--success) !important; color: white; border-color: var(--success); }
-.option-btn.wrong { background: var(--fail) !important; color: white; border-color: var(--fail); }
+.option-btn.correct { background: var(--success) !important; color: white !important; border-color: var(--success) !important; }
+.option-btn.wrong { background: var(--fail) !important; color: white !important; border-color: var(--fail) !important; }
+
+#explanation-box {
+    margin-top: 20px;
+    padding: 15px;
+    background: #eef6ff;
+    border-radius: 8px;
+    border-left: 5px solid var(--med-blue);
+}
 
 .hidden { display: none !important; }
 
-/* --- MOBILE MEDIA QUERIES --- */
+/* --- MOBILE QUERIES --- */
 @media (max-width: 600px) {
-    .hero-logo {
-        max-width: 110px; /* Smaller logo for mobile */
-    }
-    
-    .stats-grid {
-        grid-template-columns: 1fr; /* Stack stats vertically */
-    }
-    
-    .subject-grid {
-        grid-template-columns: 1fr 1fr; /* Two columns for subjects */
-    }
-    
-    .card {
-        padding: 20px;
-    }
+    .hero-logo { max-width: 110px; }
+    .stats-grid { grid-template-columns: 1fr; }
+    .subject-grid { grid-template-columns: 1fr 1fr; }
+    .card { padding: 20px; max-width: 95%; }
+    .container { padding: 0 10px; }
 }
