@@ -18,18 +18,8 @@ body {
     transition: background 0.3s ease;
 }
 
-/* Dark Mode Support */
-body.dark-mode {
-    background-color: var(--dark-bg);
-    color: #fff;
-}
-
-body.dark-mode .card, 
-body.dark-mode .subject-card {
-    background: var(--dark-card);
-    color: #fff;
-    border: 1px solid #333;
-}
+body.dark-mode { background-color: var(--dark-bg); color: #fff; }
+body.dark-mode .card, body.dark-mode .subject-card { background: var(--dark-card); color: #fff; border: 1px solid #333; }
 
 /* Navigation */
 nav {
@@ -40,17 +30,24 @@ nav {
     background: white;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
-
 body.dark-mode nav { background: #1a1a1a; }
 
-.logo { display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 1.2rem; }
-#nav-logo { height: 40px; }
+.logo { display: flex; align-items: center; gap: 10px; font-weight: bold; }
+#nav-logo { height: 30px; width: auto; }
 
-/* Layout Containers */
-.container {
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 0 15px;
+/* Fix the Logo & Auth Scaling */
+.hero-logo {
+    max-width: 150px;
+    height: auto;
+    margin: 0 auto 20px auto;
+    display: block;
+}
+
+#auth-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
 }
 
 .card {
@@ -58,10 +55,14 @@ body.dark-mode nav { background: #1a1a1a; }
     padding: 30px;
     border-radius: 15px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    text-align: center;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
 }
 
-/* Dashboard Stats */
+/* Dashboard & Subjects */
+.container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
+
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -69,34 +70,32 @@ body.dark-mode nav { background: #1a1a1a; }
     margin-bottom: 25px;
 }
 
-.stat-card {
-    background: var(--med-blue);
-    color: white;
-    padding: 15px;
-    border-radius: 10px;
-}
+.stat-card { background: var(--med-blue); color: white; padding: 15px; border-radius: 10px; text-align: center; }
 
-.stat-card h3 { margin: 0; font-size: 1.5rem; }
-.stat-card p { margin: 5px 0 0; font-size: 0.8rem; opacity: 0.9; }
-
-/* Subject Selection */
 .subject-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 15px;
 }
 
 .subject-card {
     background: white;
-    padding: 20px;
+    padding: 15px;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    border: 2px solid var(--med-blue);
+    text-align: center;
 }
 
-/* Buttons */
+/* Form Styling */
+input, select, textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    margin-bottom: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
 button {
     padding: 12px 20px;
     border: none;
@@ -104,78 +103,33 @@ button {
     background: var(--med-blue);
     color: white;
     cursor: pointer;
-    font-size: 14px;
-    transition: 0.2s;
-}
-
-button:hover { opacity: 0.9; transform: translateY(-1px); }
-
-.btn-secondary { background: #6c757d; margin-top: 10px; width: 100%; }
-.btn-sm { padding: 8px; font-size: 12px; }
-
-/* Quiz Interface */
-.quiz-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
     font-weight: bold;
-    color: var(--med-blue);
+    width: 100%;
 }
+
+.btn-secondary { background: #6c757d; }
+
+.mode-options {
+    display: flex;
+    justify-content: space-around;
+    margin: 15px 0;
+}
+
+/* Quiz UI */
+.option-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: white;
+    color: #333;
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.option-btn.correct { background: var(--success) !important; color: white; border-color: var(--success); }
+.option-btn.wrong { background: var(--fail) !important; color: white; border-color: var(--fail); }
 
 .hidden { display: none !important; }
-
-/* --- ADMIN PANEL & FORM STYLING --- */
-
-#admin-mcq-form {
-    text-align: left; /* Keeps labels and inputs aligned left for easier reading */
-}
-
-.options-input input,
-#admin-mcq-form input[type="text"],
-#admin-mcq-form input[type="email"] {
-    width: 100%;
-    box-sizing: border-box; /* Ensures padding doesn't push the width over 100% */
-    margin-bottom: 12px;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 14px;
-}
-
-textarea {
-    width: 100%;
-    box-sizing: border-box;
-    height: 120px;
-    margin-bottom: 15px;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-family: inherit;
-    font-size: 14px;
-    resize: vertical; /* Allows users to expand the box if needed */
-}
-
-select {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 12px;
-    margin-bottom: 15px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    background-color: white;
-    font-size: 14px;
-}
-
-/* Small adjustments for the Grid in Admin Panel */
-.grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    margin-bottom: 10px;
-}
-
-@media (max-width: 600px) {
-    .grid {
-        grid-template-columns: 1fr; /* Stacks inputs on mobile */
-    }
-}
