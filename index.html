@@ -145,12 +145,12 @@
 
         // --- AUTH ---
         window.login = () => {
-            const email = document.getElementById("email").value;
+            const email = document.getElementById("email").value.trim();
             const password = document.getElementById("password").value;
             signInWithEmailAndPassword(auth, email, password).catch(e => alert(e.message));
         };
         window.register = () => {
-            const email = document.getElementById("email").value;
+            const email = document.getElementById("email").value.trim();
             const password = document.getElementById("password").value;
             createUserWithEmailAndPassword(auth, email, password).catch(e => alert(e.message));
         };
