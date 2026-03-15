@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MedBytes | Admin Panel</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
         <div class="card">
             <h2><i class="fas fa-user-shield"></i> MCQ Admin Manager</h2>
-            <p>Fill in the details below to add a new MBBS question.</p>
+            <p>Add a single MBBS question or use Bulk Upload below.</p>
             <hr>
             
             <form id="admin-mcq-form">
@@ -50,10 +51,20 @@
 
                 <textarea id="adm-explanation" placeholder="Enter Explanation" required></textarea>
                 
-                <button type="submit" class="btn-primary" style="width: 100%;">Upload to Firebase</button>
+                <button type="submit" class="btn-primary" style="width: 100%;">Upload Single MCQ</button>
             </form>
+
+            <hr style="margin: 30px 0;">
+
+            <div class="bulk-section" style="text-align: left;">
+                <h3><i class="fas fa-file-import"></i> Bulk Upload (JSON)</h3>
+                <p style="font-size: 0.8rem; color: #666;">Paste an array of questions here to upload multiple at once.</p>
+                <textarea id="bulk-json-input" style="height: 150px; font-family: monospace;" placeholder='[{"subject": "Pathology", "question": "...", "optionA": "...", ...}]'></textarea>
+                <button id="bulk-upload-btn" class="btn-secondary" style="width: 100%; background-color: #6f42c1;">Upload All Questions</button>
+            </div>
+
             <br>
-            <a href="subjects.html" style="text-decoration: none; color: grey;">Back to Dashboard</a>
+            <a href="subjects.html" style="text-decoration: none; color: grey;"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
         </div>
     </div>
 
