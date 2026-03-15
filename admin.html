@@ -16,24 +16,26 @@
     <main class="container">
         <div class="card">
             <h2>Excel Bulk Upload</h2>
+            <p style="font-size: 0.8rem; color: #666; margin-bottom: 10px;">Headers: subject, question, optionA, optionB, optionC, optionD, optionE, correctAnswer, explanation</p>
             <input type="file" id="excel-file" accept=".xlsx, .xls">
             <button class="btn-primary" onclick="uploadExcel()" style="background:#27ae60">Process Excel</button>
         </div>
 
         <div class="card" style="margin-top: 20px;">
             <h2>JSON Bulk Upload</h2>
-            <textarea id="json-input" placeholder="Paste JSON array here..." style="width:100%; height:150px; margin-bottom:10px;"></textarea>
+            <textarea id="json-input" placeholder="Paste JSON array here..." style="width:100%; height:150px; margin-bottom:10px; font-family: monospace;"></textarea>
             <button class="btn-primary" onclick="uploadJSON()" style="background:#2980b9">Process JSON</button>
         </div>
 
-        <div id="status-log" style="margin-top:20px; color: #7f8c8d; font-family: monospace;"></div>
+        <div id="status-log" style="margin-top:20px; color: #2c3e50; font-family: monospace; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; max-height: 300px; overflow-y: auto;">
+            <strong>System Log:</strong><br>
+        </div>
     </main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-        // Your specific config
         const firebaseConfig = {
             apiKey: "AIzaSyDc-yEvFYvP8_OZedCyIqXjpEOnocOe87k",
             authDomain: "the-medbytes-4e614.firebaseapp.com",
@@ -49,50 +51,71 @@
         const log = (msg) => {
             const div = document.getElementById('status-log');
             div.innerHTML += `> ${msg}<br>`;
+            div.scrollTop = div.scrollHeight;
         };
 
-        // Common uploader function
+        // Hardened uploader function to prevent "undefined" field errors
         async function saveToFirestore(dataArray) {
             log(`Starting upload of ${dataArray.length} items...`);
-            let count = 0;
-            for (const item of dataArray) {
+            let successCount = 0;
+            let errorCount = 0;
+
+            for (let i = 0; i < dataArray.length; i++) {
+                const item = dataArray[i];
                 try {
-                    await addDoc(collection(db, "mcqs"), {
-                        subject: item.subject,
-                        question: item.question,
-                        optionA: String(item.optionA),
-                        optionB: String(item.optionB),
-                        optionC: String(item.optionC),
-                        optionD: String(item.optionD),
-                        optionE: String(item.optionE),
-                        correctAnswer: String(item.correctAnswer).toUpperCase().trim(),
-                        explanation: item.explanation || ""
-                    });
-                    count++;
-                } catch (e) { log(`Error at item ${count}: ${e.message}`); }
+                    // Mapping with explicit safety fallbacks
+                    const docData = {
+                        subject: item.subject || "General", 
+                        question: item.question || "Missing Question Text",
+                        optionA: String(item.optionA || "N/A"),
+                        optionB: String(item.optionB || "N/A"),
+                        optionC: String(item.optionC || "N/A"),
+                        optionD: String(item.optionD || "N/A"),
+                        optionE: String(item.optionE || "N/A"),
+                        // Safely handle correctAnswer formatting
+                        correctAnswer: item.correctAnswer ? String(item.correctAnswer).toUpperCase().trim() : "A",
+                        explanation: item.explanation || "No explanation provided."
+                    };
+
+                    await addDoc(collection(db, "mcqs"), docData);
+                    successCount++;
+                } catch (e) { 
+                    errorCount++;
+                    log(`Error at item ${i}: ${e.message}`); 
+                }
             }
-            log(`Upload Complete! Success: ${count}`);
-            alert(`Uploaded ${count} MCQs successfully.`);
+            log(`--- Upload Finished ---`);
+            log(`Success: ${successCount} | Failed: ${errorCount}`);
+            alert(`Process complete! ${successCount} MCQs added.`);
         }
 
         window.uploadExcel = () => {
             const file = document.getElementById('excel-file').files[0];
-            if (!file) return alert("Select a file first.");
+            if (!file) return alert("Please select an Excel file first.");
+            
             const reader = new FileReader();
             reader.onload = (e) => {
-                const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-                const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                saveToFirestore(data);
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                saveToFirestore(jsonData);
             };
             reader.readAsArrayBuffer(file);
         };
 
         window.uploadJSON = () => {
+            const rawInput = document.getElementById('json-input').value;
+            if (!rawInput.trim()) return alert("Please paste JSON data first.");
+            
             try {
-                const data = JSON.parse(document.getElementById('json-input').value);
-                if(!Array.isArray(data)) throw new Error("Input must be a JSON array.");
+                const data = JSON.parse(rawInput);
+                if(!Array.isArray(data)) throw new Error("Input must be a JSON array [ {...}, {...} ]");
                 saveToFirestore(data);
-            } catch (e) { alert("Invalid JSON: " + e.message); }
+            } catch (e) { 
+                alert("Invalid JSON format: " + e.message); 
+            }
         };
     </script>
 </body>
