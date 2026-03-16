@@ -12,6 +12,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MedBytes">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <style>
@@ -82,10 +83,33 @@
         
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; }
         .modal-content { background: var(--card); padding: 20px; border-radius: 10px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; text-align: left; }
+
+        /* --- Custom Loading Screen CSS --- */
+        .loading-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--bg); z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        @keyframes pulse-logo {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+        .loading-logo { 
+            width: 180px; /* Adjust this to make your logo bigger or smaller */
+            height: auto;
+            animation: pulse-logo 2s infinite ease-in-out; 
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body class="light-mode">
     
+    <div id="loading-screen" class="loading-overlay">
+        <img src="logo.png" alt="MedBytes Logo" class="loading-logo">
+        <h2 style="color: var(--primary); margin-top: 10px; font-family: 'Segoe UI', sans-serif;">Loading...</h2>
+    </div>
+
     <nav>
         <div class="logo">
             <span><i class="fas fa-microscope"></i> MedBytes</span>
@@ -98,7 +122,7 @@
     </nav>
 
     <main class="container">
-        <section id="auth-screen" class="view">
+        <section id="auth-screen" class="view hidden">
             <div class="card">
                 <i class="fas fa-user-md fa-4x" style="color: var(--secondary); margin-bottom: 1rem;"></i>
                 <h1>Doctor Login</h1>
@@ -308,7 +332,9 @@
         let adminQuestionsCache = []; 
         let currentUserRef = null;
 
+        // Modified showView to automatically hide the loading screen when transitioning
         window.showView = (id) => {
+            document.getElementById('loading-screen').classList.add('hidden');
             document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
         };
@@ -320,29 +346,36 @@
         };
 
         window.login = async () => {
+            document.getElementById('loading-screen').classList.remove('hidden'); // Show loader
             const email = document.getElementById("email").value.trim();
             const password = document.getElementById("password").value;
             try {
                 await signInWithEmailAndPassword(auth, email, password);
             } catch (e) {
+                document.getElementById('loading-screen').classList.add('hidden'); // Hide on fail
                 alert(e.message);
             }
         };
 
         window.register = async () => {
+            document.getElementById('loading-screen').classList.remove('hidden'); // Show loader
             const email = document.getElementById("email").value.trim();
             const password = document.getElementById("password").value;
             try {
                 await createUserWithEmailAndPassword(auth, email, password);
             } catch (e) {
+                document.getElementById('loading-screen').classList.add('hidden'); // Hide on fail
                 alert(e.message);
             }
         };
 
-        window.handleLogout = () => signOut(auth).then(() => {
-            localStorage.removeItem('medbytes_session_id');
-            location.reload();
-        });
+        window.handleLogout = () => {
+            document.getElementById('loading-screen').classList.remove('hidden'); // Show loader
+            signOut(auth).then(() => {
+                localStorage.removeItem('medbytes_session_id');
+                location.reload();
+            });
+        };
 
         // Setup User profile & Session Check on login
         onAuthStateChanged(auth, async (user) => {
@@ -355,14 +388,12 @@
                 const sessionRef = ref(rtdb, 'sessions/' + user.uid);
                 let currentLocalSessionId = localStorage.getItem('medbytes_session_id');
                 
-                // 1. If there's no local session ID, generate it HERE before starting the listener
                 if (!currentLocalSessionId) {
                     currentLocalSessionId = Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
                     localStorage.setItem('medbytes_session_id', currentLocalSessionId);
                     await set(sessionRef, currentLocalSessionId);
                 }
                 
-                // 2. Start listening for changes from other devices
                 onValue(sessionRef, (snapshot) => {
                     const dbSessionId = snapshot.val();
                     const latestLocalId = localStorage.getItem('medbytes_session_id');
@@ -388,14 +419,13 @@
                         totalCorrect: 0,
                         streak: 0,
                         lastDaily: null,
-                        stats: {} // ADDED STATS OBJECT FOR ANALYTICS
+                        stats: {} 
                     });
                     document.getElementById('streak-display').innerText = "🔥 0";
                 } else {
                     let data = userSnap.data();
                     let currentStreak = data.streak || 0;
                     
-                    // Break streak if missed a day
                     if (data.lastDaily && data.lastDaily !== today && data.lastDaily !== yesterday) {
                         currentStreak = 0;
                         await updateDoc(currentUserRef, { streak: 0 });
@@ -403,16 +433,17 @@
                     
                     document.getElementById('streak-display').innerText = `🔥 ${currentStreak}`;
                     
-                    // Lock Daily Quiz if already done today
                     if(data.lastDaily === today) {
                         const btn = document.getElementById('daily-quiz-btn');
                         btn.disabled = true;
                         btn.innerText = "Daily Challenge Completed ✅";
                     }
                 }
+                // Hides loader and shows dashboard
                 showView('block-selection-screen');
             } else {
                 currentUserRef = null;
+                // Hides loader and shows login
                 showView('auth-screen');
             }
         });
@@ -577,7 +608,6 @@
                         mistakesLog.push({ question: data.question, yourAnswer: `${letter}: ${optText}`, correctAnswer: `${correct}: ${data['option' + correct]}`, explanation: data.explanation || "No explanation provided." });
                     }
                     
-                    // Analytics logic prepared for batch update at the end of quiz
                     if(!currentQuizSubjects[data.subject]) currentQuizSubjects[data.subject] = { c: 0, t: 0 };
                     currentQuizSubjects[data.subject].t++;
                     if(isCorrect) currentQuizSubjects[data.subject].c++;
@@ -625,14 +655,12 @@
                     currentStats[sub].correct += currentQuizSubjects[sub].c;
                 }
 
-                // Update both the total score AND the new analytics stats in one call
                 let updates = { stats: currentStats };
                 if (scoreState.correct > 0) updates.totalCorrect = increment(scoreState.correct);
                 
                 await updateDoc(currentUserRef, updates);
             }
 
-            // Process Streak if it was a Daily Quiz
             if (isDailyQuiz && currentUserRef) {
                 const today = new Date().toDateString();
                 const yesterday = new Date(Date.now() - 86400000).toDateString();
