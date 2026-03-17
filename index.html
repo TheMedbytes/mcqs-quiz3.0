@@ -78,6 +78,31 @@
         .stat-box { background: rgba(52, 152, 219, 0.1); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid var(--secondary); }
         .stat-box h3 { margin: 0; font-size: 1.5rem; color: var(--secondary); }
         .stat-box p { margin: 5px 0 0 0; font-size: 0.8rem; font-weight: bold; }
+        
+        /* --- NEW: Theme Select Styling for Admin Filters --- */
+        .theme-select {
+            padding: 8px 12px;
+            border: 2px solid var(--secondary);
+            border-radius: 8px;
+            background-color: transparent;
+            color: var(--secondary);
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+            transition: 0.3s;
+            margin: 0; /* Reset default margin */
+            width: auto;
+        }
+        .theme-select:hover {
+            background-color: var(--secondary);
+            color: white;
+        }
+        .theme-select option {
+            background-color: var(--card);
+            color: var(--text);
+        }
+
+        .admin-filters-container { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 15px; }
         .admin-mcq-list { max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 5px; margin-top: 10px; padding: 10px; }
         .admin-mcq-item { border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
         
@@ -106,7 +131,7 @@
 <body class="light-mode">
     
     <div id="loading-screen" class="loading-overlay">
-        <img src="logo.png" alt="MedBytes Logo" class="loading-logo">
+        <img src="logo.png" alt="MedBytes Logo" class="loading-logo" onerror="this.src='https://via.placeholder.com/180x180?text=Logo'">
         <h2 style="color: var(--primary); margin-top: 10px; font-family: 'Segoe UI', sans-serif;">Loading...</h2>
     </div>
 
@@ -245,13 +270,25 @@
                 </div>
 
                 <div class="admin-section">
-                    <div style="display:flex; justify-content: space-between; align-items: center;">
-                        <h4><i class="fas fa-edit"></i> Manage MCQs</h4>
-                        <input type="text" id="admin-search" placeholder="Search to edit/delete..." style="width:50%; margin:0;" onkeyup="filterAdminMCQs()">
+                    <h4 style="margin-bottom: 10px;"><i class="fas fa-edit"></i> Manage MCQs</h4>
+                    
+                    <div class="admin-filters-container">
+                        <select id="admin-filter-block" class="theme-select" onchange="updateAdminSubjectFilter()">
+                            <option value="all">All Blocks</option>
+                            <option value="7">Block 7</option>
+                            <option value="8">Block 8</option>
+                            <option value="9">Block 9</option>
+                        </select>
+                        
+                        <select id="admin-filter-subject" class="theme-select" onchange="filterAdminMCQs()">
+                            <option value="all">All Subjects</option>
+                        </select>
+                        
+                        <input type="text" id="admin-search" placeholder="Search keywords..." style="flex:1; margin:0;" onkeyup="filterAdminMCQs()">
                     </div>
+                    
                     <div class="admin-mcq-list" id="admin-mcq-list-container">Loading questions...</div>
                 </div>
-
                 <div class="admin-section">
                     <h4><i class="fas fa-file-upload"></i> Bulk Upload</h4>
                     <div style="display:flex; gap:10px;">
@@ -321,7 +358,6 @@
 
         const commonSubjects = ["Pharmacology", "Pathology", "Medicine", "Forensic Medicine", "Community Medicine", "Surgery", "Behavioral Sciences", "Patient Safety"];
 
-        // --- NEW: Syllabus Quotas Database for Mock Exams ---
         const mockQuotas = {
             7: { "Pharmacology": 55, "Pathology": 50, "Forensic Medicine": 18, "Surgery": 5, "Medicine": 5, "Patient Safety": 3, "Community Medicine": 2, "Behavioral Sciences": 2 },
             8: { "Pathology": 55, "Pharmacology": 22, "Surgery": 20, "Medicine": 20, "Forensic Medicine": 15, "Community Medicine": 4, "Behavioral Sciences": 2, "Patient Safety": 2 },
@@ -434,7 +470,6 @@
             }
         });
 
-        // --- NEW: Save and Resume System Methods ---
         function getSaveKey() {
             return auth.currentUser ? `medbytes_quiz_${auth.currentUser.uid}_${selectedBlock}` : null;
         }
@@ -480,7 +515,7 @@
                 
                 document.getElementById('quiz-subject-title').innerText = state.title;
                 showView('quiz-screen');
-                startTimer(state.timeRemaining, true); // True indicates it's resuming in seconds
+                startTimer(state.timeRemaining, true); 
                 loadQuestion();
             }
         };
@@ -524,11 +559,10 @@
                 list.appendChild(div);
             });
             renderAnalytics();
-            checkSavedQuiz(); // Check if we should show Resume Button
+            checkSavedQuiz(); 
             showView('dashboard-screen');
         };
 
-        // Modified timer to allow seconds (for resuming) and auto-save
         function startTimer(duration, isSeconds = false) {
             clearInterval(timerInterval);
             timeRemaining = isSeconds ? duration : duration * 60;
@@ -536,7 +570,6 @@
             timerInterval = setInterval(() => {
                 timeRemaining--;
                 updateTimerDisplay();
-                // Auto-save the timer every 10 seconds to prevent loss
                 if(timeRemaining % 10 === 0) saveQuizState(); 
                 
                 if (timeRemaining <= 0) {
@@ -596,7 +629,6 @@
             initQuizState(results, `Search: "${searchTerm}"`);
         };
 
-        // --- NEW: Syllabus-Based Mock Exam Generation ---
         window.startMockExam = async () => {
             document.getElementById('loading-screen').classList.remove('hidden');
             const q = query(collection(db, "mcqs"), where("block", "==", Number(selectedBlock)));
@@ -607,41 +639,36 @@
             const quotas = mockQuotas[selectedBlock];
 
             if(quotas) {
-                // Group all questions by subject
                 let bySubject = {};
                 allQuestions.forEach(q => {
                     let sub = q.subject;
-                    if(sub === "Forensic") sub = "Forensic Medicine"; // Normalize name
+                    if(sub === "Forensic") sub = "Forensic Medicine"; 
                     if(!bySubject[sub]) bySubject[sub] = [];
                     bySubject[sub].push(q);
                 });
 
-                // Pick required number per subject based on syllabus quotas
                 for (let sub in quotas) {
                     let required = quotas[sub];
                     let available = bySubject[sub] || [];
-                    available = available.sort(() => Math.random() - 0.5); // shuffle available pool
+                    available = available.sort(() => Math.random() - 0.5); 
                     
                     if (available.length < required) {
                         console.warn(`Not enough DB questions for ${sub}. Needed ${required}, got ${available.length}`);
-                        mockQuestions.push(...available); // take what we have
+                        mockQuestions.push(...available); 
                     } else {
-                        mockQuestions.push(...available.slice(0, required)); // take exactly the quota
+                        mockQuestions.push(...available.slice(0, required)); 
                     }
                 }
             } else {
-                // Fallback (just in case)
                 mockQuestions = allQuestions.sort(() => Math.random() - 0.5).slice(0, 140);
             }
 
-            // Shuffle the final 140 mix
             mockQuestions = mockQuestions.sort(() => Math.random() - 0.5);
 
             document.getElementById('loading-screen').classList.add('hidden');
             if(mockQuestions.length === 0) return alert("No questions available for a mock exam.");
             
             isMockExamMode = true; isDailyQuiz = false;
-            // Launch 140 Questions with 120 Minutes
             initQuizState(mockQuestions, `Mock Exam - Block ${selectedBlock}`, 120);
         };
 
@@ -670,7 +697,7 @@
             document.getElementById('explanation-box').classList.add('hidden');
             const list = document.getElementById('options-list'); list.innerHTML = '';
             
-            saveQuizState(); // Trigger save state as soon as new question loads
+            saveQuizState(); 
             
             ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
                 const optText = data['option' + letter];
@@ -716,7 +743,7 @@
         };
 
         async function finishQuiz() {
-            clearQuizState(); // Quiz is done, clear the save
+            clearQuizState(); 
             clearInterval(timerInterval);
             const total = scoreState.correct + scoreState.wrong;
             const percentage = total > 0 ? Math.round((scoreState.correct / total) * 100) : 0;
@@ -784,28 +811,73 @@
             showView('result-screen');
         }
 
-        // --- Admin Functions Remain Unchanged ---
+        // --- UPDATED: Admin Functions ---
         window.openAdmin = async () => { showView('admin-screen'); await loadAdminData(); };
+        
         async function loadAdminData() {
             const snap = await getDocs(collection(db, "mcqs"));
             adminQuestionsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            
             let total = adminQuestionsCache.length;
             let subjectCounts = {};
             adminQuestionsCache.forEach(q => { subjectCounts[q.subject] = (subjectCounts[q.subject] || 0) + 1; });
+            
             let statsHtml = `<div class="stat-box"><h3>${total}</h3><p>Total MCQs</p></div>`;
             for(let sub in subjectCounts) { statsHtml += `<div class="stat-box"><h3>${subjectCounts[sub]}</h3><p>${sub}</p></div>`; }
             document.getElementById('admin-stats-container').innerHTML = statsHtml;
-            renderAdminMCQList(adminQuestionsCache);
+            
+            // Populate Subject Dropdown based on "All Blocks" initially
+            updateAdminSubjectFilter();
         }
+
+        window.updateAdminSubjectFilter = () => {
+            const blockFilter = document.getElementById('admin-filter-block').value;
+            const subjectSelect = document.getElementById('admin-filter-subject');
+            
+            // Get unique subjects for the selected block
+            let subjects = new Set();
+            adminQuestionsCache.forEach(q => {
+                if (blockFilter === 'all' || q.block.toString() === blockFilter) {
+                    subjects.add(q.subject);
+                }
+            });
+
+            // Rebuild subject options
+            subjectSelect.innerHTML = '<option value="all">All Subjects</option>';
+            Array.from(subjects).sort().forEach(sub => {
+                subjectSelect.innerHTML += `<option value="${sub}">${sub}</option>`;
+            });
+
+            // Trigger the filter list
+            filterAdminMCQs();
+        };
+
+        window.filterAdminMCQs = () => {
+            const term = document.getElementById('admin-search').value.toLowerCase();
+            const blockFilter = document.getElementById('admin-filter-block').value;
+            const subjectFilter = document.getElementById('admin-filter-subject').value;
+
+            const filtered = adminQuestionsCache.filter(q => {
+                const matchTerm = q.question.toLowerCase().includes(term) || q.subject.toLowerCase().includes(term);
+                const matchBlock = (blockFilter === 'all') || (q.block.toString() === blockFilter);
+                const matchSubject = (subjectFilter === 'all') || (q.subject === subjectFilter);
+                
+                return matchTerm && matchBlock && matchSubject;
+            });
+            
+            renderAdminMCQList(filtered);
+        };
 
         function renderAdminMCQList(list) {
             const container = document.getElementById('admin-mcq-list-container');
             if(list.length === 0) { container.innerHTML = "<p>No questions found.</p>"; return; }
             let html = "";
-            list.forEach(q => {
+            list.forEach((q, index) => {
+                // The index + 1 is injected as Q1, Q2...
                 html += `
                 <div class="admin-mcq-item">
                     <div style="flex:1; font-size:0.9rem;">
+                        <span style="font-weight: bold; color: var(--secondary); margin-right: 5px;">Q${index + 1}.</span>
                         <span class="timer-badge" style="background:var(--secondary); font-size:0.7rem;">Block ${q.block}</span> 
                         <strong>${q.subject}</strong> <br> ${q.question.substring(0, 80)}...
                     </div>
@@ -817,12 +889,6 @@
             });
             container.innerHTML = html;
         }
-
-        window.filterAdminMCQs = () => {
-            const term = document.getElementById('admin-search').value.toLowerCase();
-            const filtered = adminQuestionsCache.filter(q => q.question.toLowerCase().includes(term) || q.subject.toLowerCase().includes(term));
-            renderAdminMCQList(filtered);
-        };
 
         window.deleteMCQ = async (id) => {
             if(!confirm("Are you sure you want to delete this question? This cannot be undone.")) return;
