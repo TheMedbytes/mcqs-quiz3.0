@@ -96,6 +96,7 @@
             box-shadow: 0 2px 8px rgba(239,68,68,0.35);
         }
 
+        /* Mobile nav: shrink text */
         @media (max-width: 480px) {
             nav { padding: 0.65rem 1rem; }
             #admin-btn span.btn-text { display: none; }
@@ -203,6 +204,7 @@
             outline: none; border-color: var(--secondary); 
             box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
         }
+        .nav-actions { display: flex; gap: 8px; align-items: center; }
         
         .admin-section { text-align: left; border-top: 1px solid var(--border); padding-top: 20px; margin-top: 20px; }
         .score-circle { width: 120px; height: 120px; border-radius: 50%; background: var(--secondary); color: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; margin: 0 auto 20px; border: 8px solid rgba(59,130,246,0.2); }
@@ -381,6 +383,8 @@
             background-size: 200% 100%;
         }
         .skeleton-card { height: 90px; margin-bottom: 12px; }
+        .skeleton-text { height: 14px; margin: 6px 0; width: 60%; }
+        .skeleton-text.wide { width: 90%; }
 
         /* ===== SVG SCORE RING ===== */
         .score-ring-wrap { position: relative; width: 140px; height: 140px; margin: 0 auto 20px; }
@@ -415,6 +419,11 @@
             border-color: #555 !important;
             background: #3a3a3a !important;
         }
+        .dark-mode #google-btn {
+            background: #2d2d2d !important;
+            color: #e2e8f0 !important;
+            border-color: #555 !important;
+        }
         .dark-mode .card { border: 1px solid #444; }
         .dark-mode .subject-card { border-color: #555; }
         .dark-mode .option-btn { border-color: #555; }
@@ -431,6 +440,7 @@
         }
         .subject-card[data-color] { border-left: 4px solid var(--subj-color, var(--secondary)); }
 
+        /* ===== DASHBOARD SECTIONS ===== */
         .dash-section-label {
             text-align: left; font-size: 0.75rem; font-weight: 700;
             text-transform: uppercase; letter-spacing: 1px;
@@ -438,6 +448,7 @@
             padding-left: 4px;
         }
 
+        /* ===== DUPLICATE DETECTOR ===== */
         .dupe-warning {
             background: rgba(243,156,18,0.15); border: 1px solid var(--warning);
             padding: 10px 14px; border-radius: 8px; margin: 8px 0;
@@ -445,12 +456,14 @@
         }
         .dupe-warning strong { color: var(--warning); }
 
+        /* ===== MOBILE FILTER STACK ===== */
         @media (max-width: 600px) {
             .admin-filters-container { flex-direction: column; }
             .admin-filters-container select,
             .admin-filters-container input { width: 100% !important; }
         }
 
+        /* ===== WEAK RETRY BUTTON ===== */
         .btn-retry { background: linear-gradient(135deg, #8e44ad, #6c3483); color: white; width: 100%; margin-bottom: 10px; font-size: 1rem; }
 
         /* ===== LEADERBOARD ===== */
@@ -472,12 +485,26 @@
         .leaderboard-name { flex: 1; font-weight: 600; font-size: 0.9rem; }
         .leaderboard-score { color: var(--secondary); font-weight: 700; font-size: 0.85rem; }
 
+        /* ===== INLINE CHAPTER EDIT ===== */
+        .inline-ch-edit {
+            display: inline-flex; align-items: center; gap: 4px;
+            background: rgba(22,160,133,0.1); border: 1px dashed var(--chapter);
+            border-radius: 6px; padding: 2px 6px; cursor: pointer; font-size: 0.8rem;
+        }
+        .inline-ch-input {
+            width: 60px; padding: 2px 4px; font-size: 0.8rem;
+            border: 1px solid var(--chapter); border-radius: 4px;
+            display: none;
+        }
+
+        /* ===== LOADING TEXT ===== */
         .loading-sub { font-size: 0.85rem; margin-top: 6px; }
         @keyframes dot-pulse { 0%,80%,100%{opacity:0} 40%{opacity:1} }
         .loading-dots span { animation: dot-pulse 1.4s infinite; display:inline-block; }
         .loading-dots span:nth-child(2) { animation-delay:.2s; }
         .loading-dots span:nth-child(3) { animation-delay:.4s; }
 
+        /* ===== DESKTOP RESPONSIVE ===== */
         @media (min-width: 768px) {
             .container { padding: 1.5rem 1.5rem 3rem; }
             .subject-grid { grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); }
@@ -508,19 +535,23 @@
         .result-stat-box .stat-num { font-size: 1.8rem; font-weight: 800; }
         .result-stat-box .stat-lbl { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
 
+        /* ===== SCROLLBAR ===== */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
+        /* ===== HOVER CARD TILT (desktop) ===== */
         @media (hover: hover) {
             .subject-card:hover { transform: translateY(-5px) scale(1.01); }
         }
-    </style>
+
+        </style>
 </head>
 <body class="light-mode">
     
     <div id="loading-screen" class="loading-overlay">
+        <img src="logo.png" alt="MedBytes Logo" class="loading-logo" onerror="this.style.display='none'">
         <h2 class="loading-title">MedBytes</h2>
         <p class="loading-sub" id="loading-sub-text" style="color:rgba(255,255,255,0.55); position:relative; z-index:1;">
             Loading<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>
@@ -626,6 +657,11 @@
                 <div id="analytics-breakdown" style="font-size: 0.9rem; margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;"></div>
             </div>
 
+            <div class="search-bar-container">
+                <input type="text" id="mcq-search-input" placeholder="Search keywords...">
+                <button class="btn-primary" onclick="searchMCQs()"><i class="fas fa-search"></i></button>
+            </div>
+
             <div class="tool-bar">
                 <i class="fas fa-filter" style="color:var(--text-muted); font-size:0.85rem;"></i>
                 <label style="font-size: 0.82rem; font-weight: 600; color:var(--text-muted); white-space:nowrap;">Difficulty:</label>
@@ -635,10 +671,12 @@
                     <option value="medium">Medium</option>
                     <option value="hard">Hard</option>
                 </select>
+                <button class="btn-primary" onclick="searchMCQs()" style="margin:0; padding:8px 14px; font-size:0.82rem; white-space:nowrap;">
+                    <i class="fas fa-search"></i> Search
+                </button>
             </div>
             <div class="search-bar-container" style="margin-bottom:10px;">
                 <input type="text" id="mcq-search-input" placeholder="Search questions by keyword..." style="margin:0;">
-                <button class="btn-primary" onclick="searchMCQs()"><i class="fas fa-search"></i> Search</button>
             </div>
 
             <div class="dash-section-label">📚 Study by Subject</div>
@@ -756,7 +794,7 @@
                 <div id="tab-chapters" class="admin-tab-content">
                     <div class="chapter-manager-box">
                         <h4 style="margin-top:0; color: var(--chapter);"><i class="fas fa-bookmark"></i> Chapter Manager</h4>
-                        <p style="font-size:0.9rem; color:#666; margin-top:-5px;">Define chapters for each Block &rarr; Subject combination.</p>
+                        <p style="font-size:0.9rem; color:#666; margin-top:-5px;">Define chapters for each Block → Subject combination. Students will see these as drill-down options.</p>
 
                         <div class="chapter-selectors">
                             <div>
@@ -791,7 +829,7 @@
                             </div>
                             <div style="flex:3; min-width:180px;">
                                 <label style="font-size:0.8rem; font-weight:bold; color:var(--chapter);">Chapter Name</label>
-                                <input type="text" id="new-ch-name" placeholder="e.g. Introduction to Pharmacology" style="margin:0;">
+                                <input type="text" id="new-ch-name" placeholder="e.g. Autonomic Pharmacology" style="margin:0;">
                             </div>
                             <button class="btn-chapter" style="height:40px; white-space:nowrap;" onclick="addChapter()"><i class="fas fa-plus"></i> Add</button>
                         </div>
@@ -842,6 +880,7 @@
                         <h4><i class="fas fa-file-upload"></i> Bulk Upload</h4>
                         <p style="font-size:0.85rem; color:#666;">
                             Excel/JSON columns: <code>block, subject, chapter, difficulty, question, optionA, optionB, optionC, optionD, optionE, correctAnswer, explanation</code><br>
+                            <strong>chapter</strong> field is optional — use the chapter number (e.g. <code>1</code>, <code>2</code>) to tag MCQs to a chapter.
                         </p>
                         <div style="display:flex; gap:10px;">
                             <input type="file" id="excel-file" accept=".xlsx, .xls" style="flex:1;">
@@ -932,31 +971,22 @@
         let isDailyQuiz = false;
         let currentQuizSubjects = {}; 
         let adminQuestionsCache = []; 
-        let chaptersCache = {}; 
+        let chaptersCache = {}; // { "7_Pharmacology": [{number:1, name:"..."}, ...] }
         let currentUserRef = null;
-
-        // ===================== EXPOSE BASE OBJECTS FOR INTERNAL APP MODULE USE =====================
-        window.db = db;
-        window.doc = doc;
-        window.setDoc = doc;
 
         // ===================== VIEWS =====================
         window.showView = (id) => {
-            const ls = document.getElementById('loading-screen');
-            if (ls) ls.classList.add('hidden');
+            document.getElementById('loading-screen').classList.add('hidden');
             document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
-            const target = document.getElementById(id);
-            if (target) target.classList.remove('hidden');
+            document.getElementById(id).classList.remove('hidden');
         };
 
         // ===================== THEME =====================
         const themeBtn = document.getElementById('theme-toggle');
-        if (themeBtn) {
-            themeBtn.onclick = () => {
-                document.body.classList.toggle('dark-mode');
-                themeBtn.innerHTML = document.body.classList.contains('dark-mode') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-            };
-        }
+        themeBtn.onclick = () => {
+            document.body.classList.toggle('dark-mode');
+            themeBtn.innerHTML = document.body.classList.contains('dark-mode') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        };
 
         // ===================== AUTH =====================
         window.login = async () => {
@@ -973,6 +1003,20 @@
             const password = document.getElementById("password").value;
             try { await createUserWithEmailAndPassword(auth, email, password); } 
             catch (e) { document.getElementById('loading-screen').classList.add('hidden'); alert(e.message); }
+        };
+
+        window.loginWithGoogle = async () => {
+            const btn = document.getElementById('google-btn');
+            if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...'; }
+            try {
+                const result = await signInWithPopup(auth, googleProvider);
+                // onAuthStateChanged will handle the rest (create Firestore doc if needed)
+            } catch (e) {
+                if (btn) { btn.disabled = false; btn.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:18px;height:18px;"> Continue with Google'; }
+                if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
+                    alert('Google sign-in failed: ' + e.message);
+                }
+            }
         };
 
         window.handleLogout = () => {
@@ -1036,10 +1080,6 @@
                         btn.innerText = "Daily Challenge Completed ✅";
                     }
                 }
-                // Pre-load backend question counts natively
-                const snap = await getDocs(collection(db, "mcqs"));
-                adminQuestionsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
                 showView('block-selection-screen');
             } else {
                 currentUserRef = null;
@@ -1135,7 +1175,7 @@
                 const div = document.createElement('div');
                 div.className = 'subject-card';
                 const meta = subjectMeta[sub] || { icon: '📖', color: 'var(--secondary)' };
-                const count = adminQuestionsCache ? adminQuestionsCache.filter(q => q.subject === sub && q.block == block).length : 0;
+                const count = adminQuestionsCache.filter ? adminQuestionsCache.filter(q => q.subject === sub && q.block == block).length : '?';
                 div.style.setProperty('--subj-color', meta.color);
                 div.dataset.color = meta.color;
                 div.innerHTML = `
@@ -1152,7 +1192,6 @@
             });
             renderAnalytics();
             checkSavedQuiz(); 
-            loadLeaderboard();
             showView('dashboard-screen');
         };
 
@@ -1163,6 +1202,7 @@
             document.getElementById('chapter-subject-label').innerText = subject;
 
             const chapterKey = `${selectedBlock}_${subject}`;
+            // Load chapters from Firestore
             const chapDoc = await getDoc(doc(db, "chapters", chapterKey));
             const chapters = chapDoc.exists() ? (chapDoc.data().list || []) : [];
             chapters.sort((a,b) => a.number - b.number);
@@ -1311,7 +1351,7 @@
         };
 
         window.quitQuiz = () => {
-            if(confirm("Pause quiz? Your progress has been saved locally.")) {
+            if(confirm("Pause quiz? Your progress has been saved locally and you can resume from the dashboard.")) {
                 saveQuizState();
                 clearInterval(timerInterval);
                 checkSavedQuiz();
@@ -1436,19 +1476,15 @@
             showView('result-screen');
         }
 
-        // ===================== ADMIN TABS =====================
+        // ===================== ADMIN =====================
         window.switchAdminTab = (tabId) => {
             document.querySelectorAll('.admin-tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            if (event && event.target) event.target.classList.add('active');
+            event.target.classList.add('active');
         };
 
-        window.openAdmin = async () => { 
-            showView('admin-screen'); 
-            await loadAdminData(); 
-            await loadChapterList(); 
-        };
+        window.openAdmin = async () => { showView('admin-screen'); await loadAdminData(); await loadChapterList(); };
         
         async function loadAdminData() {
             const snap = await getDocs(collection(db, "mcqs"));
@@ -1465,7 +1501,7 @@
             updateAdminSubjectFilter();
         }
 
-        // ===================== CHAPTER MANAGEMENT (ADMIN & FIRESTORE ENTRY FIXED) =====================
+        // ===================== CHAPTER MANAGEMENT (ADMIN) =====================
         function getChapterKey() {
             const block = document.getElementById('ch-block').value;
             const subject = document.getElementById('ch-subject').value;
@@ -1486,7 +1522,7 @@
         function renderChapterTable(chapters, block, subject) {
             const container = document.getElementById('chapter-list-container');
             if(chapters.length === 0) {
-                container.innerHTML = `<p style="color:#888; font-size:0.9rem; margin-top:8px;">No chapters yet for Block ${block} &rarr; ${subject}. Add one above!</p>`;
+                container.innerHTML = `<p style="color:#888; font-size:0.9rem; margin-top:8px;">No chapters yet for Block ${block} → ${subject}. Add one above!</p>`;
                 return;
             }
             let html = `
@@ -1494,7 +1530,8 @@
                     <thead><tr><th>#</th><th>Chapter Name</th><th>MCQs Tagged</th><th>Action</th></tr></thead>
                     <tbody>`;
             chapters.forEach(ch => {
-                const tagged = adminQuestionsCache ? adminQuestionsCache.filter(q => q.block == block && q.subject === subject && q.chapter == ch.number).length : 0;
+                const key = `${block}_${subject}`;
+                const tagged = adminQuestionsCache.filter(q => q.block == block && q.subject === subject && q.chapter == ch.number).length;
                 html += `<tr>
                     <td><span class="chapter-badge">Ch.${String(ch.number).padStart(2,'0')}</span></td>
                     <td>${ch.name || '<em style="color:#aaa">Unnamed</em>'}</td>
@@ -1515,7 +1552,6 @@
             const number = parseInt(document.getElementById('new-ch-number').value);
             const name = document.getElementById('new-ch-name').value.trim();
             if(!number || number < 1) return alert("Please enter a valid chapter number.");
-            if(!name) return alert("Please enter a chapter name.");
             
             const key = getChapterKey();
             const block = document.getElementById('ch-block').value;
@@ -1530,13 +1566,14 @@
 
             document.getElementById('new-ch-number').value = '';
             document.getElementById('new-ch-name').value = '';
-            alert(`Chapter ${number} "${name}" added successfully!`);
+            alert(`Chapter ${number} "${name}" added to Block ${block} → ${subject}!`);
             await loadChapterList();
+            // Refresh chapter filter in MCQ tab too
             await updateAdminChapterFilter();
         };
 
         window.deleteChapter = async (number) => {
-            if(!confirm(`Delete Chapter ${number}? The MCQs tagged to it won't be deleted.`)) return;
+            if(!confirm(`Delete Chapter ${number}? The MCQs tagged to it won't be deleted, but they'll lose their chapter tag.`)) return;
             const key = getChapterKey();
             const existing = chaptersCache[key] || [];
             const updated = existing.filter(c => c.number !== number);
@@ -1600,7 +1637,7 @@
         // ===================== MULTI-SELECT STATE =====================
         let selectModeActive = false;
         let selectedIds = new Set();
-        let currentFilteredList = []; 
+        let currentFilteredList = []; // tracks what's currently rendered
 
         window.toggleSelectMode = () => {
             selectModeActive = !selectModeActive;
@@ -1614,7 +1651,7 @@
                 btn.innerHTML = '<i class="fas fa-check-square"></i> Select';
             }
             updateBulkBar();
-            filterAdminMCQs(); 
+            filterAdminMCQs(); // re-render to show/hide checkboxes
         };
 
         function updateBulkBar() {
@@ -1631,6 +1668,7 @@
         window.toggleCheckbox = (id) => {
             if(selectedIds.has(id)) selectedIds.delete(id);
             else selectedIds.add(id);
+            // Update visual state of that row
             const row = document.querySelector(`.admin-mcq-item[data-id="${id}"]`);
             if(row) row.classList.toggle('selected', selectedIds.has(id));
             const cb = document.querySelector(`.mcq-checkbox[data-id="${id}"]`);
@@ -1640,6 +1678,7 @@
 
         window.selectAllVisible = () => {
             currentFilteredList.forEach(q => selectedIds.add(q.id));
+            // Re-render to check all boxes
             renderAdminMCQList(currentFilteredList);
             updateBulkBar();
         };
@@ -1657,7 +1696,7 @@
 
         window.deleteSelected = async () => {
             if(selectedIds.size === 0) return;
-            if(!confirm(`Delete ${selectedIds.size} selected question(s)?`)) return;
+            if(!confirm(`Delete ${selectedIds.size} selected question${selectedIds.size > 1 ? 's' : ''}? This cannot be undone.`)) return;
             document.getElementById('loading-screen').classList.remove('hidden');
             let deleted = 0;
             for(const id of selectedIds) {
@@ -1671,7 +1710,7 @@
             btn.innerHTML = '<i class="fas fa-check-square"></i> Select';
             document.getElementById('bulk-action-bar').classList.add('hidden');
             document.getElementById('loading-screen').classList.add('hidden');
-            alert(`Deleted ${deleted} question(s) successfully.`);
+            alert(`Deleted ${deleted} question${deleted > 1 ? 's' : ''} successfully.`);
             await loadAdminData();
         };
 
@@ -1705,7 +1744,7 @@
         }
 
         window.deleteMCQ = async (id) => {
-            if(!confirm("Are you sure you want to delete this question?")) return;
+            if(!confirm("Are you sure you want to delete this question? This cannot be undone.")) return;
             try { await deleteDoc(doc(db, "mcqs", id)); alert("Question deleted."); loadAdminData(); } 
             catch (e) { alert("Error deleting: " + e.message); }
         };
@@ -1788,16 +1827,9 @@
             const file = document.getElementById('excel-file').files[0];
             if (!file) return alert("Select file");
             const reader = new FileReader();
-            reader.onload = async (e) => {
+            reader.onload = (e) => {
                 const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
                 const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                const snap = await getDocs(collection(db, "mcqs"));
-                const existingQs = new Set(snap.docs.map(d => d.data().question.trim().toLowerCase()));
-                const dupes = json.filter(row => row.question && existingQs.has(row.question.trim().toLowerCase()));
-                if (dupes.length > 0) {
-                    const proceed = confirm(`⚠️ ${dupes.length} duplicate question(s) detected!\n\nThese will be skipped automatically. Proceed with upload?`);
-                    if (!proceed) return;
-                }
                 processUpload(json);
             };
             reader.readAsArrayBuffer(file);
@@ -1812,29 +1844,30 @@
             } catch (e) { alert("Invalid JSON format: " + e.message); }
         };
 
-        // ===================== LEADERBOARD =====================
-        async function loadLeaderboard() {
-            const container = document.getElementById('leaderboard-list');
-            if (!container) return;
-            try {
-                const snap = await getDocs(collection(db, "users"));
-                let users = snap.docs.map(d => ({ name: d.data().name || d.data().email?.split('@')[0] || 'Anonymous', xp: d.data().totalCorrect || 0, streak: d.data().streak || 0 }));
-                users.sort((a, b) => b.xp - a.xp);
-                const top = users.slice(0, 8);
-                const rankEmojis = ['🥇','🥈','🥉'];
-                if (top.length === 0) { container.innerHTML = '<p style="color:#888; font-size:0.9rem;">No data yet.</p>'; return; }
-                container.innerHTML = top.map((u, i) => `
-                    <div class="leaderboard-row">
-                        <span class="leaderboard-rank">${rankEmojis[i] || (i+1)}</span>
-                        <div class="leaderboard-avatar">${u.name.charAt(0).toUpperCase()}</div>
-                        <span class="leaderboard-name">${u.name}</span>
-                        <span class="leaderboard-score">⚡${u.xp} XP</span>
-                        <span style="color:#f59e0b; font-size:0.82rem; font-weight:600;">🔥${u.streak}</span>
-                    </div>`).join('');
-            } catch(e) { console.error(e); container.innerHTML = '<p style="color:#888; font-size:0.85rem;">Leaderboard unavailable.</p>'; }
-        }
+        // ===================== LOADING SCREEN SAFETY TIMEOUT =====================
+        // Force-hide loading screen after 10s to prevent stuck state
+        const _loadingTimeout = setTimeout(() => {
+            const ls = document.getElementById('loading-screen');
+            if (ls && !ls.classList.contains('hidden')) {
+                console.warn('Loading timeout — forcing dismiss');
+                ls.classList.add('hidden');
+                // If no view is showing, show auth
+                const anyVisible = document.querySelector('.view:not(.hidden)');
+                if (!anyVisible) showView('auth-screen');
+            }
+        }, 10000);
 
-        // ===================== XP & LAYOUT HELPER SYSTEM =====================
+        // Update loading sub-text for better UX
+        const _loadingMessages = ['Connecting to MedBytes', 'Loading question bank...', 'Almost ready...'];
+        let _lmi = 0;
+        const _lmInterval = setInterval(() => {
+            _lmi++;
+            const el = document.getElementById('loading-sub-text');
+            if (el && _lmi < _loadingMessages.length) el.innerText = _loadingMessages[_lmi];
+            else clearInterval(_lmInterval);
+        }, 2500);
+
+        // ===================== XP / LEVEL SYSTEM =====================
         const XP_LEVELS = [
             { name: 'Intern', min: 0, max: 49 },
             { name: 'Resident', min: 50, max: 199 },
@@ -1856,17 +1889,71 @@
             if (el) el.innerHTML = `<span class="level-badge">🩺 ${lvl.name}</span> <span class="xp-badge">⚡ ${totalCorrect || 0} XP</span>`;
         }
 
+        // ===================== WEAK RETRY MODE =====================
+        let weakQuestionIds = [];
+
+        window.startWeakRetry = async () => {
+            if (!currentUserRef) return;
+            const userSnap = await getDoc(currentUserRef);
+            if (!userSnap.exists()) return;
+            const stats = userSnap.data().stats || {};
+            const weakSubjects = Object.entries(stats)
+                .filter(([, v]) => v.total >= 3 && (v.correct / v.total) < 0.6)
+                .map(([sub]) => sub);
+
+            if (weakSubjects.length === 0) return alert("No weak subjects detected yet. Complete more quizzes to unlock this!");
+
+            document.getElementById('loading-screen').classList.remove('hidden');
+            let allWeak = [];
+            for (const sub of weakSubjects) {
+                const q = query(collection(db, "mcqs"), where("subject", "==", sub), where("block", "==", Number(selectedBlock)));
+                const snap = await getDocs(q);
+                allWeak.push(...snap.docs.map(d => d.data()));
+            }
+            allWeak = allWeak.sort(() => Math.random() - 0.5).slice(0, 30);
+            document.getElementById('loading-screen').classList.add('hidden');
+            if (allWeak.length === 0) return alert("No questions found for your weak subjects.");
+            isMockExamMode = false; isDailyQuiz = false;
+            initQuizState(allWeak, `🔁 Weak Question Retry`);
+        };
+
+        // ===================== LEADERBOARD =====================
+        async function loadLeaderboard() {
+            const container = document.getElementById('leaderboard-list');
+            if (!container) return;
+            try {
+                const snap = await getDocs(collection(db, "users"));
+                let users = snap.docs.map(d => ({ name: d.data().name || d.data().email?.split('@')[0] || 'Anonymous', xp: d.data().totalCorrect || 0, streak: d.data().streak || 0 }));
+                users.sort((a, b) => b.xp - a.xp);
+                const top = users.slice(0, 8);
+                const rankEmojis = ['🥇','🥈','🥉'];
+                if (top.length === 0) { container.innerHTML = '<p style="color:#888; font-size:0.9rem;">No data yet. Be the first!</p>'; return; }
+                container.innerHTML = top.map((u, i) => `
+                    <div class="leaderboard-row">
+                        <span class="leaderboard-rank">${rankEmojis[i] || (i+1)}</span>
+                        <div class="leaderboard-avatar">${u.name.charAt(0).toUpperCase()}</div>
+                        <span class="leaderboard-name">${u.name}</span>
+                        <span class="leaderboard-score">⚡${u.xp} XP</span>
+                        <span style="color:#f59e0b; font-size:0.82rem; font-weight:600;">🔥${u.streak}</span>
+                    </div>`).join('');
+            } catch(e) { console.error(e); container.innerHTML = '<p style="color:#888; font-size:0.85rem;">Leaderboard unavailable.</p>'; }
+        }
+
+        // ===================== SCORE RING ANIMATION =====================
         function animateScoreRing(percentage) {
-            const circumference = 377; 
+            const circumference = 377; // 2*PI*60
             const fill = document.getElementById('score-ring-fill');
             if (!fill) return;
             const offset = circumference - (percentage / 100) * circumference;
+            // Color based on score
             if (percentage >= 70) fill.style.stroke = 'var(--success)';
             else if (percentage >= 50) fill.style.stroke = 'var(--warning)';
             else fill.style.stroke = 'var(--accent)';
+            // Animate after a tick
             setTimeout(() => { fill.style.strokeDashoffset = offset; }, 50);
         }
 
+        // ===================== SUBJECT ICONS & COLORS =====================
         const subjectMeta = {
             'Pharmacology':      { icon: '💊', color: '#3498db' },
             'Pathology':         { icon: '🔬', color: '#e74c3c' },
@@ -1879,9 +1966,11 @@
             'Family Medicine':   { icon: '👨‍👩‍👧', color: '#1abc9c' },
         };
 
+        // ===================== BULK ASSIGN CHAPTER =====================
         window.bulkAssignChapter = async () => {
             if (selectedIds.size === 0) return;
-            const chNum = prompt(`Assign ${selectedIds.size} selected question(s) to which chapter number?`);
+            const chNum = prompt(`Assign ${selectedIds.size} selected question(s) to which chapter number?
+(Enter a number, e.g. 3)`);
             if (!chNum || isNaN(Number(chNum))) return;
             const chapter = Number(chNum);
             document.getElementById('loading-screen').classList.remove('hidden');
@@ -1903,40 +1992,60 @@
             await loadAdminData();
         };
 
-        window.startWeakRetry = async () => {
-            if (!currentUserRef) return;
-            const userSnap = await getDoc(currentUserRef);
-            if (!userSnap.exists()) return;
-            const stats = userSnap.data().stats || {};
-            const weakSubjects = Object.entries(stats)
-                .filter(([, v]) => v.total >= 3 && (v.correct / v.total) < 0.6)
-                .map(([sub]) => sub);
-
-            if (weakSubjects.length === 0) return alert("No weak subjects detected yet.");
-
-            document.getElementById('loading-screen').classList.remove('hidden');
-            let allWeak = [];
-            for (const sub of weakSubjects) {
-                const q = query(collection(db, "mcqs"), where("subject", "==", sub), where("block", "==", Number(selectedBlock)));
-                const snap = await getDocs(q);
-                allWeak.push(...snap.docs.map(d => d.data()));
-            }
-            allWeak = allWeak.sort(() => Math.random() - 0.5).slice(0, 30);
-            document.getElementById('loading-screen').classList.add('hidden');
-            if (allWeak.length === 0) return alert("No questions found for your weak subjects.");
-            isMockExamMode = false; isDailyQuiz = false;
-            initQuizState(allWeak, `🔁 Weak Question Retry`);
+        // ===================== DUPLICATE DETECTOR BEFORE UPLOAD =====================
+        const _origProcessUpload = processUpload;
+        // Override to show dupe warning in UI before uploading
+        window.previewUploadDuplicates = async (dataArray) => {
+            const snap = await getDocs(collection(db, "mcqs"));
+            const existingQs = new Set(snap.docs.map(d => d.data().question.trim().toLowerCase()));
+            const dupes = dataArray.filter(row => row.question && existingQs.has(row.question.trim().toLowerCase()));
+            return dupes;
         };
 
-        // Expose critical UI controllers to the root context cleanly
-        window.addChapter = addChapter;
-        window.deleteChapter = deleteChapter;
-        window.loadChapterList = loadChapterList;
+        // Wrap uploadExcel for dupe preview
+        const _origUploadExcel = window.uploadExcel;
+        window.uploadExcel = () => {
+            const file = document.getElementById('excel-file').files[0];
+            if (!file) return alert("Select file");
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+                const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                const dupes = await window.previewUploadDuplicates(json);
+                if (dupes.length > 0) {
+                    const proceed = confirm(`⚠️ ${dupes.length} duplicate question(s) detected!\n\nThese will be skipped automatically. Proceed with upload?\n\nFirst duplicate: "${dupes[0].question?.substring(0,80)}..."`);
+                    if (!proceed) return;
+                }
+                processUpload(json);
+            };
+            reader.readAsArrayBuffer(file);
+        };
 
-        const _loadingTimeout = setTimeout(() => {
-            const ls = document.getElementById('loading-screen');
-            if (ls && !ls.classList.contains('hidden')) ls.classList.add('hidden');
-        }, 5000);
+
+        // ===================== INLINE CHAPTER EDIT =====================
+        window.inlineEditChapter = async (id, currentChapter) => {
+            const newCh = prompt(`Edit chapter for this MCQ\nCurrent: ${currentChapter || 'None'}\nEnter new chapter number (or clear to remove):`);
+            if (newCh === null) return; // cancelled
+            const chapter = newCh.trim() === '' ? null : Number(newCh);
+            if (newCh.trim() !== '' && isNaN(chapter)) return alert('Please enter a valid number.');
+            try {
+                await updateDoc(doc(db, "mcqs", id), { chapter });
+                // Update cache
+                const idx = adminQuestionsCache.findIndex(q => q.id === id);
+                if (idx !== -1) adminQuestionsCache[idx].chapter = chapter;
+                filterAdminMCQs();
+            } catch(e) { alert('Error: ' + e.message); }
+        };
+
+        // Clear loading timeout once auth resolves
+        const _origOnAuth = onAuthStateChanged;
+        // We patch showView to clear the loading timeout
+        const _origShowView = window.showView;
+        window.showView = (id) => {
+            clearTimeout(_loadingTimeout);
+            clearInterval(_lmInterval);
+            _origShowView(id);
+        };
 
     </script>
 </body>
