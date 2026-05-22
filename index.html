@@ -1526,29 +1526,39 @@
         }
 
         window.addChapter = async () => {
-            const number = parseInt(document.getElementById('new-ch-number').value);
-            const name = document.getElementById('new-ch-name').value.trim();
-            if(!number || number < 1) return alert("Please enter a valid chapter number.");
-            
-            const key = getChapterKey();
-            const block = document.getElementById('ch-block').value;
-            const subject = document.getElementById('ch-subject').value;
-            const existing = chaptersCache[key] || [];
+    const number = parseInt(document.getElementById('new-ch-number').value);
+    const name = document.getElementById('new-ch-name').value.trim();
+    if (!number || number < 1) return alert("Please enter a valid chapter number.");
+    if (!name) return alert("Please enter a chapter name.");
 
-            if(existing.find(c => c.number === number)) return alert(`Chapter ${number} already exists for this subject!`);
+    const key = getChapterKey();
+    const block = document.getElementById('ch-block').value;
+    const subject = document.getElementById('ch-subject').value;
 
-            const updated = [...existing, { number, name }];
-            await setDoc(doc(db, "chapters", key), { block: Number(block), subject, list: updated });
-            chaptersCache[key] = updated;
+    // Always fetch from Firestore if cache is missing
+    if (!chaptersCache[key]) {
+        const chapDoc = await getDoc(doc(db, "chapters", key));
+        chaptersCache[key] = chapDoc.exists() ? (chapDoc.data().list || []) : [];
+    }
 
-            document.getElementById('new-ch-number').value = '';
-            document.getElementById('new-ch-name').value = '';
-            alert(`Chapter ${number} "${name}" added to Block ${block} → ${subject}!`);
-            await loadChapterList();
-            // Refresh chapter filter in MCQ tab too
-            await updateAdminChapterFilter();
-        };
+    const existing = chaptersCache[key];
+    if (existing.find(c => c.number === number))
+        return alert(`Chapter ${number} already exists for this subject!`);
 
+    const updated = [...existing, { number, name }];
+
+    try {
+        await setDoc(doc(db, "chapters", key), { block: Number(block), subject, list: updated });
+        chaptersCache[key] = updated;
+        document.getElementById('new-ch-number').value = '';
+        document.getElementById('new-ch-name').value = '';
+        alert(`Chapter ${number} "${name}" added to Block ${block} → ${subject}!`);
+        await loadChapterList();
+        await updateAdminChapterFilter();
+    } catch (e) {
+        alert('Failed to save: ' + e.message);
+    }
+};
         window.deleteChapter = async (number) => {
             if(!confirm(`Delete Chapter ${number}? The MCQs tagged to it won't be deleted, but they'll lose their chapter tag.`)) return;
             const key = getChapterKey();
