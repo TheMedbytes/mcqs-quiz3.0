@@ -26,6 +26,7 @@
             --warning: #f39c12;
             --success: #27ae60;
             --daily: #8e44ad;
+            --chapter: #16a085;
         }
 
         .dark-mode {
@@ -49,6 +50,7 @@
         .btn-danger { background: var(--accent); color: white; margin-top: 10px; }
         .btn-success { background: var(--success); color: white; margin-top: 10px; }
         .btn-daily { background: var(--daily); color: white; width: 100%; margin-bottom: 10px; font-size: 1.1rem; }
+        .btn-chapter { background: var(--chapter); color: white; }
         
         .block-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
         .btn-block { padding: 30px 10px; font-size: 1.2rem; border: 2px solid var(--secondary); background: transparent; color: var(--secondary); border-radius: 12px; }
@@ -78,8 +80,7 @@
         .stat-box { background: rgba(52, 152, 219, 0.1); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid var(--secondary); }
         .stat-box h3 { margin: 0; font-size: 1.5rem; color: var(--secondary); }
         .stat-box p { margin: 5px 0 0 0; font-size: 0.8rem; font-weight: bold; }
-        
-        /* --- NEW: Theme Select Styling for Admin Filters --- */
+
         .theme-select {
             padding: 8px 12px;
             border: 2px solid var(--secondary);
@@ -90,17 +91,11 @@
             outline: none;
             cursor: pointer;
             transition: 0.3s;
-            margin: 0; /* Reset default margin */
+            margin: 0;
             width: auto;
         }
-        .theme-select:hover {
-            background-color: var(--secondary);
-            color: white;
-        }
-        .theme-select option {
-            background-color: var(--card);
-            color: var(--text);
-        }
+        .theme-select:hover { background-color: var(--secondary); color: white; }
+        .theme-select option { background-color: var(--card); color: var(--text); }
 
         .admin-filters-container { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 15px; }
         .admin-mcq-list { max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 5px; margin-top: 10px; padding: 10px; }
@@ -109,7 +104,32 @@
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; }
         .modal-content { background: var(--card); padding: 20px; border-radius: 10px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; text-align: left; }
 
-        /* --- Custom Loading Screen CSS --- */
+        /* --- Chapter Management Styles --- */
+        .chapter-manager-box {
+            background: rgba(22, 160, 133, 0.08);
+            border: 1px solid var(--chapter);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        .chapter-selectors { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 12px; }
+        .chapter-selectors > div { flex: 1; min-width: 140px; }
+        .chapter-selectors label { font-size: 0.8rem; font-weight: bold; display: block; margin-bottom: 3px; color: var(--chapter); }
+        .chapter-selectors select, .chapter-selectors input { margin: 0; }
+        .chapter-list-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 10px; }
+        .chapter-list-table th { background: var(--chapter); color: white; padding: 8px 10px; text-align: left; }
+        .chapter-list-table td { padding: 8px 10px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        .chapter-list-table tr:hover td { background: rgba(22, 160, 133, 0.05); }
+        .chapter-badge { background: var(--chapter); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
+        .no-chapter-badge { background: #bdc3c7; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; }
+
+        /* Chapter drill-down in student dashboard */
+        .chapter-drill-section { margin-top: 10px; }
+        .chapter-drill-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 10px; }
+        .chapter-pill { border: 2px solid var(--chapter); color: var(--chapter); background: transparent; border-radius: 10px; padding: 12px 8px; font-size: 0.9rem; text-align: center; transition: 0.2s; }
+        .chapter-pill:hover { background: var(--chapter); color: white; transform: translateY(-2px); }
+        .chapter-pill span { display: block; font-size: 0.75rem; margin-top: 3px; color: #888; }
+
+        /* Loading Screen */
         .loading-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: var(--bg); z-index: 9999;
@@ -121,11 +141,17 @@
             100% { transform: scale(1); }
         }
         .loading-logo { 
-            width: 180px; 
-            height: auto;
+            width: 180px; height: auto;
             animation: pulse-logo 2s infinite ease-in-out; 
             margin-bottom: 15px;
         }
+
+        /* Admin tabs */
+        .admin-tabs { display: flex; gap: 0; border-bottom: 2px solid #ddd; margin-bottom: 20px; }
+        .admin-tab-btn { background: none; border: none; border-bottom: 3px solid transparent; padding: 10px 18px; font-size: 0.95rem; color: #888; margin-bottom: -2px; border-radius: 0; }
+        .admin-tab-btn.active { color: var(--secondary); border-bottom-color: var(--secondary); font-weight: bold; }
+        .admin-tab-content { display: none; }
+        .admin-tab-content.active { display: block; }
     </style>
 </head>
 <body class="light-mode">
@@ -147,6 +173,7 @@
     </nav>
 
     <main class="container">
+        <!-- AUTH -->
         <section id="auth-screen" class="view hidden">
             <div class="card">
                 <i class="fas fa-user-md fa-4x" style="color: var(--secondary); margin-bottom: 1rem;"></i>
@@ -159,6 +186,7 @@
             </div>
         </section>
 
+        <!-- BLOCK SELECTION -->
         <section id="block-selection-screen" class="view hidden">
             <div class="card">
                 <h2>Welcome, <span id="user-name-display">Doctor</span></h2>
@@ -171,6 +199,7 @@
             </div>
         </section>
 
+        <!-- DASHBOARD -->
         <section id="dashboard-screen" class="view hidden">
             <div class="welcome-bar" style="margin-bottom: 20px; text-align: left; display: flex; justify-content: space-between; align-items: center;">
                 <div>
@@ -183,7 +212,6 @@
             </div>
 
             <button id="resume-quiz-btn" class="btn-success hidden" style="width: 100%; margin-bottom: 10px; font-size: 1.1rem;" onclick="resumeQuiz()"><i class="fas fa-play-circle"></i> Resume Paused Quiz</button>
-            
             <button id="daily-quiz-btn" class="btn-daily" onclick="startDailyQuiz()"><i class="fas fa-calendar-day"></i> Take Daily Challenge (10 Qs)</button>
             
             <div id="analytics-panel" class="analytics-panel hidden">
@@ -213,6 +241,26 @@
             <div class="subject-grid" id="subject-list"></div>
         </section>
 
+        <!-- CHAPTER DRILL-DOWN (Student) -->
+        <section id="chapter-screen" class="view hidden">
+            <div class="card">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:15px;">
+                    <button onclick="showView('dashboard-screen')" style="background:none; color:var(--secondary); padding:0; font-size:1.2rem;"><i class="fas fa-arrow-left"></i></button>
+                    <div>
+                        <div style="font-size:0.85rem; color:#888;">Block <span id="chapter-block-label">?</span></div>
+                        <h3 style="margin:0;" id="chapter-subject-label">Subject</h3>
+                    </div>
+                </div>
+                <button class="btn-primary" style="width:100%; margin-bottom:15px;" onclick="startQuiz(window._chapterSubject)">
+                    <i class="fas fa-layer-group"></i> Start Full Subject Quiz (All Chapters)
+                </button>
+                <h4 style="text-align:left; margin-bottom:8px; color: var(--chapter);"><i class="fas fa-bookmark"></i> Study by Chapter</h4>
+                <div id="chapter-drill-grid" class="chapter-drill-grid"></div>
+                <p id="chapter-drill-empty" class="hidden" style="color:#888; font-size:0.9rem; margin-top:10px;">No chapters configured for this subject yet. Ask your admin!</p>
+            </div>
+        </section>
+
+        <!-- QUIZ -->
         <section id="quiz-screen" class="view hidden">
             <div class="card" style="text-align: left;">
                 <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: bold; color: var(--secondary);">
@@ -234,6 +282,7 @@
             </div>
         </section>
 
+        <!-- RESULT -->
         <section id="result-screen" class="view hidden">
             <div class="card">
                 <h2>Quiz Complete!</h2>
@@ -244,7 +293,7 @@
                 </div>
                 
                 <div id="mock-breakdown-section" class="hidden" style="margin-bottom: 20px; background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; text-align: left;">
-                    <h4 style="margin-top: 0; border-bottom: 2px solid #ddd; padding-bottom: 5px;">Mock Exam Breakdown</h4>
+                    <h4 style="margin-top: 0; border-bottom: 2px solid #ddd; padding-bottom: 5px;">Exam Breakdown</h4>
                     <div id="mock-breakdown-list"></div>
                 </div>
 
@@ -257,21 +306,82 @@
             </div>
         </section>
 
+        <!-- ADMIN -->
         <section id="admin-screen" class="view hidden">
             <div class="card">
                 <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
                     <button onclick="showView('block-selection-screen')" style="background:none; color:var(--secondary); padding:0; font-size: 1.5rem;" title="Back"><i class="fas fa-arrow-left"></i></button>
                     <h2 style="margin: 0;"><i class="fas fa-tools"></i> Admin Control Panel</h2>
                 </div>
-                
-                <div class="admin-section">
+
+                <!-- TABS -->
+                <div class="admin-tabs">
+                    <button class="admin-tab-btn active" onclick="switchAdminTab('tab-stats')"><i class="fas fa-chart-bar"></i> Stats</button>
+                    <button class="admin-tab-btn" onclick="switchAdminTab('tab-chapters')"><i class="fas fa-bookmark"></i> Chapters</button>
+                    <button class="admin-tab-btn" onclick="switchAdminTab('tab-mcqs')"><i class="fas fa-edit"></i> MCQs</button>
+                    <button class="admin-tab-btn" onclick="switchAdminTab('tab-upload')"><i class="fas fa-upload"></i> Upload</button>
+                </div>
+
+                <!-- TAB: STATS -->
+                <div id="tab-stats" class="admin-tab-content active">
                     <h4><i class="fas fa-chart-bar"></i> Database Statistics</h4>
                     <div class="admin-stats-grid" id="admin-stats-container">Loading stats...</div>
                 </div>
 
-                <div class="admin-section">
+                <!-- TAB: CHAPTERS -->
+                <div id="tab-chapters" class="admin-tab-content">
+                    <div class="chapter-manager-box">
+                        <h4 style="margin-top:0; color: var(--chapter);"><i class="fas fa-bookmark"></i> Chapter Manager</h4>
+                        <p style="font-size:0.9rem; color:#666; margin-top:-5px;">Define chapters for each Block → Subject combination. Students will see these as drill-down options.</p>
+
+                        <div class="chapter-selectors">
+                            <div>
+                                <label>Block</label>
+                                <select id="ch-block" class="theme-select" onchange="loadChapterList()" style="width:100%;">
+                                    <option value="7">Block 7</option>
+                                    <option value="8">Block 8</option>
+                                    <option value="9">Block 9</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Subject</label>
+                                <select id="ch-subject" class="theme-select" onchange="loadChapterList()" style="width:100%;">
+                                    <option value="Pharmacology">Pharmacology</option>
+                                    <option value="Pathology">Pathology</option>
+                                    <option value="Medicine">Medicine</option>
+                                    <option value="Forensic Medicine">Forensic Medicine</option>
+                                    <option value="Community Medicine">Community Medicine</option>
+                                    <option value="Surgery">Surgery</option>
+                                    <option value="Behavioral Sciences">Behavioral Sciences</option>
+                                    <option value="Patient Safety">Patient Safety</option>
+                                    <option value="Family Medicine">Family Medicine</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Add new chapter -->
+                        <div style="display:flex; gap:10px; align-items:flex-end; margin-bottom:10px; flex-wrap:wrap;">
+                            <div style="flex:1; min-width:80px;">
+                                <label style="font-size:0.8rem; font-weight:bold; color:var(--chapter);">Chapter No.</label>
+                                <input type="number" id="new-ch-number" placeholder="e.g. 1" min="1" max="99" style="margin:0;">
+                            </div>
+                            <div style="flex:3; min-width:180px;">
+                                <label style="font-size:0.8rem; font-weight:bold; color:var(--chapter);">Chapter Name</label>
+                                <input type="text" id="new-ch-name" placeholder="e.g. Autonomic Pharmacology" style="margin:0;">
+                            </div>
+                            <button class="btn-chapter" style="height:40px; white-space:nowrap;" onclick="addChapter()"><i class="fas fa-plus"></i> Add</button>
+                        </div>
+
+                        <!-- Chapter list for selected block+subject -->
+                        <div id="chapter-list-container">
+                            <p style="color:#888; font-size:0.9rem;">Select a block and subject to view chapters.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: MCQs -->
+                <div id="tab-mcqs" class="admin-tab-content">
                     <h4 style="margin-bottom: 10px;"><i class="fas fa-edit"></i> Manage MCQs</h4>
-                    
                     <div class="admin-filters-container">
                         <select id="admin-filter-block" class="theme-select" onchange="updateAdminSubjectFilter()">
                             <option value="all">All Blocks</option>
@@ -279,25 +389,33 @@
                             <option value="8">Block 8</option>
                             <option value="9">Block 9</option>
                         </select>
-                        
-                        <select id="admin-filter-subject" class="theme-select" onchange="filterAdminMCQs()">
+                        <select id="admin-filter-subject" class="theme-select" onchange="updateAdminChapterFilter()">
                             <option value="all">All Subjects</option>
                         </select>
-                        
+                        <select id="admin-filter-chapter" class="theme-select" onchange="filterAdminMCQs()">
+                            <option value="all">All Chapters</option>
+                        </select>
                         <input type="text" id="admin-search" placeholder="Search keywords..." style="flex:1; margin:0;" onkeyup="filterAdminMCQs()">
                     </div>
-                    
                     <div class="admin-mcq-list" id="admin-mcq-list-container">Loading questions...</div>
                 </div>
-                <div class="admin-section">
-                    <h4><i class="fas fa-file-upload"></i> Bulk Upload</h4>
-                    <div style="display:flex; gap:10px;">
-                        <input type="file" id="excel-file" accept=".xlsx, .xls" style="flex:1;">
-                        <button onclick="uploadExcel()" class="btn-success">Upload Excel</button>
+
+                <!-- TAB: UPLOAD -->
+                <div id="tab-upload" class="admin-tab-content">
+                    <div class="admin-section" style="border-top:none; padding-top:0; margin-top:0;">
+                        <h4><i class="fas fa-file-upload"></i> Bulk Upload</h4>
+                        <p style="font-size:0.85rem; color:#666;">
+                            Excel/JSON columns: <code>block, subject, chapter, difficulty, question, optionA, optionB, optionC, optionD, optionE, correctAnswer, explanation</code><br>
+                            <strong>chapter</strong> field is optional — use the chapter number (e.g. <code>1</code>, <code>2</code>) to tag MCQs to a chapter.
+                        </p>
+                        <div style="display:flex; gap:10px;">
+                            <input type="file" id="excel-file" accept=".xlsx, .xls" style="flex:1;">
+                            <button onclick="uploadExcel()" class="btn-success">Upload Excel</button>
+                        </div>
+                        <hr style="margin: 15px 0;">
+                        <textarea id="json-input" rows="4" placeholder='[{"block": 9, "subject": "Surgery", "chapter": 3, "difficulty": "hard", "question": "Example?", ...}]'></textarea>
+                        <button onclick="uploadJSON()" class="btn-primary" style="width: 100%;">Upload JSON</button>
                     </div>
-                    <hr style="margin: 15px 0;">
-                    <textarea id="json-input" rows="4" placeholder='[{"block": 9, "subject": "Surgery", "difficulty": "hard", "question": "Example?", ...}]'></textarea>
-                    <button onclick="uploadJSON()" class="btn-primary" style="width: 100%;">Upload JSON</button>
                 </div>
 
                 <hr style="margin: 20px 0;">
@@ -306,14 +424,16 @@
         </section>
     </main>
 
+    <!-- Edit MCQ Modal -->
     <div id="edit-modal" class="modal-overlay hidden">
         <div class="modal-content">
             <h3 style="margin-top:0;">Edit Question</h3>
             <input type="hidden" id="edit-id">
             <label>Question Text</label><textarea id="edit-q" rows="3"></textarea>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
                 <div><label>Block</label><input type="number" id="edit-block"></div>
                 <div><label>Subject</label><input type="text" id="edit-subject"></div>
+                <div><label>Chapter #</label><input type="number" id="edit-chapter" placeholder="Optional"></div>
             </div>
             <label>Difficulty</label>
             <select id="edit-difficulty">
@@ -375,20 +495,24 @@
         let isDailyQuiz = false;
         let currentQuizSubjects = {}; 
         let adminQuestionsCache = []; 
+        let chaptersCache = {}; // { "7_Pharmacology": [{number:1, name:"..."}, ...] }
         let currentUserRef = null;
 
+        // ===================== VIEWS =====================
         window.showView = (id) => {
             document.getElementById('loading-screen').classList.add('hidden');
             document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
         };
 
+        // ===================== THEME =====================
         const themeBtn = document.getElementById('theme-toggle');
         themeBtn.onclick = () => {
             document.body.classList.toggle('dark-mode');
             themeBtn.innerHTML = document.body.classList.contains('dark-mode') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
         };
 
+        // ===================== AUTH =====================
         window.login = async () => {
             document.getElementById('loading-screen').classList.remove('hidden'); 
             const email = document.getElementById("email").value.trim();
@@ -431,7 +555,6 @@
                 onValue(sessionRef, (snapshot) => {
                     const dbSessionId = snapshot.val();
                     const latestLocalId = localStorage.getItem('medbytes_session_id');
-                    
                     if (dbSessionId && latestLocalId && dbSessionId !== latestLocalId) {
                         alert("You logged in from another device. This session will now be closed.");
                         signOut(auth).then(() => {
@@ -470,6 +593,7 @@
             }
         });
 
+        // ===================== QUIZ SAVE/RESUME =====================
         function getSaveKey() {
             return auth.currentUser ? `medbytes_quiz_${auth.currentUser.uid}_${selectedBlock}` : null;
         }
@@ -512,7 +636,6 @@
                 currentQuizSubjects = state.currentQuizSubjects;
                 isMockExamMode = state.isMockExamMode;
                 isDailyQuiz = state.isDailyQuiz;
-                
                 document.getElementById('quiz-subject-title').innerText = state.title;
                 showView('quiz-screen');
                 startTimer(state.timeRemaining, true); 
@@ -520,6 +643,7 @@
             }
         };
 
+        // ===================== ANALYTICS =====================
         window.renderAnalytics = async () => {
             const panel = document.getElementById('analytics-panel');
             if (!currentUserRef) return;
@@ -545,6 +669,7 @@
             }
         };
 
+        // ===================== BLOCK & SUBJECTS =====================
         window.selectBlock = (block) => {
             selectedBlock = block;
             document.getElementById('current-block-id').innerText = block;
@@ -555,7 +680,14 @@
             subjects.forEach(sub => {
                 const div = document.createElement('div');
                 div.className = 'subject-card';
-                div.innerHTML = `<h4>${sub}</h4><button class="btn-primary" onclick="startQuiz('${sub}')">Start Quiz</button>`;
+                div.innerHTML = `
+                    <h4>${sub}</h4>
+                    <button class="btn-primary" style="width:100%; margin-bottom:6px;" onclick="openChapterDrill('${sub}')">
+                        <i class="fas fa-bookmark"></i> By Chapter
+                    </button>
+                    <button class="btn-secondary" style="width:100%; margin-top:0;" onclick="startQuiz('${sub}')">
+                        All Questions
+                    </button>`;
                 list.appendChild(div);
             });
             renderAnalytics();
@@ -563,6 +695,40 @@
             showView('dashboard-screen');
         };
 
+        // ===================== CHAPTER DRILL (STUDENT) =====================
+        window.openChapterDrill = async (subject) => {
+            window._chapterSubject = subject;
+            document.getElementById('chapter-block-label').innerText = selectedBlock;
+            document.getElementById('chapter-subject-label').innerText = subject;
+
+            const chapterKey = `${selectedBlock}_${subject}`;
+            // Load chapters from Firestore
+            const chapDoc = await getDoc(doc(db, "chapters", chapterKey));
+            const chapters = chapDoc.exists() ? (chapDoc.data().list || []) : [];
+            chapters.sort((a,b) => a.number - b.number);
+
+            const grid = document.getElementById('chapter-drill-grid');
+            const empty = document.getElementById('chapter-drill-empty');
+            grid.innerHTML = '';
+
+            if(chapters.length === 0) {
+                grid.classList.add('hidden');
+                empty.classList.remove('hidden');
+            } else {
+                grid.classList.remove('hidden');
+                empty.classList.add('hidden');
+                chapters.forEach(ch => {
+                    const btn = document.createElement('button');
+                    btn.className = 'chapter-pill';
+                    btn.innerHTML = `<strong>Ch. ${String(ch.number).padStart(2,'0')}</strong><span>${ch.name || ''}</span>`;
+                    btn.onclick = () => startChapterQuiz(subject, ch.number, ch.name);
+                    grid.appendChild(btn);
+                });
+            }
+            showView('chapter-screen');
+        };
+
+        // ===================== TIMER =====================
         function startTimer(duration, isSeconds = false) {
             clearInterval(timerInterval);
             timeRemaining = isSeconds ? duration : duration * 60;
@@ -571,7 +737,6 @@
                 timeRemaining--;
                 updateTimerDisplay();
                 if(timeRemaining % 10 === 0) saveQuizState(); 
-                
                 if (timeRemaining <= 0) {
                     clearInterval(timerInterval);
                     alert("Time is up! Submitting quiz.");
@@ -588,13 +753,13 @@
             else document.getElementById('quiz-timer').style.background = "var(--accent)";
         }
 
+        // ===================== QUIZ INIT =====================
         function initQuizState(questionsList, title, customTime = null) {
             const key = getSaveKey();
             if(key && localStorage.getItem(key)) {
                 if(!confirm("You have a paused quiz. Starting a new one will discard your saved progress. Continue?")) return;
                 clearQuizState();
             }
-
             currentQuestions = questionsList;
             if (currentQuestions.length === 0) return alert("No questions found for this criteria.");
             currentIndex = 0; scoreState = { correct: 0, wrong: 0 }; mistakesLog = []; currentQuizSubjects = {}; 
@@ -616,6 +781,22 @@
             initQuizState(questions, subject);
         };
 
+        window.startChapterQuiz = async (subject, chapterNumber, chapterName) => {
+            isMockExamMode = false; isDailyQuiz = false;
+            const diff = document.getElementById('difficulty-filter').value;
+            let conditions = [
+                where("subject", "==", subject),
+                where("block", "==", Number(selectedBlock)),
+                where("chapter", "==", Number(chapterNumber))
+            ];
+            if(diff !== 'all') conditions.push(where("difficulty", "==", diff));
+            const q = query(collection(db, "mcqs"), ...conditions);
+            const snapshot = await getDocs(q);
+            const questions = snapshot.docs.map(d => d.data()).sort(() => Math.random() - 0.5);
+            const title = `${subject} — Ch.${String(chapterNumber).padStart(2,'0')} ${chapterName || ''}`;
+            initQuizState(questions, title);
+        };
+
         window.searchMCQs = async () => {
             const searchTerm = document.getElementById('mcq-search-input').value.trim().toLowerCase();
             if(!searchTerm) return alert("Please enter a keyword.");
@@ -634,7 +815,6 @@
             const q = query(collection(db, "mcqs"), where("block", "==", Number(selectedBlock)));
             const snapshot = await getDocs(q);
             let allQuestions = snapshot.docs.map(doc => doc.data());
-            
             let mockQuestions = [];
             const quotas = mockQuotas[selectedBlock];
 
@@ -646,28 +826,17 @@
                     if(!bySubject[sub]) bySubject[sub] = [];
                     bySubject[sub].push(q);
                 });
-
                 for (let sub in quotas) {
                     let required = quotas[sub];
-                    let available = bySubject[sub] || [];
-                    available = available.sort(() => Math.random() - 0.5); 
-                    
-                    if (available.length < required) {
-                        console.warn(`Not enough DB questions for ${sub}. Needed ${required}, got ${available.length}`);
-                        mockQuestions.push(...available); 
-                    } else {
-                        mockQuestions.push(...available.slice(0, required)); 
-                    }
+                    let available = (bySubject[sub] || []).sort(() => Math.random() - 0.5); 
+                    mockQuestions.push(...available.slice(0, Math.min(required, available.length)));
                 }
             } else {
                 mockQuestions = allQuestions.sort(() => Math.random() - 0.5).slice(0, 140);
             }
-
             mockQuestions = mockQuestions.sort(() => Math.random() - 0.5);
-
             document.getElementById('loading-screen').classList.add('hidden');
             if(mockQuestions.length === 0) return alert("No questions available for a mock exam.");
-            
             isMockExamMode = true; isDailyQuiz = false;
             initQuizState(mockQuestions, `Mock Exam - Block ${selectedBlock}`, 120);
         };
@@ -696,16 +865,13 @@
             document.getElementById('question-text').innerText = data.question;
             document.getElementById('explanation-box').classList.add('hidden');
             const list = document.getElementById('options-list'); list.innerHTML = '';
-            
             saveQuizState(); 
-            
             ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
                 const optText = data['option' + letter];
                 if(!optText) return;
                 const btn = document.createElement('button');
                 btn.className = 'option-btn'; btn.dataset.letter = letter;
                 btn.innerHTML = `<strong>${letter}</strong>: ${optText}`;
-                
                 btn.onclick = () => {
                     const correct = data.correctAnswer.trim().toUpperCase();
                     const isCorrect = (letter === correct);
@@ -714,17 +880,14 @@
                         scoreState.wrong++;
                         mistakesLog.push({ question: data.question, yourAnswer: `${letter}: ${optText}`, correctAnswer: `${correct}: ${data['option' + correct]}`, explanation: data.explanation || "No explanation provided." });
                     }
-                    
                     if(!currentQuizSubjects[data.subject]) currentQuizSubjects[data.subject] = { c: 0, t: 0 };
                     currentQuizSubjects[data.subject].t++;
                     if(isCorrect) currentQuizSubjects[data.subject].c++;
-
                     document.querySelectorAll('.option-btn').forEach(b => {
                         b.disabled = true;
                         if(b.dataset.letter === correct) b.classList.add('correct');
                         if(b.dataset.letter === letter && letter !== correct) b.classList.add('wrong');
                     });
-                    
                     if(!isMockExamMode && !isDailyQuiz) {
                         document.getElementById('explanation-text').innerText = data.explanation || "No explanation.";
                         document.getElementById('explanation-box').classList.remove('hidden');
@@ -754,13 +917,11 @@
             if (currentUserRef) {
                 const userSnap = await getDoc(currentUserRef);
                 let currentStats = userSnap.exists() && userSnap.data().stats ? userSnap.data().stats : {};
-                
                 for(let sub in currentQuizSubjects) {
                     if(!currentStats[sub]) currentStats[sub] = { correct: 0, total: 0 };
                     currentStats[sub].total += currentQuizSubjects[sub].t;
                     currentStats[sub].correct += currentQuizSubjects[sub].c;
                 }
-
                 let updates = { stats: currentStats };
                 if (scoreState.correct > 0) updates.totalCorrect = increment(scoreState.correct);
                 await updateDoc(currentUserRef, updates);
@@ -811,8 +972,15 @@
             showView('result-screen');
         }
 
-        // --- UPDATED: Admin Functions ---
-        window.openAdmin = async () => { showView('admin-screen'); await loadAdminData(); };
+        // ===================== ADMIN =====================
+        window.switchAdminTab = (tabId) => {
+            document.querySelectorAll('.admin-tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        };
+
+        window.openAdmin = async () => { showView('admin-screen'); await loadAdminData(); await loadChapterList(); };
         
         async function loadAdminData() {
             const snap = await getDocs(collection(db, "mcqs"));
@@ -826,29 +994,123 @@
             for(let sub in subjectCounts) { statsHtml += `<div class="stat-box"><h3>${subjectCounts[sub]}</h3><p>${sub}</p></div>`; }
             document.getElementById('admin-stats-container').innerHTML = statsHtml;
             
-            // Populate Subject Dropdown based on "All Blocks" initially
             updateAdminSubjectFilter();
         }
 
+        // ===================== CHAPTER MANAGEMENT (ADMIN) =====================
+        function getChapterKey() {
+            const block = document.getElementById('ch-block').value;
+            const subject = document.getElementById('ch-subject').value;
+            return `${block}_${subject}`;
+        }
+
+        window.loadChapterList = async () => {
+            const key = getChapterKey();
+            const block = document.getElementById('ch-block').value;
+            const subject = document.getElementById('ch-subject').value;
+            const chapDoc = await getDoc(doc(db, "chapters", key));
+            const chapters = chapDoc.exists() ? (chapDoc.data().list || []) : [];
+            chapters.sort((a,b) => a.number - b.number);
+            chaptersCache[key] = chapters;
+            renderChapterTable(chapters, block, subject);
+        };
+
+        function renderChapterTable(chapters, block, subject) {
+            const container = document.getElementById('chapter-list-container');
+            if(chapters.length === 0) {
+                container.innerHTML = `<p style="color:#888; font-size:0.9rem; margin-top:8px;">No chapters yet for Block ${block} → ${subject}. Add one above!</p>`;
+                return;
+            }
+            let html = `
+                <table class="chapter-list-table">
+                    <thead><tr><th>#</th><th>Chapter Name</th><th>MCQs Tagged</th><th>Action</th></tr></thead>
+                    <tbody>`;
+            chapters.forEach(ch => {
+                const key = `${block}_${subject}`;
+                const tagged = adminQuestionsCache.filter(q => q.block == block && q.subject === subject && q.chapter == ch.number).length;
+                html += `<tr>
+                    <td><span class="chapter-badge">Ch.${String(ch.number).padStart(2,'0')}</span></td>
+                    <td>${ch.name || '<em style="color:#aaa">Unnamed</em>'}</td>
+                    <td><strong>${tagged}</strong> MCQs</td>
+                    <td>
+                        <button class="btn-danger" style="padding:4px 10px; font-size:0.8rem; margin:0;" 
+                            onclick="deleteChapter(${ch.number})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            });
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        window.addChapter = async () => {
+            const number = parseInt(document.getElementById('new-ch-number').value);
+            const name = document.getElementById('new-ch-name').value.trim();
+            if(!number || number < 1) return alert("Please enter a valid chapter number.");
+            
+            const key = getChapterKey();
+            const block = document.getElementById('ch-block').value;
+            const subject = document.getElementById('ch-subject').value;
+            const existing = chaptersCache[key] || [];
+
+            if(existing.find(c => c.number === number)) return alert(`Chapter ${number} already exists for this subject!`);
+
+            const updated = [...existing, { number, name }];
+            await setDoc(doc(db, "chapters", key), { block: Number(block), subject, list: updated });
+            chaptersCache[key] = updated;
+
+            document.getElementById('new-ch-number').value = '';
+            document.getElementById('new-ch-name').value = '';
+            alert(`Chapter ${number} "${name}" added to Block ${block} → ${subject}!`);
+            await loadChapterList();
+            // Refresh chapter filter in MCQ tab too
+            await updateAdminChapterFilter();
+        };
+
+        window.deleteChapter = async (number) => {
+            if(!confirm(`Delete Chapter ${number}? The MCQs tagged to it won't be deleted, but they'll lose their chapter tag.`)) return;
+            const key = getChapterKey();
+            const existing = chaptersCache[key] || [];
+            const updated = existing.filter(c => c.number !== number);
+            await setDoc(doc(db, "chapters", key), { list: updated });
+            chaptersCache[key] = updated;
+            alert(`Chapter ${number} deleted.`);
+            await loadChapterList();
+        };
+
+        // ===================== MCQ ADMIN FILTERS =====================
         window.updateAdminSubjectFilter = () => {
             const blockFilter = document.getElementById('admin-filter-block').value;
             const subjectSelect = document.getElementById('admin-filter-subject');
-            
-            // Get unique subjects for the selected block
             let subjects = new Set();
             adminQuestionsCache.forEach(q => {
-                if (blockFilter === 'all' || q.block.toString() === blockFilter) {
-                    subjects.add(q.subject);
-                }
+                if (blockFilter === 'all' || q.block.toString() === blockFilter) subjects.add(q.subject);
             });
-
-            // Rebuild subject options
             subjectSelect.innerHTML = '<option value="all">All Subjects</option>';
             Array.from(subjects).sort().forEach(sub => {
                 subjectSelect.innerHTML += `<option value="${sub}">${sub}</option>`;
             });
+            updateAdminChapterFilter();
+        };
 
-            // Trigger the filter list
+        window.updateAdminChapterFilter = async () => {
+            const blockFilter = document.getElementById('admin-filter-block').value;
+            const subjectFilter = document.getElementById('admin-filter-subject').value;
+            const chapterSelect = document.getElementById('admin-filter-chapter');
+            chapterSelect.innerHTML = '<option value="all">All Chapters</option>';
+
+            if(blockFilter !== 'all' && subjectFilter !== 'all') {
+                const key = `${blockFilter}_${subjectFilter}`;
+                if(!chaptersCache[key]) {
+                    const chapDoc = await getDoc(doc(db, "chapters", key));
+                    chaptersCache[key] = chapDoc.exists() ? (chapDoc.data().list || []) : [];
+                }
+                const chapters = chaptersCache[key].sort((a,b) => a.number - b.number);
+                chapters.forEach(ch => {
+                    chapterSelect.innerHTML += `<option value="${ch.number}">Ch.${String(ch.number).padStart(2,'0')} ${ch.name || ''}</option>`;
+                });
+            }
             filterAdminMCQs();
         };
 
@@ -856,15 +1118,15 @@
             const term = document.getElementById('admin-search').value.toLowerCase();
             const blockFilter = document.getElementById('admin-filter-block').value;
             const subjectFilter = document.getElementById('admin-filter-subject').value;
+            const chapterFilter = document.getElementById('admin-filter-chapter').value;
 
             const filtered = adminQuestionsCache.filter(q => {
                 const matchTerm = q.question.toLowerCase().includes(term) || q.subject.toLowerCase().includes(term);
                 const matchBlock = (blockFilter === 'all') || (q.block.toString() === blockFilter);
                 const matchSubject = (subjectFilter === 'all') || (q.subject === subjectFilter);
-                
-                return matchTerm && matchBlock && matchSubject;
+                const matchChapter = (chapterFilter === 'all') || (String(q.chapter) === String(chapterFilter));
+                return matchTerm && matchBlock && matchSubject && matchChapter;
             });
-            
             renderAdminMCQList(filtered);
         };
 
@@ -873,13 +1135,16 @@
             if(list.length === 0) { container.innerHTML = "<p>No questions found.</p>"; return; }
             let html = "";
             list.forEach((q, index) => {
-                // The index + 1 is injected as Q1, Q2...
+                const chapterBadge = q.chapter 
+                    ? `<span class="chapter-badge" style="margin-left:4px;">Ch.${String(q.chapter).padStart(2,'0')}</span>` 
+                    : `<span class="no-chapter-badge" style="margin-left:4px;">No Chapter</span>`;
                 html += `
                 <div class="admin-mcq-item">
                     <div style="flex:1; font-size:0.9rem;">
                         <span style="font-weight: bold; color: var(--secondary); margin-right: 5px;">Q${index + 1}.</span>
-                        <span class="timer-badge" style="background:var(--secondary); font-size:0.7rem;">Block ${q.block}</span> 
-                        <strong>${q.subject}</strong> <br> ${q.question.substring(0, 80)}...
+                        <span class="timer-badge" style="background:var(--secondary); font-size:0.7rem;">Block ${q.block}</span>
+                        ${chapterBadge}
+                        <strong> ${q.subject}</strong><br>${q.question.substring(0, 80)}...
                     </div>
                     <div style="display:flex; gap:5px; flex-direction:column;">
                         <button class="btn-primary" style="padding:5px 10px; font-size:0.8rem;" onclick="openEditModal('${q.id}')">Edit</button>
@@ -903,6 +1168,7 @@
             document.getElementById('edit-q').value = q.question;
             document.getElementById('edit-block').value = q.block;
             document.getElementById('edit-subject').value = q.subject;
+            document.getElementById('edit-chapter').value = q.chapter || '';
             document.getElementById('edit-difficulty').value = q.difficulty || 'medium';
             document.getElementById('edit-a').value = q.optionA || '';
             document.getElementById('edit-b').value = q.optionB || '';
@@ -916,11 +1182,21 @@
 
         window.saveEdit = async () => {
             const id = document.getElementById('edit-id').value;
+            const chapterVal = document.getElementById('edit-chapter').value;
             try {
                 await updateDoc(doc(db, "mcqs", id), {
-                    question: document.getElementById('edit-q').value, block: Number(document.getElementById('edit-block').value), subject: document.getElementById('edit-subject').value.trim(), difficulty: document.getElementById('edit-difficulty').value,
-                    optionA: document.getElementById('edit-a').value, optionB: document.getElementById('edit-b').value, optionC: document.getElementById('edit-c').value, optionD: document.getElementById('edit-d').value, optionE: document.getElementById('edit-e').value,
-                    correctAnswer: document.getElementById('edit-correct').value.trim().toUpperCase(), explanation: document.getElementById('edit-exp').value
+                    question: document.getElementById('edit-q').value,
+                    block: Number(document.getElementById('edit-block').value),
+                    subject: document.getElementById('edit-subject').value.trim(),
+                    chapter: chapterVal ? Number(chapterVal) : null,
+                    difficulty: document.getElementById('edit-difficulty').value,
+                    optionA: document.getElementById('edit-a').value,
+                    optionB: document.getElementById('edit-b').value,
+                    optionC: document.getElementById('edit-c').value,
+                    optionD: document.getElementById('edit-d').value,
+                    optionE: document.getElementById('edit-e').value,
+                    correctAnswer: document.getElementById('edit-correct').value.trim().toUpperCase(),
+                    explanation: document.getElementById('edit-exp').value
                 });
                 alert("Question updated successfully!");
                 document.getElementById('edit-modal').classList.add('hidden');
@@ -928,6 +1204,7 @@
             } catch (e) { alert("Error updating: " + e.message); }
         };
 
+        // ===================== UPLOAD =====================
         const processUpload = async (dataArray) => {
             const snap = await getDocs(collection(db, "mcqs"));
             const existingQs = new Set(snap.docs.map(d => d.data().question.trim().toLowerCase()));
@@ -939,9 +1216,16 @@
                 if (existingQs.has(qText)) { dupes++; continue; }
                 try {
                     await addDoc(collection(db, "mcqs"), {
-                        block: Number(row.block), subject: row.subject.trim(), difficulty: (row.difficulty || "medium").toLowerCase(),
-                        question: row.question, optionA: String(row.optionA), optionB: String(row.optionB), optionC: String(row.optionC), optionD: String(row.optionD), optionE: String(row.optionE || ""),
-                        correctAnswer: String(row.correctAnswer).trim().toUpperCase(), explanation: row.explanation || ""
+                        block: Number(row.block),
+                        subject: row.subject.trim(),
+                        chapter: row.chapter ? Number(row.chapter) : null,
+                        difficulty: (row.difficulty || "medium").toLowerCase(),
+                        question: row.question,
+                        optionA: String(row.optionA), optionB: String(row.optionB),
+                        optionC: String(row.optionC), optionD: String(row.optionD),
+                        optionE: String(row.optionE || ""),
+                        correctAnswer: String(row.correctAnswer).trim().toUpperCase(),
+                        explanation: row.explanation || ""
                     });
                     existingQs.add(qText);
                     count++;
