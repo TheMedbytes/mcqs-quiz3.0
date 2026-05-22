@@ -883,45 +883,71 @@
         };
 
         // ===================== BLOCK & SUBJECTS =====================
-        window.selectBlock = async (block) => {
+        window.selectBlock = (block) => {
             selectedBlock = block;
             document.getElementById('current-block-id').innerText = block;
             const list = document.getElementById('subject-list');
-            // Show skeleton while loading
+            // Show skeleton placeholders immediately
             list.innerHTML = '<div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div>';
             
-            // Fetch question counts per subject
-            const snap = await getDocs(query(collection(db, "mcqs"), where("block", "==", Number(block))));
-            const counts = {};
-            snap.docs.forEach(d => { const s = d.data().subject; counts[s] = (counts[s]||0)+1; });
-            
-            list.innerHTML = '';
-            let subjects = [...commonSubjects];
-            if(block === 9) subjects.push("Family Medicine");
-            subjects.forEach(sub => {
-                const accent = subjectAccents[sub] || 'var(--secondary)';
-                const icon = subjectIcons[sub] || '📖';
-                const count = counts[sub] || 0;
-                const div = document.createElement('div');
-                div.className = 'subject-card';
-                div.style.setProperty('--subject-accent', accent);
-                div.innerHTML = `
-                    <div class="subject-card-header">
-                        <span class="subject-card-icon">${icon}</span>
-                        <h4>${sub}</h4>
-                        <span class="subject-q-badge">${count} Qs</span>
-                    </div>
-                    <button class="btn-primary" style="width:100%; margin-bottom:6px;" onclick="openChapterDrill('${sub}')">
-                        <i class="fas fa-bookmark"></i> By Chapter
-                    </button>
-                    <button class="btn-secondary" style="width:100%; margin-top:0;" onclick="startQuiz('${sub}')">
-                        All Questions
-                    </button>`;
-                list.appendChild(div);
-            });
-            renderAnalytics();
-            checkSavedQuiz(); 
+            // Show the dashboard RIGHT AWAY so the loading screen disappears
             showView('dashboard-screen');
+            renderAnalytics();
+            checkSavedQuiz();
+
+            // Then fetch question counts and populate cards in the background
+            getDocs(query(collection(db, "mcqs"), where("block", "==", Number(block)))).then(snap => {
+                const counts = {};
+                snap.docs.forEach(d => { const s = d.data().subject; counts[s] = (counts[s]||0)+1; });
+                list.innerHTML = '';
+                let subjects = [...commonSubjects];
+                if(block === 9) subjects.push("Family Medicine");
+                subjects.forEach(sub => {
+                    const accent = subjectAccents[sub] || 'var(--secondary)';
+                    const icon = subjectIcons[sub] || '📖';
+                    const count = counts[sub] || 0;
+                    const div = document.createElement('div');
+                    div.className = 'subject-card';
+                    div.style.setProperty('--subject-accent', accent);
+                    div.innerHTML = `
+                        <div class="subject-card-header">
+                            <span class="subject-card-icon">${icon}</span>
+                            <h4>${sub}</h4>
+                            <span class="subject-q-badge">${count} Qs</span>
+                        </div>
+                        <button class="btn-primary" style="width:100%; margin-bottom:6px;" onclick="openChapterDrill('${sub}')">
+                            <i class="fas fa-bookmark"></i> By Chapter
+                        </button>
+                        <button class="btn-secondary" style="width:100%; margin-top:0;" onclick="startQuiz('${sub}')">
+                            All Questions
+                        </button>`;
+                    list.appendChild(div);
+                });
+            }).catch(e => {
+                // Fallback: render cards without counts if fetch fails
+                list.innerHTML = '';
+                let subjects = [...commonSubjects];
+                if(block === 9) subjects.push("Family Medicine");
+                subjects.forEach(sub => {
+                    const accent = subjectAccents[sub] || 'var(--secondary)';
+                    const icon = subjectIcons[sub] || '📖';
+                    const div = document.createElement('div');
+                    div.className = 'subject-card';
+                    div.style.setProperty('--subject-accent', accent);
+                    div.innerHTML = `
+                        <div class="subject-card-header">
+                            <span class="subject-card-icon">${icon}</span>
+                            <h4>${sub}</h4>
+                        </div>
+                        <button class="btn-primary" style="width:100%; margin-bottom:6px;" onclick="openChapterDrill('${sub}')">
+                            <i class="fas fa-bookmark"></i> By Chapter
+                        </button>
+                        <button class="btn-secondary" style="width:100%; margin-top:0;" onclick="startQuiz('${sub}')">
+                            All Questions
+                        </button>`;
+                    list.appendChild(div);
+                });
+            });
         };
 
         // ===================== CHAPTER DRILL (STUDENT) =====================
