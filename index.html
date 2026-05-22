@@ -826,7 +826,7 @@
                                 <label style="font-size:0.8rem; font-weight:bold; color:var(--chapter);">Chapter Name</label>
                                 <input type="text" id="new-ch-name" placeholder="e.g. Autonomic Pharmacology" style="margin:0;">
                             </div>
-                            <button class="btn-chapter" style="height:40px; white-space:nowrap;" onclick="addChapter()"><i class="fas fa-plus"></i> Add</button>
+                  <button type="button" class="btn-chapter" style="height:40px; white-space:nowrap;" onclick="addChapter()">
                         </div>
 
                         <!-- Chapter list for selected block+subject -->
@@ -1526,6 +1526,7 @@
         }
 
         window.addChapter = async () => {
+    alert("Button reached!"); // ← ADD THIS FIRST
     const number = parseInt(document.getElementById('new-ch-number').value);
     const name = document.getElementById('new-ch-name').value.trim();
     if (!number || number < 1) return alert("Please enter a valid chapter number.");
