@@ -172,13 +172,135 @@
             padding: 5px 12px; font-size: 0.85rem; border-radius: 6px; font-weight: 600;
         }
         .select-mode-toggle.active { background: var(--secondary); color: white; }
-    </style>
+    
+        /* ===== SKELETON LOADER ===== */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .skeleton {
+            background: linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.12) 50%, rgba(0,0,0,0.06) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite;
+            border-radius: 8px;
+        }
+        .dark-mode .skeleton {
+            background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+            background-size: 200% 100%;
+        }
+        .skeleton-card { height: 90px; margin-bottom: 12px; }
+        .skeleton-text { height: 14px; margin: 6px 0; width: 60%; }
+        .skeleton-text.wide { width: 90%; }
+
+        /* ===== SVG SCORE RING ===== */
+        .score-ring-wrap { position: relative; width: 140px; height: 140px; margin: 0 auto 20px; }
+        .score-ring-wrap .ring-label {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem; font-weight: bold; color: var(--secondary);
+        }
+        .score-ring { transform: rotate(-90deg); }
+        .score-ring-bg { fill: none; stroke: rgba(52,152,219,0.15); stroke-width: 10; }
+        .score-ring-fill { fill: none; stroke: var(--secondary); stroke-width: 10; stroke-linecap: round;
+            transition: stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1); }
+
+        /* ===== XP / LEVEL BADGE ===== */
+        .xp-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white; padding: 4px 12px; border-radius: 20px;
+            font-size: 0.8rem; font-weight: bold; margin-left: 8px;
+        }
+        .level-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: white; padding: 3px 10px; border-radius: 12px;
+            font-size: 0.75rem; font-weight: bold; margin-left: 6px;
+        }
+
+        /* ===== DARK MODE FIXES ===== */
+        .dark-mode input, .dark-mode select, .dark-mode textarea {
+            border-color: #555 !important;
+            background: #3a3a3a !important;
+        }
+        .dark-mode .card { border: 1px solid #444; }
+        .dark-mode .subject-card { border-color: #555; }
+        .dark-mode .option-btn { border-color: #555; }
+        .dark-mode .admin-mcq-item { border-bottom-color: #444; }
+
+        /* ===== SUBJECT CARD ICONS & ACCENTS ===== */
+        .subject-card { position: relative; overflow: hidden; }
+        .subject-card .subj-icon { font-size: 2rem; margin-bottom: 8px; display: block; }
+        .subject-card .subj-count { 
+            position: absolute; top: 10px; right: 10px;
+            background: var(--secondary); color: white;
+            font-size: 0.7rem; font-weight: bold;
+            padding: 2px 7px; border-radius: 10px;
+        }
+        .subject-card[data-color] { border-left: 4px solid var(--subj-color, var(--secondary)); }
+
+        /* ===== DASHBOARD SECTIONS ===== */
+        .dash-section-label {
+            text-align: left; font-size: 0.75rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1px;
+            color: #888; margin: 18px 0 8px;
+            padding-left: 4px;
+        }
+
+        /* ===== DUPLICATE DETECTOR ===== */
+        .dupe-warning {
+            background: rgba(243,156,18,0.15); border: 1px solid var(--warning);
+            padding: 10px 14px; border-radius: 8px; margin: 8px 0;
+            font-size: 0.85rem;
+        }
+        .dupe-warning strong { color: var(--warning); }
+
+        /* ===== MOBILE FILTER STACK ===== */
+        @media (max-width: 600px) {
+            .admin-filters-container { flex-direction: column; }
+            .admin-filters-container select,
+            .admin-filters-container input { width: 100% !important; }
+        }
+
+        /* ===== WEAK RETRY BUTTON ===== */
+        .btn-retry { background: linear-gradient(135deg, #8e44ad, #6c3483); color: white; width: 100%; margin-bottom: 10px; font-size: 1rem; }
+
+        /* ===== LEADERBOARD ===== */
+        .leaderboard-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; margin-bottom: 6px; background: rgba(0,0,0,0.03); }
+        .dark-mode .leaderboard-row { background: rgba(255,255,255,0.04); }
+        .leaderboard-rank { font-size: 1.2rem; width: 30px; text-align:center; }
+        .leaderboard-name { flex: 1; font-weight: 600; }
+        .leaderboard-score { color: var(--secondary); font-weight: bold; }
+
+        /* ===== INLINE CHAPTER EDIT ===== */
+        .inline-ch-edit {
+            display: inline-flex; align-items: center; gap: 4px;
+            background: rgba(22,160,133,0.1); border: 1px dashed var(--chapter);
+            border-radius: 6px; padding: 2px 6px; cursor: pointer; font-size: 0.8rem;
+        }
+        .inline-ch-input {
+            width: 60px; padding: 2px 4px; font-size: 0.8rem;
+            border: 1px solid var(--chapter); border-radius: 4px;
+            display: none;
+        }
+
+        /* ===== LOADING TEXT ===== */
+        .loading-sub { color: #888; font-size: 0.85rem; margin-top: 6px; }
+        @keyframes dot-pulse { 0%,80%,100%{opacity:0} 40%{opacity:1} }
+        .loading-dots span { animation: dot-pulse 1.4s infinite; display:inline-block; }
+        .loading-dots span:nth-child(2) { animation-delay:.2s; }
+        .loading-dots span:nth-child(3) { animation-delay:.4s; }
+
+        </style>
 </head>
 <body class="light-mode">
     
     <div id="loading-screen" class="loading-overlay">
         <img src="logo.png" alt="MedBytes Logo" class="loading-logo" onerror="this.src='https://via.placeholder.com/180x180?text=Logo'">
-        <h2 style="color: var(--primary); margin-top: 10px; font-family: 'Segoe UI', sans-serif;">Loading...</h2>
+        <h2 style="color: var(--primary); margin-top: 10px; font-family: 'Segoe UI', sans-serif;">
+            Loading<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>
+        </h2>
+        <p class="loading-sub" id="loading-sub-text">Connecting to MedBytes</p>
     </div>
 
     <nav>
@@ -228,10 +350,13 @@
                 </div>
                 <div style="text-align: right;">
                     <div id="streak-display" style="font-size: 1.5rem; font-weight: bold; color: #e67e22;" title="Daily Streak">🔥 0</div>
+                    <div id="xp-display" style="margin-top:4px; font-size:0.8rem; color:#888;"><span id="xp-label"></span></div>
                 </div>
             </div>
 
             <button id="resume-quiz-btn" class="btn-success hidden" style="width: 100%; margin-bottom: 10px; font-size: 1.1rem;" onclick="resumeQuiz()"><i class="fas fa-play-circle"></i> Resume Paused Quiz</button>
+            <button id="weak-retry-btn" class="btn-retry hidden" onclick="startWeakRetry()"><i class="fas fa-redo-alt"></i> Retry Weak Questions</button>
+            <div class="dash-section-label">🎯 Daily & Exams</div>
             <button id="daily-quiz-btn" class="btn-daily" onclick="startDailyQuiz()"><i class="fas fa-calendar-day"></i> Take Daily Challenge (10 Qs)</button>
             
             <div id="analytics-panel" class="analytics-panel hidden">
@@ -258,7 +383,12 @@
                 <button class="btn-danger" style="margin: 0;" onclick="startMockExam()"><i class="fas fa-stopwatch"></i> Mock Exam (140 Qs)</button>
             </div>
 
+            <div class="dash-section-label">📚 Study by Subject</div>
             <div class="subject-grid" id="subject-list"></div>
+            <div class="dash-section-label">🏆 Leaderboard</div>
+            <div id="leaderboard-section" class="card" style="padding:15px;">
+                <div id="leaderboard-list"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div></div>
+            </div>
         </section>
 
         <!-- CHAPTER DRILL-DOWN (Student) -->
@@ -306,7 +436,14 @@
         <section id="result-screen" class="view hidden">
             <div class="card">
                 <h2>Quiz Complete!</h2>
-                <div class="score-circle" id="final-score-circle">0%</div>
+                <div class="score-ring-wrap">
+                    <svg class="score-ring" width="140" height="140" viewBox="0 0 140 140">
+                        <circle class="score-ring-bg" cx="70" cy="70" r="60"/>
+                        <circle class="score-ring-fill" id="score-ring-fill" cx="70" cy="70" r="60"
+                            stroke-dasharray="377" stroke-dashoffset="377"/>
+                    </svg>
+                    <div class="ring-label" id="final-score-circle">0%</div>
+                </div>
                 <div style="display: flex; justify-content: space-around; margin-bottom: 20px;">
                     <h3 style="color: var(--success);"><i class="fas fa-check-circle"></i> Correct: <span id="correct-count">0</span></h3>
                     <h3 style="color: var(--accent);"><i class="fas fa-times-circle"></i> Wrong: <span id="wrong-count">0</span></h3>
@@ -411,6 +548,7 @@
                         <span class="bulk-count" id="bulk-count-label">0 selected</span>
                         <button onclick="selectAllVisible()" style="background:var(--warning); color:white; padding:5px 12px; font-size:0.82rem; margin:0;"><i class="fas fa-check-double"></i> Select All</button>
                         <button onclick="deselectAll()" style="background:#95a5a6; color:white; padding:5px 12px; font-size:0.82rem; margin:0;"><i class="fas fa-times"></i> Deselect All</button>
+                        <button onclick="bulkAssignChapter()" style="background:var(--chapter); color:white; padding:5px 12px; font-size:0.82rem; margin:0;"><i class="fas fa-bookmark"></i> Assign Chapter</button>
                         <button onclick="deleteSelected()" style="background:var(--accent); color:white; padding:5px 12px; font-size:0.82rem; margin:0;"><i class="fas fa-trash"></i> Delete Selected</button>
                     </div>
                     <div class="admin-filters-container">
@@ -603,6 +741,7 @@
                 if (!userSnap.exists()) {
                     await setDoc(currentUserRef, { email: user.email, name: user.email.split('@')[0].toUpperCase(), totalCorrect: 0, streak: 0, lastDaily: null, stats: {} });
                     document.getElementById('streak-display').innerText = "🔥 0";
+                    renderXP(0);
                 } else {
                     let data = userSnap.data();
                     let currentStreak = data.streak || 0;
@@ -611,6 +750,7 @@
                         await updateDoc(currentUserRef, { streak: 0 });
                     }
                     document.getElementById('streak-display').innerText = `🔥 ${currentStreak}`;
+                    renderXP(data.totalCorrect || 0);
                     if(data.lastDaily === today) {
                         const btn = document.getElementById('daily-quiz-btn');
                         btn.disabled = true;
@@ -711,8 +851,14 @@
             subjects.forEach(sub => {
                 const div = document.createElement('div');
                 div.className = 'subject-card';
+                const meta = subjectMeta[sub] || { icon: '📖', color: 'var(--secondary)' };
+                const count = adminQuestionsCache.filter ? adminQuestionsCache.filter(q => q.subject === sub && q.block == block).length : '?';
+                div.style.setProperty('--subj-color', meta.color);
+                div.dataset.color = meta.color;
                 div.innerHTML = `
-                    <h4>${sub}</h4>
+                    <span class="subj-icon">${meta.icon}</span>
+                    <span class="subj-count">${count > 0 ? count + ' Qs' : ''}</span>
+                    <h4 style="margin:0 0 8px;">${sub}</h4>
                     <button class="btn-primary" style="width:100%; margin-bottom:6px;" onclick="openChapterDrill('${sub}')">
                         <i class="fas fa-bookmark"></i> By Chapter
                     </button>
@@ -942,6 +1088,7 @@
             const total = scoreState.correct + scoreState.wrong;
             const percentage = total > 0 ? Math.round((scoreState.correct / total) * 100) : 0;
             document.getElementById('final-score-circle').innerText = `${percentage}%`;
+            animateScoreRing(percentage);
             document.getElementById('correct-count').innerText = scoreState.correct;
             document.getElementById('wrong-count').innerText = scoreState.wrong;
 
@@ -1370,6 +1517,209 @@
                 processUpload(data);
             } catch (e) { alert("Invalid JSON format: " + e.message); }
         };
+
+        // ===================== LOADING SCREEN SAFETY TIMEOUT =====================
+        // Force-hide loading screen after 10s to prevent stuck state
+        const _loadingTimeout = setTimeout(() => {
+            const ls = document.getElementById('loading-screen');
+            if (ls && !ls.classList.contains('hidden')) {
+                console.warn('Loading timeout — forcing dismiss');
+                ls.classList.add('hidden');
+                // If no view is showing, show auth
+                const anyVisible = document.querySelector('.view:not(.hidden)');
+                if (!anyVisible) showView('auth-screen');
+            }
+        }, 10000);
+
+        // Update loading sub-text for better UX
+        const _loadingMessages = ['Connecting to MedBytes', 'Loading question bank...', 'Almost ready...'];
+        let _lmi = 0;
+        const _lmInterval = setInterval(() => {
+            _lmi++;
+            const el = document.getElementById('loading-sub-text');
+            if (el && _lmi < _loadingMessages.length) el.innerText = _loadingMessages[_lmi];
+            else clearInterval(_lmInterval);
+        }, 2500);
+
+        // ===================== XP / LEVEL SYSTEM =====================
+        const XP_LEVELS = [
+            { name: 'Intern', min: 0, max: 49 },
+            { name: 'Resident', min: 50, max: 199 },
+            { name: 'Registrar', min: 200, max: 499 },
+            { name: 'Consultant', min: 500, max: 999 },
+            { name: 'Professor', min: 1000, max: Infinity }
+        ];
+
+        function getLevelInfo(xp) {
+            for (const l of XP_LEVELS) {
+                if (xp >= l.min && xp <= l.max) return l;
+            }
+            return XP_LEVELS[XP_LEVELS.length - 1];
+        }
+
+        function renderXP(totalCorrect) {
+            const lvl = getLevelInfo(totalCorrect || 0);
+            const el = document.getElementById('xp-label');
+            if (el) el.innerHTML = `<span class="level-badge">🩺 ${lvl.name}</span> <span class="xp-badge">⚡ ${totalCorrect || 0} XP</span>`;
+        }
+
+        // ===================== WEAK RETRY MODE =====================
+        let weakQuestionIds = [];
+
+        window.startWeakRetry = async () => {
+            if (!currentUserRef) return;
+            const userSnap = await getDoc(currentUserRef);
+            if (!userSnap.exists()) return;
+            const stats = userSnap.data().stats || {};
+            const weakSubjects = Object.entries(stats)
+                .filter(([, v]) => v.total >= 3 && (v.correct / v.total) < 0.6)
+                .map(([sub]) => sub);
+
+            if (weakSubjects.length === 0) return alert("No weak subjects detected yet. Complete more quizzes to unlock this!");
+
+            document.getElementById('loading-screen').classList.remove('hidden');
+            let allWeak = [];
+            for (const sub of weakSubjects) {
+                const q = query(collection(db, "mcqs"), where("subject", "==", sub), where("block", "==", Number(selectedBlock)));
+                const snap = await getDocs(q);
+                allWeak.push(...snap.docs.map(d => d.data()));
+            }
+            allWeak = allWeak.sort(() => Math.random() - 0.5).slice(0, 30);
+            document.getElementById('loading-screen').classList.add('hidden');
+            if (allWeak.length === 0) return alert("No questions found for your weak subjects.");
+            isMockExamMode = false; isDailyQuiz = false;
+            initQuizState(allWeak, `🔁 Weak Question Retry`);
+        };
+
+        // ===================== LEADERBOARD =====================
+        async function loadLeaderboard() {
+            const container = document.getElementById('leaderboard-list');
+            if (!container) return;
+            try {
+                const snap = await getDocs(collection(db, "users"));
+                let users = snap.docs.map(d => ({ name: d.data().name || d.data().email?.split('@')[0] || 'Anonymous', xp: d.data().totalCorrect || 0, streak: d.data().streak || 0 }));
+                users.sort((a, b) => b.xp - a.xp);
+                const top = users.slice(0, 8);
+                const rankEmojis = ['🥇','🥈','🥉'];
+                if (top.length === 0) { container.innerHTML = '<p style="color:#888; font-size:0.9rem;">No data yet. Be the first!</p>'; return; }
+                container.innerHTML = top.map((u, i) => `
+                    <div class="leaderboard-row">
+                        <span class="leaderboard-rank">${rankEmojis[i] || (i+1)}</span>
+                        <span class="leaderboard-name">${u.name}</span>
+                        <span class="leaderboard-score">⚡${u.xp}</span>
+                        <span style="color:#e67e22; font-size:0.85rem;">🔥${u.streak}</span>
+                    </div>`).join('');
+            } catch(e) { console.error(e); container.innerHTML = '<p style="color:#888; font-size:0.85rem;">Leaderboard unavailable.</p>'; }
+        }
+
+        // ===================== SCORE RING ANIMATION =====================
+        function animateScoreRing(percentage) {
+            const circumference = 377; // 2*PI*60
+            const fill = document.getElementById('score-ring-fill');
+            if (!fill) return;
+            const offset = circumference - (percentage / 100) * circumference;
+            // Color based on score
+            if (percentage >= 70) fill.style.stroke = 'var(--success)';
+            else if (percentage >= 50) fill.style.stroke = 'var(--warning)';
+            else fill.style.stroke = 'var(--accent)';
+            // Animate after a tick
+            setTimeout(() => { fill.style.strokeDashoffset = offset; }, 50);
+        }
+
+        // ===================== SUBJECT ICONS & COLORS =====================
+        const subjectMeta = {
+            'Pharmacology':      { icon: '💊', color: '#3498db' },
+            'Pathology':         { icon: '🔬', color: '#e74c3c' },
+            'Medicine':          { icon: '🩺', color: '#27ae60' },
+            'Forensic Medicine': { icon: '⚖️', color: '#2c3e50' },
+            'Community Medicine':{ icon: '🌍', color: '#16a085' },
+            'Surgery':           { icon: '🔧', color: '#8e44ad' },
+            'Behavioral Sciences':{ icon: '🧠', color: '#f39c12' },
+            'Patient Safety':    { icon: '🛡️', color: '#e67e22' },
+            'Family Medicine':   { icon: '👨‍👩‍👧', color: '#1abc9c' },
+        };
+
+        // ===================== BULK ASSIGN CHAPTER =====================
+        window.bulkAssignChapter = async () => {
+            if (selectedIds.size === 0) return;
+            const chNum = prompt(`Assign ${selectedIds.size} selected question(s) to which chapter number?
+(Enter a number, e.g. 3)`);
+            if (!chNum || isNaN(Number(chNum))) return;
+            const chapter = Number(chNum);
+            document.getElementById('loading-screen').classList.remove('hidden');
+            let updated = 0;
+            for (const id of selectedIds) {
+                try {
+                    await updateDoc(doc(db, "mcqs", id), { chapter });
+                    updated++;
+                } catch(e) { console.error(e); }
+            }
+            selectedIds.clear();
+            selectModeActive = false;
+            const btn = document.getElementById('select-mode-btn');
+            btn.classList.remove('active');
+            btn.innerHTML = '<i class="fas fa-check-square"></i> Select';
+            document.getElementById('bulk-action-bar').classList.add('hidden');
+            document.getElementById('loading-screen').classList.add('hidden');
+            alert(`Assigned ${updated} questions to Chapter ${chapter}.`);
+            await loadAdminData();
+        };
+
+        // ===================== DUPLICATE DETECTOR BEFORE UPLOAD =====================
+        const _origProcessUpload = processUpload;
+        // Override to show dupe warning in UI before uploading
+        window.previewUploadDuplicates = async (dataArray) => {
+            const snap = await getDocs(collection(db, "mcqs"));
+            const existingQs = new Set(snap.docs.map(d => d.data().question.trim().toLowerCase()));
+            const dupes = dataArray.filter(row => row.question && existingQs.has(row.question.trim().toLowerCase()));
+            return dupes;
+        };
+
+        // Wrap uploadExcel for dupe preview
+        const _origUploadExcel = window.uploadExcel;
+        window.uploadExcel = () => {
+            const file = document.getElementById('excel-file').files[0];
+            if (!file) return alert("Select file");
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+                const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                const dupes = await window.previewUploadDuplicates(json);
+                if (dupes.length > 0) {
+                    const proceed = confirm(`⚠️ ${dupes.length} duplicate question(s) detected!\n\nThese will be skipped automatically. Proceed with upload?\n\nFirst duplicate: "${dupes[0].question?.substring(0,80)}..."`);
+                    if (!proceed) return;
+                }
+                processUpload(json);
+            };
+            reader.readAsArrayBuffer(file);
+        };
+
+
+        // ===================== INLINE CHAPTER EDIT =====================
+        window.inlineEditChapter = async (id, currentChapter) => {
+            const newCh = prompt(`Edit chapter for this MCQ\nCurrent: ${currentChapter || 'None'}\nEnter new chapter number (or clear to remove):`);
+            if (newCh === null) return; // cancelled
+            const chapter = newCh.trim() === '' ? null : Number(newCh);
+            if (newCh.trim() !== '' && isNaN(chapter)) return alert('Please enter a valid number.');
+            try {
+                await updateDoc(doc(db, "mcqs", id), { chapter });
+                // Update cache
+                const idx = adminQuestionsCache.findIndex(q => q.id === id);
+                if (idx !== -1) adminQuestionsCache[idx].chapter = chapter;
+                filterAdminMCQs();
+            } catch(e) { alert('Error: ' + e.message); }
+        };
+
+        // Clear loading timeout once auth resolves
+        const _origOnAuth = onAuthStateChanged;
+        // We patch showView to clear the loading timeout
+        const _origShowView = window.showView;
+        window.showView = (id) => {
+            clearTimeout(_loadingTimeout);
+            clearInterval(_lmInterval);
+            _origShowView(id);
+        };
+
     </script>
 </body>
 </html>
