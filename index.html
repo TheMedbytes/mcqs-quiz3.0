@@ -33,6 +33,100 @@
             --bg: #1a1a1a;
             --card: #2d2d2d;
             --text: #eee;
+            --border-color: #4a4a4a;
+            --input-border: #555;
+        }
+        .light-mode {
+            --border-color: #ddd;
+            --input-border: #ddd;
+        }
+
+        /* ===== SKELETON LOADER ===== */
+        @keyframes skeleton-shimmer {
+            0% { background-position: -400px 0; }
+            100% { background-position: 400px 0; }
+        }
+        .skeleton {
+            background: linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.12) 50%, rgba(0,0,0,0.06) 75%);
+            background-size: 800px 100%;
+            animation: skeleton-shimmer 1.4s infinite;
+            border-radius: 8px;
+        }
+        .dark-mode .skeleton {
+            background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.04) 75%);
+            background-size: 800px 100%;
+            animation: skeleton-shimmer 1.4s infinite;
+        }
+        .skeleton-card { height: 100px; border-radius: 10px; margin-bottom: 10px; }
+        .skeleton-text { height: 14px; border-radius: 4px; margin: 6px 0; }
+        .skeleton-text.short { width: 60%; }
+
+        /* ===== SVG SCORE RING ===== */
+        .score-ring-wrap { position: relative; width: 140px; height: 140px; margin: 0 auto 20px; }
+        .score-ring-svg { transform: rotate(-90deg); }
+        .score-ring-bg { fill: none; stroke: rgba(52,152,219,0.15); stroke-width: 10; }
+        .score-ring-fill { fill: none; stroke: var(--secondary); stroke-width: 10; stroke-linecap: round;
+            stroke-dasharray: 339.29; stroke-dashoffset: 339.29;
+            transition: stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1); }
+        .score-ring-fill.excellent { stroke: var(--success); }
+        .score-ring-fill.poor { stroke: var(--accent); }
+        .score-ring-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+            font-size: 1.9rem; font-weight: bold; color: var(--secondary); text-align: center; line-height: 1; }
+        .score-ring-text.excellent { color: var(--success); }
+        .score-ring-text.poor { color: var(--accent); }
+
+        /* ===== ENHANCED SUBJECT CARDS ===== */
+        .subject-card { background: var(--card); border: 1px solid var(--border-color); padding: 15px; border-radius: 10px; transition: 0.2s; position: relative; overflow: hidden; }
+        .subject-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--subject-accent, var(--secondary)); }
+        .subject-card:hover { border-color: var(--secondary); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+        .subject-card-icon { font-size: 1.8rem; margin-bottom: 8px; display: block; }
+        .subject-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .subject-card-header h4 { margin: 0; flex: 1; }
+        .subject-q-badge { background: var(--subject-accent, var(--secondary)); color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 12px; font-weight: bold; white-space: nowrap; }
+
+        /* ===== DASHBOARD SECTIONS ===== */
+        .dash-section-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #999; margin: 18px 0 8px; text-align: left; }
+        .dash-section-group { background: rgba(0,0,0,0.025); border-radius: 10px; padding: 12px; margin-bottom: 14px; }
+        .dark-mode .dash-section-group { background: rgba(255,255,255,0.03); }
+
+        /* ===== DUPLICATE DETECTOR ===== */
+        .dupe-warning-box { background: rgba(231,76,60,0.08); border: 1px solid var(--accent); border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; display: none; }
+        .dupe-warning-box h5 { margin: 0 0 6px; color: var(--accent); font-size: 0.9rem; }
+        .dupe-item { font-size: 0.82rem; padding: 4px 0; border-bottom: 1px solid rgba(231,76,60,0.15); }
+        .dupe-item:last-child { border-bottom: none; }
+
+        /* ===== INLINE CHAPTER EDIT ===== */
+        .inline-chapter-edit { display: inline-flex; align-items: center; gap: 4px; vertical-align: middle; }
+        .inline-chapter-input { width: 55px; padding: 2px 6px; font-size: 0.75rem; border-radius: 4px; border: 1px solid var(--input-border); background: var(--card); color: var(--text); margin: 0; }
+        .inline-chapter-save { background: var(--success); color: white; padding: 2px 7px; font-size: 0.72rem; border-radius: 4px; margin: 0; }
+
+        /* ===== BULK ASSIGN ===== */
+        .bulk-assign-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .bulk-assign-input { width: 65px; padding: 4px 8px; font-size: 0.82rem; border-radius: 5px; border: 1px solid var(--input-border); background: var(--card); color: var(--text); margin: 0; }
+
+        /* ===== XP / LEVEL SYSTEM ===== */
+        .xp-bar-wrap { background: rgba(0,0,0,0.1); border-radius: 20px; height: 8px; margin-top: 4px; overflow: hidden; }
+        .xp-bar-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, #f39c12, #e74c3c); transition: width 0.8s ease; }
+        .level-badge { display: inline-flex; align-items: center; gap: 5px; background: linear-gradient(135deg, #f39c12, #e67e22); color: white; border-radius: 20px; padding: 3px 10px; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.03em; }
+
+        /* ===== LEADERBOARD ===== */
+        .leaderboard-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        .leaderboard-table th { background: var(--primary); color: white; padding: 8px 10px; text-align: left; font-size: 0.8rem; }
+        .leaderboard-table td { padding: 8px 10px; border-bottom: 1px solid var(--border-color); }
+        .leaderboard-table tr.me td { background: rgba(52,152,219,0.1); font-weight: bold; }
+        .leaderboard-table .rank-1 td:first-child { color: #f1c40f; }
+        .leaderboard-table .rank-2 td:first-child { color: #bdc3c7; }
+        .leaderboard-table .rank-3 td:first-child { color: #cd7f32; }
+        .trophy-icon { font-size: 1rem; }
+
+        /* ===== WEAK RETRY BUTTON ===== */
+        .btn-retry { background: linear-gradient(135deg, #8e44ad, #6c3483); color: white; }
+
+        /* ===== MOBILE FILTER STACK ===== */
+        @media (max-width: 600px) {
+            .admin-filters-container { flex-direction: column; align-items: stretch; }
+            .admin-filters-container select, .admin-filters-container input { width: 100%; margin: 0; }
+            .bulk-assign-group { flex-direction: column; align-items: flex-start; }
         }
 
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); margin: 0; transition: 0.3s; }
@@ -57,15 +151,14 @@
         .btn-block:hover { background: var(--secondary); color: white; transform: translateY(-3px); }
 
         .subject-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
-        .subject-card { background: var(--card); border: 1px solid #ddd; padding: 15px; border-radius: 10px; transition: 0.2s; }
-        .subject-card:hover { border-color: var(--secondary); }
+        /* subject-card now defined above with enhanced styles */
         
         .option-btn { display: block; width: 100%; text-align: left; padding: 12px; margin: 8px 0; border: 1px solid #ddd; background: var(--card); color: var(--text); border-radius: 8px; font-size: 1rem; }
         .option-btn:disabled { cursor: not-allowed; }
         .option-btn.correct { background: var(--success) !important; color: white; border-color: var(--success); }
         .option-btn.wrong { background: var(--accent) !important; color: white; border-color: var(--accent); }
         
-        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border-radius: 5px; border: 1px solid #ddd; box-sizing: border-box; background: var(--card); color: var(--text); }
+        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border-radius: 5px; border: 1px solid var(--input-border, #ddd); box-sizing: border-box; background: var(--card); color: var(--text); }
         .nav-actions { display: flex; gap: 10px; align-items: center; }
         
         .admin-section { text-align: left; border-top: 1px solid #eee; padding-top: 20px; margin-top: 20px; }
@@ -228,12 +321,20 @@
                 </div>
                 <div style="text-align: right;">
                     <div id="streak-display" style="font-size: 1.5rem; font-weight: bold; color: #e67e22;" title="Daily Streak">🔥 0</div>
+                    <div id="level-display" style="margin-top:4px;"></div>
+                    <div id="xp-bar-container" style="width:100px; margin-top:4px;"></div>
+                    <button onclick="openLeaderboard()" style="margin-top:6px; background:none; border:1px solid var(--warning); color:var(--warning); padding:3px 10px; font-size:0.75rem; border-radius:12px;"><i class="fas fa-trophy"></i> Leaderboard</button>
                 </div>
             </div>
 
             <button id="resume-quiz-btn" class="btn-success hidden" style="width: 100%; margin-bottom: 10px; font-size: 1.1rem;" onclick="resumeQuiz()"><i class="fas fa-play-circle"></i> Resume Paused Quiz</button>
-            <button id="daily-quiz-btn" class="btn-daily" onclick="startDailyQuiz()"><i class="fas fa-calendar-day"></i> Take Daily Challenge (10 Qs)</button>
-            
+
+            <div class="dash-section-label">⚡ Quick Play</div>
+            <div class="dash-section-group">
+                <button id="daily-quiz-btn" class="btn-daily" onclick="startDailyQuiz()"><i class="fas fa-calendar-day"></i> Take Daily Challenge (10 Qs)</button>
+                <button class="btn-retry" style="width:100%; margin-top:6px;" onclick="startWeakRetry()"><i class="fas fa-redo"></i> Retry Weak Questions</button>
+            </div>
+
             <div id="analytics-panel" class="analytics-panel hidden">
                 <h4 style="margin-top:0; color: var(--warning);"><i class="fas fa-chart-line"></i> Performance Analytics</h4>
                 <div id="weakest-subject-alert" style="font-weight: bold; color: var(--accent);">⚠️ Not enough data yet. Complete a quiz!</div>
@@ -245,23 +346,41 @@
                 <button class="btn-primary" onclick="searchMCQs()"><i class="fas fa-search"></i></button>
             </div>
 
-            <div class="tool-bar">
-                <div style="flex: 1; text-align: left;">
-                    <label style="font-size: 0.9rem; font-weight: bold;">Difficulty:</label>
-                    <select id="difficulty-filter" style="width: auto; display: inline-block; margin-left: 10px; padding: 5px;">
-                        <option value="all">All</option>
-                        <option value="easy">Easy</option>
-                        <option value="medium">Medium</option>
-                        <option value="hard">Hard</option>
-                    </select>
+            <div class="dash-section-label">🏆 Mock Exam</div>
+            <div class="dash-section-group">
+                <div class="tool-bar" style="margin-bottom:0;">
+                    <div style="flex: 1; text-align: left;">
+                        <label style="font-size: 0.9rem; font-weight: bold;">Difficulty:</label>
+                        <select id="difficulty-filter" style="width: auto; display: inline-block; margin-left: 10px; padding: 5px;">
+                            <option value="all">All</option>
+                            <option value="easy">Easy</option>
+                            <option value="medium">Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
+                    <button class="btn-danger" style="margin: 0;" onclick="startMockExam()"><i class="fas fa-stopwatch"></i> Mock Exam (140 Qs)</button>
                 </div>
-                <button class="btn-danger" style="margin: 0;" onclick="startMockExam()"><i class="fas fa-stopwatch"></i> Mock Exam (140 Qs)</button>
             </div>
 
-            <div class="subject-grid" id="subject-list"></div>
+            <div class="dash-section-label">📚 Study by Subject</div>
+            <div class="subject-grid" id="subject-list">
+                <div class="skeleton skeleton-card"></div>
+                <div class="skeleton skeleton-card"></div>
+                <div class="skeleton skeleton-card"></div>
+                <div class="skeleton skeleton-card"></div>
+            </div>
         </section>
 
-        <!-- CHAPTER DRILL-DOWN (Student) -->
+        <!-- LEADERBOARD (Student View) -->
+        <section id="leaderboard-screen" class="view hidden">
+            <div class="card">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:15px;">
+                    <button onclick="showView('dashboard-screen')" style="background:none; color:var(--secondary); padding:0; font-size:1.2rem;"><i class="fas fa-arrow-left"></i></button>
+                    <h3 style="margin:0;"><i class="fas fa-trophy" style="color:var(--warning);"></i> Leaderboard</h3>
+                </div>
+                <div id="student-leaderboard-container"><p style="color:#888;">Loading...</p></div>
+            </div>
+        </section>
         <section id="chapter-screen" class="view hidden">
             <div class="card">
                 <div style="display:flex; align-items:center; gap:12px; margin-bottom:15px;">
@@ -306,7 +425,13 @@
         <section id="result-screen" class="view hidden">
             <div class="card">
                 <h2>Quiz Complete!</h2>
-                <div class="score-circle" id="final-score-circle">0%</div>
+                <div class="score-ring-wrap">
+                    <svg class="score-ring-svg" viewBox="0 0 120 120" width="140" height="140">
+                        <circle class="score-ring-bg" cx="60" cy="60" r="54"/>
+                        <circle class="score-ring-fill" id="score-ring-fill" cx="60" cy="60" r="54"/>
+                    </svg>
+                    <div class="score-ring-text" id="final-score-circle">0%</div>
+                </div>
                 <div style="display: flex; justify-content: space-around; margin-bottom: 20px;">
                     <h3 style="color: var(--success);"><i class="fas fa-check-circle"></i> Correct: <span id="correct-count">0</span></h3>
                     <h3 style="color: var(--accent);"><i class="fas fa-times-circle"></i> Wrong: <span id="wrong-count">0</span></h3>
@@ -318,6 +443,7 @@
                 </div>
 
                 <button class="btn-primary" onclick="showView('dashboard-screen'); renderAnalytics(); checkSavedQuiz();">Back to Dashboard</button>
+                <button class="btn-retry" style="width:100%; margin-top:8px;" onclick="startWeakRetry()"><i class="fas fa-redo"></i> Retry My Weak Questions</button>
                 
                 <div id="review-section" style="margin-top: 30px;" class="hidden">
                     <h3 style="text-align: left; border-bottom: 2px solid #ddd; padding-bottom: 10px;">Review Mistakes</h3>
@@ -340,6 +466,7 @@
                     <button class="admin-tab-btn" onclick="switchAdminTab('tab-chapters')"><i class="fas fa-bookmark"></i> Chapters</button>
                     <button class="admin-tab-btn" onclick="switchAdminTab('tab-mcqs')"><i class="fas fa-edit"></i> MCQs</button>
                     <button class="admin-tab-btn" onclick="switchAdminTab('tab-upload')"><i class="fas fa-upload"></i> Upload</button>
+                    <button class="admin-tab-btn" onclick="switchAdminTab('tab-leaderboard')"><i class="fas fa-trophy"></i> Leaders</button>
                 </div>
 
                 <!-- TAB: STATS -->
@@ -411,6 +538,10 @@
                         <span class="bulk-count" id="bulk-count-label">0 selected</span>
                         <button onclick="selectAllVisible()" style="background:var(--warning); color:white; padding:5px 12px; font-size:0.82rem; margin:0;"><i class="fas fa-check-double"></i> Select All</button>
                         <button onclick="deselectAll()" style="background:#95a5a6; color:white; padding:5px 12px; font-size:0.82rem; margin:0;"><i class="fas fa-times"></i> Deselect All</button>
+                        <div class="bulk-assign-group">
+                            <input type="number" id="bulk-chapter-input" class="bulk-assign-input" placeholder="Ch #" min="1" max="99" title="Chapter number to assign">
+                            <button onclick="bulkAssignChapter()" style="background:var(--chapter); color:white; padding:5px 12px; font-size:0.82rem; margin:0;"><i class="fas fa-tag"></i> Assign Chapter</button>
+                        </div>
                         <button onclick="deleteSelected()" style="background:var(--accent); color:white; padding:5px 12px; font-size:0.82rem; margin:0;"><i class="fas fa-trash"></i> Delete Selected</button>
                     </div>
                     <div class="admin-filters-container">
@@ -435,6 +566,11 @@
                 <div id="tab-upload" class="admin-tab-content">
                     <div class="admin-section" style="border-top:none; padding-top:0; margin-top:0;">
                         <h4><i class="fas fa-file-upload"></i> Bulk Upload</h4>
+                        <div id="dupe-warning-box" class="dupe-warning-box">
+                            <h5><i class="fas fa-exclamation-triangle"></i> Duplicate Questions Detected</h5>
+                            <p style="font-size:0.82rem; color:var(--text); margin:0 0 6px;">These questions already exist in the database and will be skipped:</p>
+                            <div id="dupe-list"></div>
+                        </div>
                         <p style="font-size:0.85rem; color:#666;">
                             Excel/JSON columns: <code>block, subject, chapter, difficulty, question, optionA, optionB, optionC, optionD, optionE, correctAnswer, explanation</code><br>
                             <strong>chapter</strong> field is optional — use the chapter number (e.g. <code>1</code>, <code>2</code>) to tag MCQs to a chapter.
@@ -447,6 +583,12 @@
                         <textarea id="json-input" rows="4" placeholder='[{"block": 9, "subject": "Surgery", "chapter": 3, "difficulty": "hard", "question": "Example?", ...}]'></textarea>
                         <button onclick="uploadJSON()" class="btn-primary" style="width: 100%;">Upload JSON</button>
                     </div>
+                </div>
+
+                <!-- TAB: LEADERBOARD -->
+                <div id="tab-leaderboard" class="admin-tab-content">
+                    <h4><i class="fas fa-trophy" style="color:var(--warning);"></i> Top Students — Total Correct Answers</h4>
+                    <div id="leaderboard-container"><p style="color:#888;">Loading leaderboard...</p></div>
                 </div>
 
                 <hr style="margin: 20px 0;">
@@ -489,7 +631,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc, setDoc, getDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc, setDoc, getDoc, increment, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
 
         const firebaseConfig = {
@@ -528,6 +670,44 @@
         let adminQuestionsCache = []; 
         let chaptersCache = {}; // { "7_Pharmacology": [{number:1, name:"..."}, ...] }
         let currentUserRef = null;
+        let weakQuestionsCache = []; // for retry mode
+
+        // ===== XP / LEVEL SYSTEM =====
+        const LEVELS = [
+            { name: "Intern",    minXP: 0,    icon: "🩺" },
+            { name: "House Officer", minXP: 50,   icon: "📋" },
+            { name: "Registrar", minXP: 150,  icon: "🔬" },
+            { name: "Resident",  minXP: 350,  icon: "🏥" },
+            { name: "Consultant",minXP: 700,  icon: "⭐" },
+            { name: "Specialist",minXP: 1200, icon: "🏆" },
+        ];
+        function getLevelInfo(xp) {
+            let level = LEVELS[0];
+            for(let l of LEVELS) { if(xp >= l.minXP) level = l; else break; }
+            const idx = LEVELS.indexOf(level);
+            const next = LEVELS[idx + 1];
+            const progress = next ? Math.round(((xp - level.minXP) / (next.minXP - level.minXP)) * 100) : 100;
+            return { ...level, progress, nextXP: next ? next.minXP : null };
+        }
+        function renderXPBar(xp) {
+            const info = getLevelInfo(xp);
+            document.getElementById('level-display').innerHTML = `<span class="level-badge">${info.icon} ${info.name}</span>`;
+            document.getElementById('xp-bar-container').innerHTML = `
+                <div style="font-size:0.7rem; color:#888; text-align:right;">${xp} XP</div>
+                <div class="xp-bar-wrap"><div class="xp-bar-fill" style="width:${info.progress}%"></div></div>`;
+        }
+
+        // ===== SUBJECT ACCENT COLORS =====
+        const subjectAccents = {
+            "Pharmacology": "#8e44ad", "Pathology": "#c0392b", "Medicine": "#2980b9",
+            "Surgery": "#16a085", "Forensic Medicine": "#d35400", "Community Medicine": "#27ae60",
+            "Behavioral Sciences": "#8e44ad", "Patient Safety": "#2c3e50", "Family Medicine": "#1abc9c"
+        };
+        const subjectIcons = {
+            "Pharmacology": "💊", "Pathology": "🔬", "Medicine": "🩺", "Surgery": "🔪",
+            "Forensic Medicine": "⚖️", "Community Medicine": "🏘️",
+            "Behavioral Sciences": "🧠", "Patient Safety": "🛡️", "Family Medicine": "👨‍👩‍👧"
+        };
 
         // ===================== VIEWS =====================
         window.showView = (id) => {
@@ -601,8 +781,9 @@
                 const yesterday = new Date(Date.now() - 86400000).toDateString();
 
                 if (!userSnap.exists()) {
-                    await setDoc(currentUserRef, { email: user.email, name: user.email.split('@')[0].toUpperCase(), totalCorrect: 0, streak: 0, lastDaily: null, stats: {} });
+                    await setDoc(currentUserRef, { email: user.email, name: user.email.split('@')[0].toUpperCase(), totalCorrect: 0, streak: 0, lastDaily: null, stats: {}, xp: 0 });
                     document.getElementById('streak-display').innerText = "🔥 0";
+                    renderXPBar(0);
                 } else {
                     let data = userSnap.data();
                     let currentStreak = data.streak || 0;
@@ -611,6 +792,7 @@
                         await updateDoc(currentUserRef, { streak: 0 });
                     }
                     document.getElementById('streak-display').innerText = `🔥 ${currentStreak}`;
+                    renderXPBar(data.xp || 0);
                     if(data.lastDaily === today) {
                         const btn = document.getElementById('daily-quiz-btn');
                         btn.disabled = true;
@@ -701,18 +883,34 @@
         };
 
         // ===================== BLOCK & SUBJECTS =====================
-        window.selectBlock = (block) => {
+        window.selectBlock = async (block) => {
             selectedBlock = block;
             document.getElementById('current-block-id').innerText = block;
             const list = document.getElementById('subject-list');
+            // Show skeleton while loading
+            list.innerHTML = '<div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div>';
+            
+            // Fetch question counts per subject
+            const snap = await getDocs(query(collection(db, "mcqs"), where("block", "==", Number(block))));
+            const counts = {};
+            snap.docs.forEach(d => { const s = d.data().subject; counts[s] = (counts[s]||0)+1; });
+            
             list.innerHTML = '';
             let subjects = [...commonSubjects];
             if(block === 9) subjects.push("Family Medicine");
             subjects.forEach(sub => {
+                const accent = subjectAccents[sub] || 'var(--secondary)';
+                const icon = subjectIcons[sub] || '📖';
+                const count = counts[sub] || 0;
                 const div = document.createElement('div');
                 div.className = 'subject-card';
+                div.style.setProperty('--subject-accent', accent);
                 div.innerHTML = `
-                    <h4>${sub}</h4>
+                    <div class="subject-card-header">
+                        <span class="subject-card-icon">${icon}</span>
+                        <h4>${sub}</h4>
+                        <span class="subject-q-badge">${count} Qs</span>
+                    </div>
                     <button class="btn-primary" style="width:100%; margin-bottom:6px;" onclick="openChapterDrill('${sub}')">
                         <i class="fas fa-bookmark"></i> By Chapter
                     </button>
@@ -881,6 +1079,56 @@
             initQuizState(allQuestions, `🔥 Daily Challenge`, 10);
         };
 
+        window.startWeakRetry = async () => {
+            if(!currentUserRef) return alert("Please log in first.");
+            // Fetch user's wrong answers from mistakesLog (session) or fallback to stats-based subjects
+            let retryQs = [];
+            if(weakQuestionsCache.length > 0) {
+                // Match text back to full question objects
+                const snap = await getDocs(query(collection(db, "mcqs"), where("block", "==", Number(selectedBlock))));
+                const allQs = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                const weakTexts = new Set(weakQuestionsCache.map(w => w.question.trim().toLowerCase()));
+                retryQs = allQs.filter(q => weakTexts.has(q.question.trim().toLowerCase())).sort(() => Math.random() - 0.5);
+            }
+            if(retryQs.length === 0) return alert("No weak questions tracked yet. Complete a quiz first and try again!");
+            isMockExamMode = false; isDailyQuiz = false;
+            initQuizState(retryQs, `♻️ Weak Question Retry (${retryQs.length} Qs)`);
+        };
+
+        // ===== LEADERBOARD =====
+        function renderLeaderboard(users, containerId, currentUid) {
+            if(!users.length) { document.getElementById(containerId).innerHTML = '<p style="color:#888">No data yet.</p>'; return; }
+            let html = `<table class="leaderboard-table"><thead><tr><th>Rank</th><th>Name</th><th>✅ Correct</th><th>🔥 Streak</th><th>XP</th></tr></thead><tbody>`;
+            users.forEach((u, i) => {
+                const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+                const isMeClass = u.uid === currentUid ? 'me' : '';
+                const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
+                html += `<tr class="${rankClass} ${isMeClass}">
+                    <td><span class="trophy-icon">${medal}</span></td>
+                    <td>${u.name || 'Anonymous'}${u.uid === currentUid ? ' <em style="font-size:0.75rem;">(you)</em>' : ''}</td>
+                    <td>${u.totalCorrect || 0}</td>
+                    <td>${u.streak || 0}</td>
+                    <td>${u.xp || 0}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            document.getElementById(containerId).innerHTML = html;
+        }
+
+        window.openLeaderboard = async () => {
+            showView('leaderboard-screen');
+            const snap = await getDocs(query(collection(db, "users"), orderBy("totalCorrect", "desc"), limit(20)));
+            const users = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
+            const currentUid = auth.currentUser ? auth.currentUser.uid : null;
+            renderLeaderboard(users, 'student-leaderboard-container', currentUid);
+        };
+
+        window.loadAdminLeaderboard = async () => {
+            const snap = await getDocs(query(collection(db, "users"), orderBy("totalCorrect", "desc"), limit(30)));
+            const users = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
+            renderLeaderboard(users, 'leaderboard-container', auth.currentUser ? auth.currentUser.uid : null);
+        };
+
         window.quitQuiz = () => {
             if(confirm("Pause quiz? Your progress has been saved locally and you can resume from the dashboard.")) {
                 saveQuizState();
@@ -941,9 +1189,22 @@
             clearInterval(timerInterval);
             const total = scoreState.correct + scoreState.wrong;
             const percentage = total > 0 ? Math.round((scoreState.correct / total) * 100) : 0;
-            document.getElementById('final-score-circle').innerText = `${percentage}%`;
+            
+            // Animate SVG score ring
+            const ring = document.getElementById('score-ring-fill');
+            const label = document.getElementById('final-score-circle');
+            const circumference = 339.29;
+            const offset = circumference - (percentage / 100) * circumference;
+            ring.className = 'score-ring-fill' + (percentage >= 70 ? ' excellent' : percentage < 40 ? ' poor' : '');
+            label.className = 'score-ring-text' + (percentage >= 70 ? ' excellent' : percentage < 40 ? ' poor' : '');
+            label.innerHTML = `${percentage}%<br><span style="font-size:0.65rem; font-weight:500;">${scoreState.correct}/${total}</span>`;
+            setTimeout(() => { ring.style.strokeDashoffset = offset; }, 100);
+            
             document.getElementById('correct-count').innerText = scoreState.correct;
             document.getElementById('wrong-count').innerText = scoreState.wrong;
+
+            // Track weak questions for retry mode
+            weakQuestionsCache = [...weakQuestionsCache, ...mistakesLog.map(m => ({ question: m.question }))];
 
             if (currentUserRef) {
                 const userSnap = await getDoc(currentUserRef);
@@ -953,9 +1214,16 @@
                     currentStats[sub].total += currentQuizSubjects[sub].t;
                     currentStats[sub].correct += currentQuizSubjects[sub].c;
                 }
+                let xpEarned = scoreState.correct; // 1 XP per correct answer
                 let updates = { stats: currentStats };
-                if (scoreState.correct > 0) updates.totalCorrect = increment(scoreState.correct);
+                if (scoreState.correct > 0) {
+                    updates.totalCorrect = increment(scoreState.correct);
+                    updates.xp = increment(xpEarned);
+                }
                 await updateDoc(currentUserRef, updates);
+                // Refresh XP bar
+                const updated = await getDoc(currentUserRef);
+                if(updated.exists()) renderXPBar(updated.data().xp || 0);
             }
 
             if (isDailyQuiz && currentUserRef) {
@@ -1009,6 +1277,7 @@
             document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             event.target.classList.add('active');
+            if(tabId === 'tab-leaderboard') loadAdminLeaderboard();
         };
 
         window.openAdmin = async () => { showView('admin-screen'); await loadAdminData(); await loadChapterList(); };
@@ -1221,7 +1490,27 @@
             updateBulkBar();
         };
 
-        window.deleteSelected = async () => {
+        window.bulkAssignChapter = async () => {
+            if(selectedIds.size === 0) return alert("Select some questions first.");
+            const chNum = parseInt(document.getElementById('bulk-chapter-input').value);
+            if(!chNum || chNum < 1) return alert("Enter a valid chapter number.");
+            if(!confirm(`Assign Chapter ${chNum} to ${selectedIds.size} selected question${selectedIds.size > 1 ? 's' : ''}?`)) return;
+            document.getElementById('loading-screen').classList.remove('hidden');
+            let updated = 0;
+            for(const id of selectedIds) {
+                try { await updateDoc(doc(db, "mcqs", id), { chapter: chNum }); updated++; }
+                catch(e) { console.error("Failed to assign chapter to", id, e); }
+            }
+            selectedIds.clear();
+            selectModeActive = false;
+            const btn = document.getElementById('select-mode-btn');
+            btn.classList.remove('active');
+            btn.innerHTML = '<i class="fas fa-check-square"></i> Select';
+            document.getElementById('bulk-action-bar').classList.add('hidden');
+            document.getElementById('loading-screen').classList.add('hidden');
+            alert(`Assigned Chapter ${chNum} to ${updated} question${updated > 1 ? 's' : ''}.`);
+            await loadAdminData();
+        };
             if(selectedIds.size === 0) return;
             if(!confirm(`Delete ${selectedIds.size} selected question${selectedIds.size > 1 ? 's' : ''}? This cannot be undone.`)) return;
             document.getElementById('loading-screen').classList.remove('hidden');
@@ -1247,7 +1536,7 @@
             if(list.length === 0) { container.innerHTML = "<p>No questions found.</p>"; return; }
             let html = "";
             list.forEach((q, index) => {
-                const chapterBadge = q.chapter 
+                const chapterDisplay = q.chapter 
                     ? `<span class="chapter-badge" style="margin-left:4px;">Ch.${String(q.chapter).padStart(2,'0')}</span>` 
                     : `<span class="no-chapter-badge" style="margin-left:4px;">No Chapter</span>`;
                 const isSelected = selectedIds.has(q.id);
@@ -1257,8 +1546,15 @@
                     <div style="flex:1; font-size:0.9rem; cursor:${selectModeActive ? 'pointer' : 'default'};">
                         <span style="font-weight: bold; color: var(--secondary); margin-right: 5px;">Q${index + 1}.</span>
                         <span class="timer-badge" style="background:var(--secondary); font-size:0.7rem;">Block ${q.block}</span>
-                        ${chapterBadge}
+                        ${chapterDisplay}
                         <strong> ${q.subject}</strong><br>${q.question.substring(0, 80)}...
+                        ${!selectModeActive ? `<div style="margin-top:4px;" onclick="event.stopPropagation();">
+                            <span style="font-size:0.75rem; color:#888;">Ch#:</span>
+                            <span class="inline-chapter-edit">
+                                <input type="number" class="inline-chapter-input" id="inline-ch-${q.id}" value="${q.chapter || ''}" placeholder="–" min="1" max="99">
+                                <button class="inline-chapter-save" onclick="saveInlineChapter('${q.id}')"><i class="fas fa-check"></i></button>
+                            </span>
+                        </div>` : ''}
                     </div>
                     ${!selectModeActive ? `
                     <div style="display:flex; gap:5px; flex-direction:column;">
@@ -1269,6 +1565,17 @@
             });
             container.innerHTML = html;
         }
+
+        window.saveInlineChapter = async (id) => {
+            const input = document.getElementById(`inline-ch-${id}`);
+            const val = input ? parseInt(input.value) : null;
+            try {
+                await updateDoc(doc(db, "mcqs", id), { chapter: val && val > 0 ? val : null });
+                const cached = adminQuestionsCache.find(q => q.id === id);
+                if(cached) cached.chapter = val && val > 0 ? val : null;
+                filterAdminMCQs();
+            } catch(e) { alert("Error: " + e.message); }
+        };
 
         window.deleteMCQ = async (id) => {
             if(!confirm("Are you sure you want to delete this question? This cannot be undone.")) return;
@@ -1323,12 +1630,25 @@
         const processUpload = async (dataArray) => {
             const snap = await getDocs(collection(db, "mcqs"));
             const existingQs = new Set(snap.docs.map(d => d.data().question.trim().toLowerCase()));
-            let count = 0; let dupes = 0;
             
+            // Show duplicate detector BEFORE uploading
+            const dupes = dataArray.filter(row => row.question && existingQs.has(row.question.trim().toLowerCase()));
+            const dupeBox = document.getElementById('dupe-warning-box');
+            if(dupes.length > 0) {
+                dupeBox.style.display = 'block';
+                document.getElementById('dupe-list').innerHTML = dupes.map(d => 
+                    `<div class="dupe-item">⚠️ ${d.question.substring(0, 90)}${d.question.length > 90 ? '...' : ''}</div>`
+                ).join('');
+                if(!confirm(`Found ${dupes.length} duplicate question${dupes.length > 1 ? 's' : ''} already in the database (shown in red above). These will be skipped. Proceed with uploading the ${dataArray.length - dupes.length} new question(s)?`)) return;
+            } else {
+                dupeBox.style.display = 'none';
+            }
+            
+            let count = 0; let skipped = 0;
             for (const row of dataArray) {
                 const qText = row.question ? row.question.trim().toLowerCase() : "";
                 if(!qText) continue;
-                if (existingQs.has(qText)) { dupes++; continue; }
+                if (existingQs.has(qText)) { skipped++; continue; }
                 try {
                     await addDoc(collection(db, "mcqs"), {
                         block: Number(row.block),
@@ -1346,7 +1666,7 @@
                     count++;
                 } catch (e) { console.error(e); }
             }
-            alert(`Upload Complete!\nAdded: ${count} new MCQs.\nSkipped: ${dupes} duplicates.`);
+            alert(`Upload Complete!\nAdded: ${count} new MCQs.\nSkipped: ${skipped} duplicates.`);
             loadAdminData(); 
         };
 
