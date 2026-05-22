@@ -152,6 +152,26 @@
         .admin-tab-btn.active { color: var(--secondary); border-bottom-color: var(--secondary); font-weight: bold; }
         .admin-tab-content { display: none; }
         .admin-tab-content.active { display: block; }
+
+        /* Multi-select / bulk delete */
+        .bulk-action-bar {
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+            background: #fff3cd; border: 1px solid #ffc107;
+            border-radius: 8px; padding: 8px 12px; margin-bottom: 10px;
+            font-size: 0.9rem; font-weight: 600;
+        }
+        .dark-mode .bulk-action-bar { background: #3a3000; border-color: #ffc107; }
+        .bulk-action-bar .bulk-count { color: var(--warning); flex: 1; }
+        .mcq-checkbox {
+            width: 18px; height: 18px; accent-color: var(--accent);
+            cursor: pointer; flex-shrink: 0; margin: 0;
+        }
+        .admin-mcq-item.selected { background: rgba(231, 76, 60, 0.07); border-radius: 6px; }
+        .select-mode-toggle {
+            background: none; border: 2px solid var(--secondary); color: var(--secondary);
+            padding: 5px 12px; font-size: 0.85rem; border-radius: 6px; font-weight: 600;
+        }
+        .select-mode-toggle.active { background: var(--secondary); color: white; }
     </style>
 </head>
 <body class="light-mode">
@@ -381,7 +401,18 @@
 
                 <!-- TAB: MCQs -->
                 <div id="tab-mcqs" class="admin-tab-content">
-                    <h4 style="margin-bottom: 10px;"><i class="fas fa-edit"></i> Manage MCQs</h4>
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+                        <h4 style="margin:0;"><i class="fas fa-edit"></i> Manage MCQs</h4>
+                        <button id="select-mode-btn" class="select-mode-toggle" onclick="toggleSelectMode()">
+                            <i class="fas fa-check-square"></i> Select
+                        </button>
+                    </div>
+                    <div id="bulk-action-bar" class="bulk-action-bar hidden">
+                        <span class="bulk-count" id="bulk-count-label">0 selected</span>
+                        <button onclick="selectAllVisible()" style="background:var(--warning); color:white; padding:5px 12px; font-size:0.82rem; margin:0;"><i class="fas fa-check-double"></i> Select All</button>
+                        <button onclick="deselectAll()" style="background:#95a5a6; color:white; padding:5px 12px; font-size:0.82rem; margin:0;"><i class="fas fa-times"></i> Deselect All</button>
+                        <button onclick="deleteSelected()" style="background:var(--accent); color:white; padding:5px 12px; font-size:0.82rem; margin:0;"><i class="fas fa-trash"></i> Delete Selected</button>
+                    </div>
                     <div class="admin-filters-container">
                         <select id="admin-filter-block" class="theme-select" onchange="updateAdminSubjectFilter()">
                             <option value="all">All Blocks</option>
@@ -1130,7 +1161,88 @@
             renderAdminMCQList(filtered);
         };
 
+        // ===================== MULTI-SELECT STATE =====================
+        let selectModeActive = false;
+        let selectedIds = new Set();
+        let currentFilteredList = []; // tracks what's currently rendered
+
+        window.toggleSelectMode = () => {
+            selectModeActive = !selectModeActive;
+            selectedIds.clear();
+            const btn = document.getElementById('select-mode-btn');
+            if(selectModeActive) {
+                btn.classList.add('active');
+                btn.innerHTML = '<i class="fas fa-times"></i> Cancel';
+            } else {
+                btn.classList.remove('active');
+                btn.innerHTML = '<i class="fas fa-check-square"></i> Select';
+            }
+            updateBulkBar();
+            filterAdminMCQs(); // re-render to show/hide checkboxes
+        };
+
+        function updateBulkBar() {
+            const bar = document.getElementById('bulk-action-bar');
+            const label = document.getElementById('bulk-count-label');
+            if(selectModeActive && selectedIds.size > 0) {
+                bar.classList.remove('hidden');
+                label.innerText = `${selectedIds.size} question${selectedIds.size > 1 ? 's' : ''} selected`;
+            } else {
+                bar.classList.add('hidden');
+            }
+        }
+
+        window.toggleCheckbox = (id) => {
+            if(selectedIds.has(id)) selectedIds.delete(id);
+            else selectedIds.add(id);
+            // Update visual state of that row
+            const row = document.querySelector(`.admin-mcq-item[data-id="${id}"]`);
+            if(row) row.classList.toggle('selected', selectedIds.has(id));
+            const cb = document.querySelector(`.mcq-checkbox[data-id="${id}"]`);
+            if(cb) cb.checked = selectedIds.has(id);
+            updateBulkBar();
+        };
+
+        window.selectAllVisible = () => {
+            currentFilteredList.forEach(q => selectedIds.add(q.id));
+            // Re-render to check all boxes
+            renderAdminMCQList(currentFilteredList);
+            updateBulkBar();
+        };
+
+        window.deselectAll = () => {
+            selectedIds.clear();
+            currentFilteredList.forEach(q => {
+                const row = document.querySelector(`.admin-mcq-item[data-id="${q.id}"]`);
+                if(row) row.classList.remove('selected');
+                const cb = document.querySelector(`.mcq-checkbox[data-id="${q.id}"]`);
+                if(cb) cb.checked = false;
+            });
+            updateBulkBar();
+        };
+
+        window.deleteSelected = async () => {
+            if(selectedIds.size === 0) return;
+            if(!confirm(`Delete ${selectedIds.size} selected question${selectedIds.size > 1 ? 's' : ''}? This cannot be undone.`)) return;
+            document.getElementById('loading-screen').classList.remove('hidden');
+            let deleted = 0;
+            for(const id of selectedIds) {
+                try { await deleteDoc(doc(db, "mcqs", id)); deleted++; } 
+                catch(e) { console.error("Failed to delete", id, e); }
+            }
+            selectedIds.clear();
+            selectModeActive = false;
+            const btn = document.getElementById('select-mode-btn');
+            btn.classList.remove('active');
+            btn.innerHTML = '<i class="fas fa-check-square"></i> Select';
+            document.getElementById('bulk-action-bar').classList.add('hidden');
+            document.getElementById('loading-screen').classList.add('hidden');
+            alert(`Deleted ${deleted} question${deleted > 1 ? 's' : ''} successfully.`);
+            await loadAdminData();
+        };
+
         function renderAdminMCQList(list) {
+            currentFilteredList = list;
             const container = document.getElementById('admin-mcq-list-container');
             if(list.length === 0) { container.innerHTML = "<p>No questions found.</p>"; return; }
             let html = "";
@@ -1138,18 +1250,21 @@
                 const chapterBadge = q.chapter 
                     ? `<span class="chapter-badge" style="margin-left:4px;">Ch.${String(q.chapter).padStart(2,'0')}</span>` 
                     : `<span class="no-chapter-badge" style="margin-left:4px;">No Chapter</span>`;
+                const isSelected = selectedIds.has(q.id);
                 html += `
-                <div class="admin-mcq-item">
-                    <div style="flex:1; font-size:0.9rem;">
+                <div class="admin-mcq-item${isSelected ? ' selected' : ''}" data-id="${q.id}" onclick="${selectModeActive ? `toggleCheckbox('${q.id}')` : ''}">
+                    ${selectModeActive ? `<input type="checkbox" class="mcq-checkbox" data-id="${q.id}" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); toggleCheckbox('${q.id}')">` : ''}
+                    <div style="flex:1; font-size:0.9rem; cursor:${selectModeActive ? 'pointer' : 'default'};">
                         <span style="font-weight: bold; color: var(--secondary); margin-right: 5px;">Q${index + 1}.</span>
                         <span class="timer-badge" style="background:var(--secondary); font-size:0.7rem;">Block ${q.block}</span>
                         ${chapterBadge}
                         <strong> ${q.subject}</strong><br>${q.question.substring(0, 80)}...
                     </div>
+                    ${!selectModeActive ? `
                     <div style="display:flex; gap:5px; flex-direction:column;">
                         <button class="btn-primary" style="padding:5px 10px; font-size:0.8rem;" onclick="openEditModal('${q.id}')">Edit</button>
                         <button class="btn-danger" style="padding:5px 10px; font-size:0.8rem; margin:0;" onclick="deleteMCQ('${q.id}')">Delete</button>
-                    </div>
+                    </div>` : ''}
                 </div>`;
             });
             container.innerHTML = html;
