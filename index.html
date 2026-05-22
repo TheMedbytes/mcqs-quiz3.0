@@ -419,6 +419,11 @@
             border-color: #555 !important;
             background: #3a3a3a !important;
         }
+        .dark-mode #google-btn {
+            background: #2d2d2d !important;
+            color: #e2e8f0 !important;
+            border-color: #555 !important;
+        }
         .dark-mode .card { border: 1px solid #444; }
         .dark-mode .subject-card { border-color: #555; }
         .dark-mode .option-btn { border-color: #555; }
@@ -826,7 +831,7 @@
                                 <label style="font-size:0.8rem; font-weight:bold; color:var(--chapter);">Chapter Name</label>
                                 <input type="text" id="new-ch-name" placeholder="e.g. Autonomic Pharmacology" style="margin:0;">
                             </div>
-                  <button type="button" class="btn-chapter" style="height:40px; white-space:nowrap;" onclick="addChapter()">
+                            <button class="btn-chapter" style="height:40px; white-space:nowrap;" onclick="addChapter()"><i class="fas fa-plus"></i> Add</button>
                         </div>
 
                         <!-- Chapter list for selected block+subject -->
@@ -926,7 +931,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc, setDoc, getDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
 
@@ -943,7 +948,9 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const rtdb = getDatabase(app); 
+        const rtdb = getDatabase(app);
+        const googleProvider = new GoogleAuthProvider();
+        googleProvider.setCustomParameters({ prompt: 'select_account' });
 
         const commonSubjects = ["Pharmacology", "Pathology", "Medicine", "Forensic Medicine", "Community Medicine", "Surgery", "Behavioral Sciences", "Patient Safety"];
 
@@ -998,6 +1005,20 @@
             catch (e) { document.getElementById('loading-screen').classList.add('hidden'); alert(e.message); }
         };
 
+        window.loginWithGoogle = async () => {
+            const btn = document.getElementById('google-btn');
+            if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...'; }
+            try {
+                const result = await signInWithPopup(auth, googleProvider);
+                // onAuthStateChanged will handle the rest (create Firestore doc if needed)
+            } catch (e) {
+                if (btn) { btn.disabled = false; btn.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:18px;height:18px;"> Continue with Google'; }
+                if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
+                    alert('Google sign-in failed: ' + e.message);
+                }
+            }
+        };
+
         window.handleLogout = () => {
             document.getElementById('loading-screen').classList.remove('hidden');
             signOut(auth).then(() => {
@@ -1008,7 +1029,8 @@
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                document.getElementById('user-name-display').innerText = user.email.split('@')[0].toUpperCase();
+                const displayName = user.displayName ? user.displayName.split(' ')[0].toUpperCase() : user.email.split('@')[0].toUpperCase();
+                document.getElementById('user-name-display').innerText = displayName;
                 document.getElementById('logout-btn').classList.remove('hidden');
                 if(user.email === 'themedbytes@gmail.com') document.getElementById('admin-btn').classList.remove('hidden');
                 
@@ -1039,7 +1061,8 @@
                 const yesterday = new Date(Date.now() - 86400000).toDateString();
 
                 if (!userSnap.exists()) {
-                    await setDoc(currentUserRef, { email: user.email, name: user.email.split('@')[0].toUpperCase(), totalCorrect: 0, streak: 0, lastDaily: null, stats: {} });
+                    const userName = user.displayName ? user.displayName.split(' ')[0].toUpperCase() : user.email.split('@')[0].toUpperCase();
+                    await setDoc(currentUserRef, { email: user.email, name: userName, totalCorrect: 0, streak: 0, lastDaily: null, stats: {} });
                     document.getElementById('streak-display').innerText = "🔥 0";
                     renderXP(0);
                 } else {
@@ -1526,40 +1549,29 @@
         }
 
         window.addChapter = async () => {
-    alert("Button reached!"); // ← ADD THIS FIRST
-    const number = parseInt(document.getElementById('new-ch-number').value);
-    const name = document.getElementById('new-ch-name').value.trim();
-    if (!number || number < 1) return alert("Please enter a valid chapter number.");
-    if (!name) return alert("Please enter a chapter name.");
+            const number = parseInt(document.getElementById('new-ch-number').value);
+            const name = document.getElementById('new-ch-name').value.trim();
+            if(!number || number < 1) return alert("Please enter a valid chapter number.");
+            
+            const key = getChapterKey();
+            const block = document.getElementById('ch-block').value;
+            const subject = document.getElementById('ch-subject').value;
+            const existing = chaptersCache[key] || [];
 
-    const key = getChapterKey();
-    const block = document.getElementById('ch-block').value;
-    const subject = document.getElementById('ch-subject').value;
+            if(existing.find(c => c.number === number)) return alert(`Chapter ${number} already exists for this subject!`);
 
-    // Always fetch from Firestore if cache is missing
-    if (!chaptersCache[key]) {
-        const chapDoc = await getDoc(doc(db, "chapters", key));
-        chaptersCache[key] = chapDoc.exists() ? (chapDoc.data().list || []) : [];
-    }
+            const updated = [...existing, { number, name }];
+            await setDoc(doc(db, "chapters", key), { block: Number(block), subject, list: updated });
+            chaptersCache[key] = updated;
 
-    const existing = chaptersCache[key];
-    if (existing.find(c => c.number === number))
-        return alert(`Chapter ${number} already exists for this subject!`);
+            document.getElementById('new-ch-number').value = '';
+            document.getElementById('new-ch-name').value = '';
+            alert(`Chapter ${number} "${name}" added to Block ${block} → ${subject}!`);
+            await loadChapterList();
+            // Refresh chapter filter in MCQ tab too
+            await updateAdminChapterFilter();
+        };
 
-    const updated = [...existing, { number, name }];
-
-    try {
-        await setDoc(doc(db, "chapters", key), { block: Number(block), subject, list: updated });
-        chaptersCache[key] = updated;
-        document.getElementById('new-ch-number').value = '';
-        document.getElementById('new-ch-name').value = '';
-        alert(`Chapter ${number} "${name}" added to Block ${block} → ${subject}!`);
-        await loadChapterList();
-        await updateAdminChapterFilter();
-    } catch (e) {
-        alert('Failed to save: ' + e.message);
-    }
-};
         window.deleteChapter = async (number) => {
             if(!confirm(`Delete Chapter ${number}? The MCQs tagged to it won't be deleted, but they'll lose their chapter tag.`)) return;
             const key = getChapterKey();
