@@ -1,4103 +1,2052 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
     <title>MedBytes | MBBS MCQ Portal</title>
-
     
-
     <link rel="icon" type="image/png" href="logo.png">
-
     <link rel="apple-touch-icon" href="logo.png">
-
     <link rel="manifest" href="manifest.json">
-
     <meta name="theme-color" content="#2c3e50">
-
     <meta name="apple-mobile-web-app-capable" content="yes">
-
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
     <meta name="apple-mobile-web-app-title" content="MedBytes">
 
-
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
-
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
-
     <style>
-
         :root {
-
             --primary: #1a2840;
-
             --primary-light: #243552;
-
             --secondary: #3b82f6;
-
             --secondary-dark: #2563eb;
-
             --accent: #ef4444;
-
             --bg: #f0f4f8;
-
             --bg2: #e8eef5;
-
             --card: #ffffff;
-
             --text: #1e293b;
-
             --text-muted: #64748b;
-
             --border: #e2e8f0;
-
             --warning: #f59e0b;
-
             --success: #10b981;
-
             --daily: #7c3aed;
-
             --chapter: #0d9488;
-
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-
             --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.05);
-
             --shadow-lg: 0 10px 40px rgba(0,0,0,0.12);
-
             --radius: 14px;
-
             --radius-sm: 8px;
-
         }
-
-
 
         .dark-mode {
-
             --bg: #0f172a;
-
             --bg2: #1e293b;
-
             --card: #1e293b;
-
             --text: #f1f5f9;
-
             --text-muted: #94a3b8;
-
             --border: #334155;
-
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
-
             --shadow-md: 0 4px 16px rgba(0,0,0,0.3);
-
         }
-
-
 
         * { box-sizing: border-box; }
 
-
-
         body { 
-
             font-family: 'Poppins', 'Segoe UI', sans-serif; 
-
             background: var(--bg); color: var(--text); margin: 0; 
-
             transition: background 0.3s, color 0.3s;
-
             min-height: 100vh;
-
         }
-
-
 
         /* ===== NAV ===== */
-
         nav { 
-
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-
             color: white; padding: 0.75rem 1.5rem; 
-
             display: flex; justify-content: space-between; align-items: center;
-
             position: sticky; top: 0; z-index: 100;
-
             box-shadow: 0 2px 20px rgba(0,0,0,0.2);
-
         }
-
         .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.15rem; letter-spacing: -0.3px; }
-
         .logo .logo-icon { 
-
             width: 34px; height: 34px; background: var(--secondary); 
-
             border-radius: 10px; display: flex; align-items: center; justify-content: center;
-
             font-size: 1rem; box-shadow: 0 2px 8px rgba(59,130,246,0.4);
-
         }
-
         .nav-actions { display: flex; gap: 8px; align-items: center; }
-
         #admin-btn { 
-
             background: linear-gradient(135deg, var(--warning), #d97706) !important; 
-
             padding: 7px 14px; font-size: 0.82rem; border-radius: 10px;
-
             box-shadow: 0 2px 8px rgba(245,158,11,0.35);
-
         }
-
         #theme-toggle { 
-
             background: rgba(255,255,255,0.12) !important; color: white !important; 
-
             width: 36px; height: 36px; padding: 0; border-radius: 10px;
-
             border: 1px solid rgba(255,255,255,0.15) !important;
-
             display: flex; align-items: center; justify-content: center;
-
             backdrop-filter: blur(4px);
-
         }
-
         #theme-toggle:hover { background: rgba(255,255,255,0.22) !important; }
-
         #logout-btn { 
-
             background: linear-gradient(135deg, var(--accent), #dc2626) !important; 
-
             padding: 7px 14px; font-size: 0.82rem; border-radius: 10px;
-
             box-shadow: 0 2px 8px rgba(239,68,68,0.35);
-
         }
-
-
 
         /* Mobile nav: shrink text */
-
         @media (max-width: 480px) {
-
             nav { padding: 0.65rem 1rem; }
-
             #admin-btn span.btn-text { display: none; }
-
             #logout-btn span.btn-text { display: none; }
-
         }
-
-
 
         /* ===== LAYOUT ===== */
-
         .container { max-width: 860px; margin: 0 auto; padding: 1.25rem 1rem 3rem; text-align: center; }
 
-
-
         /* ===== CARDS ===== */
-
         .card { 
-
             background: var(--card); padding: 1.75rem; border-radius: var(--radius); 
-
             box-shadow: var(--shadow-md); margin-bottom: 1.25rem;
-
             border: 1px solid var(--border);
-
             transition: box-shadow 0.2s;
-
         }
-
         .card:hover { box-shadow: var(--shadow-lg); }
-
         
-
         .hidden { display: none !important; }
-
         button { 
-
             cursor: pointer; border: none; border-radius: var(--radius-sm); 
-
             transition: all 0.2s; padding: 10px 20px; font-weight: 600; 
-
             font-family: 'Poppins', sans-serif; letter-spacing: 0.01em;
-
         }
-
         button:active { transform: scale(0.97); }
-
         button:disabled { cursor: not-allowed; opacity: 0.6; transform: none !important; }
-
         .btn-primary { 
-
             background: linear-gradient(135deg, var(--secondary), var(--secondary-dark)); 
-
             color: white; box-shadow: 0 2px 10px rgba(59,130,246,0.3);
-
         }
-
         .btn-primary:hover { box-shadow: 0 4px 16px rgba(59,130,246,0.45); transform: translateY(-1px); }
-
         .btn-secondary { 
-
             background: var(--border); color: var(--text-muted); margin-top: 10px;
-
             border: 1px solid var(--border);
-
         }
-
         .btn-secondary:hover { background: var(--text-muted); color: white; }
-
         .btn-outline { 
-
             background: transparent; color: var(--secondary); border: 2px solid var(--secondary);
-
             margin-top: 0;
-
         }
-
         .btn-outline:hover { background: var(--secondary); color: white; transform: translateY(-1px); }
-
         .btn-warning { background: linear-gradient(135deg, var(--warning), #d97706); color: white; margin-top: 10px; box-shadow: 0 2px 8px rgba(245,158,11,0.3); }
-
         .btn-danger { background: linear-gradient(135deg, var(--accent), #dc2626); color: white; margin-top: 10px; box-shadow: 0 2px 8px rgba(239,68,68,0.3); }
-
         .btn-danger:hover { box-shadow: 0 4px 14px rgba(239,68,68,0.4); transform: translateY(-1px); }
-
         .btn-success { background: linear-gradient(135deg, var(--success), #059669); color: white; margin-top: 10px; box-shadow: 0 2px 8px rgba(16,185,129,0.3); }
-
         .btn-success:hover { box-shadow: 0 4px 14px rgba(16,185,129,0.4); transform: translateY(-1px); }
-
         .btn-daily { 
-
             background: linear-gradient(135deg, var(--daily), #6d28d9); color: white; 
-
             width: 100%; margin-bottom: 8px; font-size: 1rem; padding: 14px;
-
             box-shadow: 0 4px 16px rgba(124,58,237,0.35); border-radius: var(--radius-sm);
-
         }
-
         .btn-daily:hover { box-shadow: 0 6px 22px rgba(124,58,237,0.45); transform: translateY(-2px); }
-
         .btn-chapter { background: linear-gradient(135deg, var(--chapter), #0f766e); color: white; box-shadow: 0 2px 8px rgba(13,148,136,0.3); }
-
         
-
         .block-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px; }
-
         .btn-block { 
-
             padding: 24px 10px; font-size: 1.1rem; font-weight: 700;
-
             background: linear-gradient(145deg, var(--card), var(--bg2)); 
-
             color: var(--secondary); border-radius: var(--radius);
-
             border: 2px solid var(--border);
-
             box-shadow: var(--shadow-sm);
-
             display: flex; flex-direction: column; align-items: center; gap: 8px;
-
         }
-
         .btn-block:hover { 
-
             background: linear-gradient(135deg, var(--secondary), var(--secondary-dark)); 
-
             color: white; border-color: transparent;
-
             box-shadow: 0 6px 20px rgba(59,130,246,0.35); transform: translateY(-3px); 
-
         }
-
         .btn-block i { font-size: 1.6rem; opacity: 0.8; }
-
-
 
         @media (max-width: 400px) { .block-grid { grid-template-columns: 1fr; } }
 
-
-
         .subject-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); gap: 12px; margin-top: 8px; }
-
         @media (max-width: 480px) { .subject-grid { grid-template-columns: repeat(2, 1fr); } }
-
         .subject-card { 
-
             background: var(--card); border: 1px solid var(--border); 
-
             padding: 16px; border-radius: var(--radius); 
-
             box-shadow: var(--shadow-sm);
-
             transition: all 0.25s; text-align: center;
-
         }
-
         .subject-card:hover { 
-
             box-shadow: var(--shadow-lg); transform: translateY(-4px);
-
             border-color: var(--secondary);
-
         }
-
         
-
         .option-btn { 
-
             display: block; width: 100%; text-align: left; padding: 13px 16px; margin: 8px 0; 
-
             border: 2px solid var(--border); background: var(--card); color: var(--text); 
-
             border-radius: var(--radius-sm); font-size: 0.95rem; font-family: 'Poppins', sans-serif;
-
             transition: all 0.15s; box-shadow: var(--shadow-sm);
-
         }
-
         .option-btn:hover:not(:disabled) { border-color: var(--secondary); background: rgba(59,130,246,0.04); transform: translateX(3px); }
-
         .option-btn:disabled { cursor: not-allowed; }
-
         .option-btn.correct { background: linear-gradient(135deg, var(--success), #059669) !important; color: white; border-color: var(--success); box-shadow: 0 2px 10px rgba(16,185,129,0.3); }
-
         .option-btn.wrong { background: linear-gradient(135deg, var(--accent), #dc2626) !important; color: white; border-color: var(--accent); box-shadow: 0 2px 10px rgba(239,68,68,0.3); }
-
         
-
         input, select, textarea { 
-
             width: 100%; padding: 11px 14px; margin: 7px 0; border-radius: var(--radius-sm); 
-
             border: 2px solid var(--border); box-sizing: border-box; 
-
             background: var(--card); color: var(--text);
-
             font-family: 'Poppins', sans-serif; font-size: 0.9rem;
-
             transition: border-color 0.2s, box-shadow 0.2s;
-
         }
-
         input:focus, select:focus, textarea:focus { 
-
             outline: none; border-color: var(--secondary); 
-
             box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
-
         }
-
         .nav-actions { display: flex; gap: 8px; align-items: center; }
-
         
-
         .admin-section { text-align: left; border-top: 1px solid var(--border); padding-top: 20px; margin-top: 20px; }
-
         .score-circle { width: 120px; height: 120px; border-radius: 50%; background: var(--secondary); color: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; margin: 0 auto 20px; border: 8px solid rgba(59,130,246,0.2); }
-
         .mistake-card { 
-
             text-align: left; border-left: 4px solid var(--accent); 
-
             background: rgba(239, 68, 68, 0.04); padding: 15px; margin-bottom: 12px; 
-
             border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-
             border: 1px solid rgba(239,68,68,0.15); border-left: 4px solid var(--accent);
-
         }
-
         .timer-badge { 
-
             background: linear-gradient(135deg, var(--accent), #dc2626); color: white; 
-
             padding: 5px 14px; border-radius: 20px; font-weight: 700; font-size: 0.85rem;
-
             box-shadow: 0 2px 8px rgba(239,68,68,0.3);
-
         }
-
         .analytics-panel { 
-
             background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(245,158,11,0.04)); 
-
             border: 1px solid rgba(245,158,11,0.3); padding: 15px; border-radius: var(--radius-sm); 
-
             margin-bottom: 15px; text-align: left; 
-
         }
-
         .search-bar-container { display: flex; gap: 10px; margin-bottom: 12px; }
-
         .search-bar-container input { margin: 0; }
-
         .tool-bar { 
-
             display: flex; justify-content: space-between; gap: 12px; align-items: center; 
-
             background: var(--bg2); padding: 12px 14px; border-radius: var(--radius-sm); 
-
             margin-bottom: 15px; border: 1px solid var(--border);
-
         }
-
-
 
         .admin-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 10px; }
-
         .stat-box { 
-
             background: linear-gradient(145deg, rgba(59,130,246,0.08), rgba(59,130,246,0.04)); 
-
             padding: 14px 10px; border-radius: var(--radius-sm); text-align: center; 
-
             border: 1px solid rgba(59,130,246,0.2);
-
             transition: all 0.2s;
-
         }
-
         .stat-box:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-
         .stat-box h3 { margin: 0; font-size: 1.6rem; color: var(--secondary); font-weight: 700; }
-
         .stat-box p { margin: 4px 0 0 0; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); }
 
-
-
         .theme-select {
-
             padding: 7px 11px;
-
             border: 2px solid var(--border);
-
             border-radius: var(--radius-sm);
-
             background-color: var(--card);
-
             color: var(--text);
-
             font-weight: 600;
-
             outline: none;
-
             cursor: pointer;
-
             transition: 0.2s;
-
             margin: 0;
-
             width: auto;
-
             font-family: 'Poppins', sans-serif;
-
         }
-
         .theme-select:focus { border-color: var(--secondary); }
-
         .theme-select option { background-color: var(--card); color: var(--text); }
 
-
-
         .admin-filters-container { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
-
         .admin-mcq-list { max-height: 420px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-sm); margin-top: 10px; padding: 8px; background: var(--bg2); }
-
         .admin-mcq-item { border-bottom: 1px solid var(--border); padding: 10px 8px; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; border-radius: var(--radius-sm); transition: background 0.15s; }
-
         .admin-mcq-item:hover { background: var(--card); }
-
         .admin-mcq-item:last-child { border-bottom: none; }
-
         
-
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-
         .modal-content { background: var(--card); padding: 24px; border-radius: var(--radius); width: 92%; max-width: 600px; max-height: 92vh; overflow-y: auto; text-align: left; box-shadow: var(--shadow-lg); border: 1px solid var(--border); }
 
-
-
         /* --- Chapter Management Styles --- */
-
         .chapter-manager-box {
-
             background: rgba(22, 160, 133, 0.08);
-
             border: 1px solid var(--chapter);
-
             border-radius: 10px;
-
             padding: 15px;
-
         }
-
         .chapter-selectors { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 12px; }
-
         .chapter-selectors > div { flex: 1; min-width: 140px; }
-
         .chapter-selectors label { font-size: 0.8rem; font-weight: bold; display: block; margin-bottom: 3px; color: var(--chapter); }
-
         .chapter-selectors select, .chapter-selectors input { margin: 0; }
-
         .chapter-list-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 10px; }
-
         .chapter-list-table th { background: var(--chapter); color: white; padding: 8px 10px; text-align: left; }
-
         .chapter-list-table td { padding: 8px 10px; border-bottom: 1px solid #eee; vertical-align: middle; }
-
         .chapter-list-table tr:hover td { background: rgba(22, 160, 133, 0.05); }
-
         .chapter-badge { background: var(--chapter); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
-
         .no-chapter-badge { background: #bdc3c7; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; }
 
-
-
         /* Chapter drill-down in student dashboard */
-
         .chapter-drill-section { margin-top: 10px; }
-
         .chapter-drill-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 10px; }
-
         .chapter-pill { 
-
             border: 2px solid rgba(13,148,136,0.3); color: var(--chapter); 
-
             background: rgba(13,148,136,0.05); border-radius: var(--radius-sm); 
-
             padding: 14px 8px; font-size: 0.85rem; text-align: center; 
-
             transition: all 0.2s; font-weight: 600;
-
         }
-
         .chapter-pill:hover { background: var(--chapter); color: white; transform: translateY(-3px); border-color: var(--chapter); box-shadow: 0 4px 14px rgba(13,148,136,0.35); }
-
         .chapter-pill span { display: block; font-size: 0.72rem; margin-top: 4px; color: var(--text-muted); font-weight: 400; }
-
         .chapter-pill:hover span { color: rgba(255,255,255,0.8); }
 
-
-
         /* Loading Screen */
-
         .loading-overlay {
-
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-
             background: linear-gradient(145deg, #0f172a 0%, #1e3a5f 100%);
-
             z-index: 9999;
-
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-
         }
-
         .loading-overlay::before {
-
             content: ''; position: absolute; inset: 0;
-
             background: radial-gradient(ellipse at 30% 40%, rgba(59,130,246,0.15) 0%, transparent 60%),
-
                         radial-gradient(ellipse at 70% 60%, rgba(124,58,237,0.1) 0%, transparent 60%);
-
         }
-
         @keyframes pulse-logo {
-
             0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(59,130,246,0.3)); }
-
             50% { transform: scale(1.06); filter: drop-shadow(0 0 35px rgba(59,130,246,0.6)); }
-
         }
-
         .loading-logo { 
-
             width: 160px; height: 160px; object-fit: contain;
-
             animation: pulse-logo 2.2s infinite ease-in-out; 
-
             margin-bottom: 20px;
-
             border-radius: 24px;
-
             position: relative; z-index: 1;
-
         }
-
         .loading-title { 
-
             color: white; font-size: 1.4rem; font-weight: 700; margin: 0 0 4px;
-
             position: relative; z-index: 1; letter-spacing: -0.3px;
-
         }
-
-
 
         /* Admin tabs */
-
         .admin-tabs { 
-
             display: flex; gap: 4px; border-bottom: 2px solid var(--border); 
-
             margin-bottom: 20px; overflow-x: auto; -webkit-overflow-scrolling: touch;
-
             scrollbar-width: none;
-
         }
-
         .admin-tabs::-webkit-scrollbar { display: none; }
-
         .admin-tab-btn { 
-
             background: none; border: none; border-bottom: 3px solid transparent; 
-
             padding: 10px 14px; font-size: 0.85rem; color: var(--text-muted); 
-
             margin-bottom: -2px; border-radius: 0; white-space: nowrap;
-
             font-family: 'Poppins', sans-serif; font-weight: 500;
-
             transition: all 0.2s;
-
         }
-
         .admin-tab-btn:hover { color: var(--secondary); }
-
         .admin-tab-btn.active { color: var(--secondary); border-bottom-color: var(--secondary); font-weight: 700; }
-
         .admin-tab-content { display: none; }
-
         .admin-tab-content.active { display: block; }
 
-
-
         /* Multi-select / bulk delete */
-
         .bulk-action-bar {
-
             display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-
             background: #fff3cd; border: 1px solid #ffc107;
-
             border-radius: 8px; padding: 8px 12px; margin-bottom: 10px;
-
             font-size: 0.9rem; font-weight: 600;
-
         }
-
         .dark-mode .bulk-action-bar { background: #3a3000; border-color: #ffc107; }
-
         .bulk-action-bar .bulk-count { color: var(--warning); flex: 1; }
-
         .mcq-checkbox {
-
             width: 18px; height: 18px; accent-color: var(--accent);
-
             cursor: pointer; flex-shrink: 0; margin: 0;
-
         }
-
         .admin-mcq-item.selected { background: rgba(231, 76, 60, 0.07); border-radius: 6px; }
-
         .select-mode-toggle {
-
             background: none; border: 2px solid var(--secondary); color: var(--secondary);
-
             padding: 5px 12px; font-size: 0.85rem; border-radius: 6px; font-weight: 600;
-
         }
-
         .select-mode-toggle.active { background: var(--secondary); color: white; }
-
     
-
         /* ===== SKELETON LOADER ===== */
-
         @keyframes shimmer {
-
             0% { background-position: -200% 0; }
-
             100% { background-position: 200% 0; }
-
         }
-
         .skeleton {
-
             background: linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.12) 50%, rgba(0,0,0,0.06) 75%);
-
             background-size: 200% 100%;
-
             animation: shimmer 1.4s infinite;
-
             border-radius: 8px;
-
         }
-
         .dark-mode .skeleton {
-
             background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
-
             background-size: 200% 100%;
-
         }
-
         .skeleton-card { height: 90px; margin-bottom: 12px; }
-
         .skeleton-text { height: 14px; margin: 6px 0; width: 60%; }
-
         .skeleton-text.wide { width: 90%; }
 
-
-
         /* ===== SVG SCORE RING ===== */
-
         .score-ring-wrap { position: relative; width: 140px; height: 140px; margin: 0 auto 20px; }
-
         .score-ring-wrap .ring-label {
-
             position: absolute; top: 50%; left: 50%;
-
             transform: translate(-50%, -50%);
-
             font-size: 2rem; font-weight: bold; color: var(--secondary);
-
         }
-
         .score-ring { transform: rotate(-90deg); }
-
         .score-ring-bg { fill: none; stroke: rgba(52,152,219,0.15); stroke-width: 10; }
-
         .score-ring-fill { fill: none; stroke: var(--secondary); stroke-width: 10; stroke-linecap: round;
-
             transition: stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1); }
 
-
-
         /* ===== XP / LEVEL BADGE ===== */
-
         .xp-badge {
-
             display: inline-flex; align-items: center; gap: 5px;
-
             background: linear-gradient(135deg, #f59e0b, #d97706);
-
             color: white; padding: 3px 10px; border-radius: 20px;
-
             font-size: 0.75rem; font-weight: 700;
-
             box-shadow: 0 2px 8px rgba(245,158,11,0.35);
-
         }
-
         .level-badge {
-
             display: inline-flex; align-items: center; gap: 4px;
-
             background: linear-gradient(135deg, var(--secondary), var(--secondary-dark));
-
             color: white; padding: 3px 10px; border-radius: 12px;
-
             font-size: 0.72rem; font-weight: 700;
-
             box-shadow: 0 2px 8px rgba(59,130,246,0.3);
-
         }
-
-
 
         /* ===== DARK MODE FIXES ===== */
-
         .dark-mode input, .dark-mode select, .dark-mode textarea {
-
             border-color: #555 !important;
-
             background: #3a3a3a !important;
-
         }
-
         .dark-mode #google-btn {
-
             background: #2d2d2d !important;
-
             color: #e2e8f0 !important;
-
             border-color: #555 !important;
-
         }
-
         .dark-mode .card { border: 1px solid #444; }
-
         .dark-mode .subject-card { border-color: #555; }
-
         .dark-mode .option-btn { border-color: #555; }
-
         .dark-mode .admin-mcq-item { border-bottom-color: #444; }
 
-
-
         /* ===== SUBJECT CARD ICONS & ACCENTS ===== */
-
         .subject-card { position: relative; overflow: hidden; }
-
         .subject-card .subj-icon { font-size: 2rem; margin-bottom: 8px; display: block; }
-
         .subject-card .subj-count { 
-
             position: absolute; top: 10px; right: 10px;
-
             background: var(--secondary); color: white;
-
             font-size: 0.7rem; font-weight: bold;
-
             padding: 2px 7px; border-radius: 10px;
-
         }
-
         .subject-card[data-color] { border-left: 4px solid var(--subj-color, var(--secondary)); }
 
-
-
         /* ===== DASHBOARD SECTIONS ===== */
-
         .dash-section-label {
-
             text-align: left; font-size: 0.75rem; font-weight: 700;
-
             text-transform: uppercase; letter-spacing: 1px;
-
             color: #888; margin: 18px 0 8px;
-
             padding-left: 4px;
-
         }
-
-
 
         /* ===== DUPLICATE DETECTOR ===== */
-
         .dupe-warning {
-
             background: rgba(243,156,18,0.15); border: 1px solid var(--warning);
-
             padding: 10px 14px; border-radius: 8px; margin: 8px 0;
-
             font-size: 0.85rem;
-
         }
-
         .dupe-warning strong { color: var(--warning); }
 
-
-
         /* ===== MOBILE FILTER STACK ===== */
-
         @media (max-width: 600px) {
-
             .admin-filters-container { flex-direction: column; }
-
             .admin-filters-container select,
-
             .admin-filters-container input { width: 100% !important; }
-
         }
-
-
 
         /* ===== WEAK RETRY BUTTON ===== */
-
         .btn-retry { background: linear-gradient(135deg, #8e44ad, #6c3483); color: white; width: 100%; margin-bottom: 10px; font-size: 1rem; }
 
-
-
         /* ===== LEADERBOARD ===== */
-
         .leaderboard-row { 
-
             display: flex; align-items: center; gap: 12px; padding: 10px 14px; 
-
             border-radius: var(--radius-sm); margin-bottom: 6px; 
-
             background: var(--bg2); border: 1px solid var(--border);
-
             transition: all 0.2s;
-
         }
-
         .leaderboard-row:hover { transform: translateX(3px); box-shadow: var(--shadow-sm); }
-
         .leaderboard-row:first-child { background: linear-gradient(135deg, rgba(251,191,36,0.1), rgba(245,158,11,0.05)); border-color: rgba(245,158,11,0.3); }
-
         .leaderboard-rank { font-size: 1.15rem; width: 28px; text-align:center; flex-shrink:0; }
-
         .leaderboard-avatar { 
-
             width: 34px; height: 34px; border-radius: 50%; 
-
             background: linear-gradient(135deg, var(--secondary), var(--daily)); 
-
             color: white; display: flex; align-items: center; justify-content: center; 
-
             font-weight: 700; font-size: 0.85rem; flex-shrink: 0;
-
         }
-
         .leaderboard-name { flex: 1; font-weight: 600; font-size: 0.9rem; }
-
         .leaderboard-score { color: var(--secondary); font-weight: 700; font-size: 0.85rem; }
 
-
-
         /* ===== INLINE CHAPTER EDIT ===== */
-
         .inline-ch-edit {
-
             display: inline-flex; align-items: center; gap: 4px;
-
             background: rgba(22,160,133,0.1); border: 1px dashed var(--chapter);
-
             border-radius: 6px; padding: 2px 6px; cursor: pointer; font-size: 0.8rem;
-
         }
-
         .inline-ch-input {
-
             width: 60px; padding: 2px 4px; font-size: 0.8rem;
-
             border: 1px solid var(--chapter); border-radius: 4px;
-
             display: none;
-
         }
-
-
 
         /* ===== LOADING TEXT ===== */
-
         .loading-sub { font-size: 0.85rem; margin-top: 6px; }
-
         @keyframes dot-pulse { 0%,80%,100%{opacity:0} 40%{opacity:1} }
-
         .loading-dots span { animation: dot-pulse 1.4s infinite; display:inline-block; }
-
         .loading-dots span:nth-child(2) { animation-delay:.2s; }
-
         .loading-dots span:nth-child(3) { animation-delay:.4s; }
 
-
-
         /* ===== DESKTOP RESPONSIVE ===== */
-
         @media (min-width: 768px) {
-
             .container { padding: 1.5rem 1.5rem 3rem; }
-
             .subject-grid { grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); }
-
         }
-
         @media (min-width: 1024px) {
-
             .container { padding: 2rem 2rem 4rem; max-width: 960px; }
-
             nav { padding: 0.85rem 2.5rem; }
-
             .card { padding: 2rem; }
-
         }
-
         @media (min-width: 1280px) {
-
             .container { max-width: 1060px; }
-
             .subject-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
-
         }
-
-
 
         /* ===== QUIZ PROGRESS BAR ===== */
-
         .quiz-progress-bar-wrap { 
-
             height: 4px; background: var(--border); border-radius: 4px; 
-
             margin-bottom: 16px; overflow: hidden;
-
         }
-
         .quiz-progress-bar { height: 100%; background: linear-gradient(90deg, var(--secondary), var(--daily)); border-radius: 4px; transition: width 0.4s ease; }
 
-
-
         /* ===== RESULT SCREEN STATS ===== */
-
         .result-stats { display: flex; gap: 12px; margin-bottom: 20px; }
-
         .result-stat-box { 
-
             flex: 1; padding: 14px; border-radius: var(--radius-sm); text-align: center;
-
             border: 2px solid var(--border);
-
         }
-
         .result-stat-box .stat-num { font-size: 1.8rem; font-weight: 800; }
-
         .result-stat-box .stat-lbl { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-
-
         /* ===== SCROLLBAR ===== */
-
         ::-webkit-scrollbar { width: 6px; }
-
         ::-webkit-scrollbar-track { background: transparent; }
-
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
         ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-
-
         /* ===== HOVER CARD TILT (desktop) ===== */
-
         @media (hover: hover) {
-
             .subject-card:hover { transform: translateY(-5px) scale(1.01); }
-
         }
 
-
-
         </style>
-
 </head>
-
 <body class="light-mode">
-
     
-
     <div id="loading-screen" class="loading-overlay">
-
         <img src="logo.png" alt="MedBytes Logo" class="loading-logo" onerror="this.style.display='none'">
-
         <h2 class="loading-title">MedBytes</h2>
-
         <p class="loading-sub" id="loading-sub-text" style="color:rgba(255,255,255,0.55); position:relative; z-index:1;">
-
             Loading<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>
-
         </p>
-
     </div>
-
-
 
     <nav>
-
         <div class="logo">
-
             <div class="logo-icon"><i class="fas fa-microscope"></i></div>
-
             <span>MedBytes</span>
-
         </div>
-
         <div class="nav-actions">
-
             <button id="admin-btn" class="hidden" onclick="openAdmin()" title="Admin Panel" style="color:white;">
-
                 <i class="fas fa-user-shield"></i> <span class="btn-text">Admin</span>
-
             </button>
-
             <button id="theme-toggle" title="Toggle Mode"><i class="fas fa-moon"></i></button>
-
             <button id="logout-btn" class="hidden" onclick="handleLogout()" style="color:white;">
-
                 <i class="fas fa-sign-out-alt"></i> <span class="btn-text">Logout</span>
-
             </button>
-
         </div>
-
     </nav>
 
-
-
     <main class="container">
-
         <!-- AUTH -->
-
         <section id="auth-screen" class="view hidden">
-
             <div class="card">
-
                 <i class="fas fa-user-md fa-4x" style="color: var(--secondary); margin-bottom: 1rem;"></i>
-
                 <h1>Doctor Login</h1>
-
                 <p>Access Blocks 7, 8 & 9 MCQ Bank</p>
-
                 <input type="email" id="email" placeholder="Email Address">
-
                 <input type="password" id="password" placeholder="Password">
-
                 <button class="btn-primary" style="width:100%" onclick="login()">Login</button>
-
                 <button class="btn-secondary" style="width:100%" onclick="register()">Register Account</button>
-
             </div>
-
         </section>
-
-
 
         <!-- BLOCK SELECTION -->
-
         <section id="block-selection-screen" class="view hidden">
-
             <div style="max-width:520px; margin:1.5rem auto;">
-
                 <div style="text-align:center; margin-bottom:20px;">
-
                     <h2 style="margin:0; font-size:1.5rem; font-weight:800;">
-
                         Hello, <span id="user-name-display" style="color:var(--secondary);">Doctor</span> 👋
-
                     </h2>
-
                     <p style="color:var(--text-muted); margin:6px 0 0; font-size:0.9rem;">Choose your study block to begin</p>
-
                 </div>
-
                 <div class="block-grid">
-
                     <button class="btn-block" onclick="selectBlock(7)">
-
                         <i class="fas fa-book-medical"></i>
-
                         <span>Block 7</span>
-
                         <small style="font-size:0.7rem; opacity:0.6; font-weight:400;">Pharmacology & more</small>
-
                     </button>
-
                     <button class="btn-block" onclick="selectBlock(8)">
-
                         <i class="fas fa-microscope"></i>
-
                         <span>Block 8</span>
-
                         <small style="font-size:0.7rem; opacity:0.6; font-weight:400;">Pathology & Surgery</small>
-
                     </button>
-
                     <button class="btn-block" onclick="selectBlock(9)">
-
                         <i class="fas fa-heartbeat"></i>
-
                         <span>Block 9</span>
-
                         <small style="font-size:0.7rem; opacity:0.6; font-weight:400;">Community & Medicine</small>
-
                     </button>
-
                 </div>
-
             </div>
-
         </section>
-
-
 
         <!-- DASHBOARD -->
-
         <section id="dashboard-screen" class="view hidden">
-
             <div class="welcome-bar" style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; background:var(--card); padding:14px 18px; border-radius:var(--radius); box-shadow:var(--shadow-sm); border:1px solid var(--border);">
-
                 <div style="display:flex; align-items:center; gap:12px;">
-
                     <button onclick="showView('block-selection-screen')" style="background:rgba(59,130,246,0.1); color:var(--secondary); padding:8px 10px; border-radius:8px; font-size:0.85rem; font-weight:600;" title="Change Block">
-
                         <i class="fas fa-chevron-left"></i>
-
                     </button>
-
                     <div>
-
                         <div style="font-size:0.75rem; color:var(--text-muted); font-weight:500; text-transform:uppercase; letter-spacing:0.5px;">Currently Studying</div>
-
                         <div style="font-size:1.1rem; font-weight:800; color:var(--text);">Block <span id="current-block-id">?</span></div>
-
                     </div>
-
                 </div>
-
                 <div style="text-align:right;">
-
                     <div id="streak-display" style="font-size:1.3rem; font-weight:800; color:#f59e0b;" title="Daily Streak">🔥 0</div>
-
                     <div id="xp-display" style="margin-top:2px;"><span id="xp-label"></span></div>
-
                 </div>
-
             </div>
-
-
 
             <button id="resume-quiz-btn" class="btn-success hidden" style="width: 100%; margin-bottom: 10px; font-size: 1.1rem;" onclick="resumeQuiz()"><i class="fas fa-play-circle"></i> Resume Paused Quiz</button>
-
             <button id="weak-retry-btn" class="btn-retry hidden" onclick="startWeakRetry()"><i class="fas fa-redo-alt"></i> Retry Weak Questions</button>
-
             <div class="dash-section-label">🎯 Quick Actions</div>
-
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:8px;">
-
                 <button id="daily-quiz-btn" class="btn-daily" style="border-radius:var(--radius-sm); padding:14px 10px; font-size:0.9rem; margin:0;" onclick="startDailyQuiz()">
-
                     <div style="font-size:1.4rem; margin-bottom:4px;">📅</div>
-
                     <div>Daily Challenge</div>
-
                     <div style="font-size:0.72rem; opacity:0.8; font-weight:400; margin-top:2px;">10 Questions</div>
-
                 </button>
-
                 <button class="btn-danger" style="border-radius:var(--radius-sm); padding:14px 10px; font-size:0.9rem; margin:0; width:100%;" onclick="startMockExam()">
-
                     <div style="font-size:1.4rem; margin-bottom:4px;">📝</div>
-
                     <div>Mock Exam</div>
-
                     <div style="font-size:0.72rem; opacity:0.8; font-weight:400; margin-top:2px;">140 Questions</div>
-
                 </button>
-
             </div>
-
             
-
             <div id="analytics-panel" class="analytics-panel hidden">
-
                 <h4 style="margin-top:0; color: var(--warning);"><i class="fas fa-chart-line"></i> Performance Analytics</h4>
-
                 <div id="weakest-subject-alert" style="font-weight: bold; color: var(--accent);">⚠️ Not enough data yet. Complete a quiz!</div>
-
                 <div id="analytics-breakdown" style="font-size: 0.9rem; margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;"></div>
-
             </div>
-
-
 
             <div class="search-bar-container">
-
                 <input type="text" id="mcq-search-input" placeholder="Search keywords...">
-
                 <button class="btn-primary" onclick="searchMCQs()"><i class="fas fa-search"></i></button>
-
             </div>
-
-
 
             <div class="tool-bar">
-
                 <i class="fas fa-filter" style="color:var(--text-muted); font-size:0.85rem;"></i>
-
                 <label style="font-size: 0.82rem; font-weight: 600; color:var(--text-muted); white-space:nowrap;">Difficulty:</label>
-
                 <select id="difficulty-filter" style="width: auto; display: inline-block; margin: 0; padding: 7px 10px; flex:1; max-width:130px;">
-
                     <option value="all">All Levels</option>
-
                     <option value="easy">Easy</option>
-
                     <option value="medium">Medium</option>
-
                     <option value="hard">Hard</option>
-
                 </select>
-
                 <button class="btn-primary" onclick="searchMCQs()" style="margin:0; padding:8px 14px; font-size:0.82rem; white-space:nowrap;">
-
                     <i class="fas fa-search"></i> Search
-
                 </button>
-
             </div>
-
             <div class="search-bar-container" style="margin-bottom:10px;">
-
                 <input type="text" id="mcq-search-input" placeholder="Search questions by keyword..." style="margin:0;">
-
             </div>
-
-
 
             <div class="dash-section-label">📚 Study by Subject</div>
-
             <div class="subject-grid" id="subject-list"></div>
-
             <div class="dash-section-label">🏆 Leaderboard</div>
-
             <div id="leaderboard-section" class="card" style="padding:15px;">
-
                 <div id="leaderboard-list"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div></div>
-
             </div>
-
         </section>
-
-
 
         <!-- CHAPTER DRILL-DOWN (Student) -->
-
         <section id="chapter-screen" class="view hidden">
-
             <div class="card">
-
                 <div style="display:flex; align-items:center; gap:12px; margin-bottom:15px;">
-
                     <button onclick="showView('dashboard-screen')" style="background:none; color:var(--secondary); padding:0; font-size:1.2rem;"><i class="fas fa-arrow-left"></i></button>
-
                     <div>
-
                         <div style="font-size:0.85rem; color:#888;">Block <span id="chapter-block-label">?</span></div>
-
                         <h3 style="margin:0;" id="chapter-subject-label">Subject</h3>
-
                     </div>
-
                 </div>
-
                 <button class="btn-primary" style="width:100%; margin-bottom:15px;" onclick="startQuiz(window._chapterSubject)">
-
                     <i class="fas fa-layer-group"></i> Start Full Subject Quiz (All Chapters)
-
                 </button>
-
                 <h4 style="text-align:left; margin-bottom:8px; color: var(--chapter);"><i class="fas fa-bookmark"></i> Study by Chapter</h4>
-
                 <div id="chapter-drill-grid" class="chapter-drill-grid"></div>
-
                 <p id="chapter-drill-empty" class="hidden" style="color:#888; font-size:0.9rem; margin-top:10px;">No chapters configured for this subject yet. Ask your admin!</p>
-
             </div>
-
         </section>
-
-
 
         <!-- QUIZ -->
-
         <section id="quiz-screen" class="view hidden">
-
             <div class="card" style="text-align: left;">
-
                 <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-
                     <div style="display: flex; align-items: center; gap: 10px;">
-
                         <button onclick="quitQuiz()" style="background:rgba(239,68,68,0.1); color:var(--accent); padding:8px 10px; border-radius:8px; font-size: 1rem;" title="Quit Quiz"><i class="fas fa-arrow-left"></i></button>
-
                         <span id="quiz-subject-title" style="font-weight:700; font-size:0.9rem; color:var(--text);">Subject</span>
-
                     </div>
-
                     <div style="display:flex; align-items:center; gap:8px;">
-
                         <span id="quiz-timer" class="timer-badge"><i class="far fa-clock"></i> 00:00</span>
-
                         <span id="quiz-progress" style="color:var(--text-muted); font-size:0.82rem; font-weight:600; background:var(--bg2); padding:4px 10px; border-radius:20px; border:1px solid var(--border);">0 / 0</span>
-
                     </div>
-
                 </div>
-
                 <div class="quiz-progress-bar-wrap"><div class="quiz-progress-bar" id="quiz-progress-bar" style="width:0%"></div></div>
-
                 <h3 id="question-text" style="font-size:1rem; line-height:1.6; margin:0 0 4px;">Loading...</h3>
-
                 <div id="options-list"></div>
-
                 
-
                 <div id="explanation-box" class="hidden" style="margin-top: 25px; padding: 15px; background: rgba(52, 152, 219, 0.1); border-left: 5px solid var(--secondary); border-radius: 5px;">
-
                     <p><strong><i class="fas fa-info-circle"></i> Explanation:</strong></p>
-
                     <p id="explanation-text" style="line-height: 1.5;"></p>
-
                     <button class="btn-primary" style="width:100%; margin-top: 15px;" onclick="loadNextQuestion()">Next Question <i class="fas fa-arrow-right"></i></button>
-
                 </div>
-
             </div>
-
         </section>
-
-
 
         <!-- RESULT -->
-
         <section id="result-screen" class="view hidden">
-
             <div class="card">
-
                 <h2>Quiz Complete!</h2>
-
                 <div class="score-ring-wrap">
-
                     <svg class="score-ring" width="140" height="140" viewBox="0 0 140 140">
-
                         <circle class="score-ring-bg" cx="70" cy="70" r="60"/>
-
                         <circle class="score-ring-fill" id="score-ring-fill" cx="70" cy="70" r="60"
-
                             stroke-dasharray="377" stroke-dashoffset="377"/>
-
                     </svg>
-
                     <div class="ring-label" id="final-score-circle">0%</div>
-
                 </div>
-
                 <div class="result-stats">
-
                     <div class="result-stat-box" style="border-color:rgba(16,185,129,0.3); background:rgba(16,185,129,0.05);">
-
                         <div class="stat-num" style="color:var(--success);" id="correct-count">0</div>
-
                         <div class="stat-lbl">✅ Correct</div>
-
                     </div>
-
                     <div class="result-stat-box" style="border-color:rgba(239,68,68,0.3); background:rgba(239,68,68,0.05);">
-
                         <div class="stat-num" style="color:var(--accent);" id="wrong-count">0</div>
-
                         <div class="stat-lbl">❌ Wrong</div>
-
                     </div>
-
                 </div>
-
                 
-
                 <div id="mock-breakdown-section" class="hidden" style="margin-bottom: 20px; background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; text-align: left;">
-
                     <h4 style="margin-top: 0; border-bottom: 2px solid #ddd; padding-bottom: 5px;">Exam Breakdown</h4>
-
                     <div id="mock-breakdown-list"></div>
-
                 </div>
-
-
 
                 <button class="btn-primary" onclick="showView('dashboard-screen'); renderAnalytics(); checkSavedQuiz();">Back to Dashboard</button>
-
                 
-
                 <div id="review-section" style="margin-top: 30px;" class="hidden">
-
                     <h3 style="text-align: left; border-bottom: 2px solid #ddd; padding-bottom: 10px;">Review Mistakes</h3>
-
                     <div id="mistakes-list"></div>
-
                 </div>
-
             </div>
-
         </section>
-
-
 
         <!-- ADMIN -->
-
         <section id="admin-screen" class="view hidden">
-
             <div class="card">
-
                 <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
-
                     <button onclick="showView('block-selection-screen')" style="background:none; color:var(--secondary); padding:0; font-size: 1.5rem;" title="Back"><i class="fas fa-arrow-left"></i></button>
-
                     <h2 style="margin: 0;"><i class="fas fa-tools"></i> Admin Control Panel</h2>
-
                 </div>
-
-
 
                 <!-- TABS -->
-
                 <div class="admin-tabs">
-
                     <button class="admin-tab-btn active" onclick="switchAdminTab('tab-stats')"><i class="fas fa-chart-bar"></i> Stats</button>
-
                     <button class="admin-tab-btn" onclick="switchAdminTab('tab-chapters')"><i class="fas fa-bookmark"></i> Chapters</button>
-
                     <button class="admin-tab-btn" onclick="switchAdminTab('tab-mcqs')"><i class="fas fa-edit"></i> MCQs</button>
-
                     <button class="admin-tab-btn" onclick="switchAdminTab('tab-upload')"><i class="fas fa-upload"></i> Upload</button>
-
                 </div>
-
-
 
                 <!-- TAB: STATS -->
-
                 <div id="tab-stats" class="admin-tab-content active">
-
                     <h4><i class="fas fa-chart-bar"></i> Database Statistics</h4>
-
                     <div class="admin-stats-grid" id="admin-stats-container">Loading stats...</div>
-
                 </div>
-
-
 
                 <!-- TAB: CHAPTERS -->
-
                 <div id="tab-chapters" class="admin-tab-content">
-
                     <div class="chapter-manager-box">
-
                         <h4 style="margin-top:0; color: var(--chapter);"><i class="fas fa-bookmark"></i> Chapter Manager</h4>
-
                         <p style="font-size:0.9rem; color:#666; margin-top:-5px;">Define chapters for each Block → Subject combination. Students will see these as drill-down options.</p>
 
-
-
                         <div class="chapter-selectors">
-
                             <div>
-
                                 <label>Block</label>
-
                                 <select id="ch-block" class="theme-select" onchange="loadChapterList()" style="width:100%;">
-
                                     <option value="7">Block 7</option>
-
                                     <option value="8">Block 8</option>
-
                                     <option value="9">Block 9</option>
-
                                 </select>
-
                             </div>
-
                             <div>
-
                                 <label>Subject</label>
-
                                 <select id="ch-subject" class="theme-select" onchange="loadChapterList()" style="width:100%;">
-
                                     <option value="Pharmacology">Pharmacology</option>
-
                                     <option value="Pathology">Pathology</option>
-
                                     <option value="Medicine">Medicine</option>
-
                                     <option value="Forensic Medicine">Forensic Medicine</option>
-
                                     <option value="Community Medicine">Community Medicine</option>
-
                                     <option value="Surgery">Surgery</option>
-
                                     <option value="Behavioral Sciences">Behavioral Sciences</option>
-
                                     <option value="Patient Safety">Patient Safety</option>
-
                                     <option value="Family Medicine">Family Medicine</option>
-
                                 </select>
-
                             </div>
-
                         </div>
-
-
 
                         <!-- Add new chapter -->
-
                         <div style="display:flex; gap:10px; align-items:flex-end; margin-bottom:10px; flex-wrap:wrap;">
-
                             <div style="flex:1; min-width:80px;">
-
                                 <label style="font-size:0.8rem; font-weight:bold; color:var(--chapter);">Chapter No.</label>
-
                                 <input type="number" id="new-ch-number" placeholder="e.g. 1" min="1" max="99" style="margin:0;">
-
                             </div>
-
                             <div style="flex:3; min-width:180px;">
-
                                 <label style="font-size:0.8rem; font-weight:bold; color:var(--chapter);">Chapter Name</label>
-
                                 <input type="text" id="new-ch-name" placeholder="e.g. Autonomic Pharmacology" style="margin:0;">
-
                             </div>
-
                             <button class="btn-chapter" style="height:40px; white-space:nowrap;" onclick="addChapter()"><i class="fas fa-plus"></i> Add</button>
-
                         </div>
-
-
 
                         <!-- Chapter list for selected block+subject -->
-
                         <div id="chapter-list-container">
-
                             <p style="color:#888; font-size:0.9rem;">Select a block and subject to view chapters.</p>
-
                         </div>
-
                     </div>
-
                 </div>
-
-
 
                 <!-- TAB: MCQs -->
-
                 <div id="tab-mcqs" class="admin-tab-content">
-
                     <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
-
                         <h4 style="margin:0;"><i class="fas fa-edit"></i> Manage MCQs</h4>
-
                         <button id="select-mode-btn" class="select-mode-toggle" onclick="toggleSelectMode()">
-
                             <i class="fas fa-check-square"></i> Select
-
                         </button>
-
                     </div>
-
                     <div id="bulk-action-bar" class="bulk-action-bar hidden">
-
                         <span class="bulk-count" id="bulk-count-label">0 selected</span>
-
                         <button onclick="selectAllVisible()" style="background:var(--warning); color:white; padding:5px 12px; font-size:0.82rem; margin:0;"><i class="fas fa-check-double"></i> Select All</button>
-
                         <button onclick="deselectAll()" style="background:#95a5a6; color:white; padding:5px 12px; font-size:0.82rem; margin:0;"><i class="fas fa-times"></i> Deselect All</button>
-
                         <button onclick="bulkAssignChapter()" style="background:var(--chapter); color:white; padding:5px 12px; font-size:0.82rem; margin:0;"><i class="fas fa-bookmark"></i> Assign Chapter</button>
-
                         <button onclick="deleteSelected()" style="background:var(--accent); color:white; padding:5px 12px; font-size:0.82rem; margin:0;"><i class="fas fa-trash"></i> Delete Selected</button>
-
                     </div>
-
                     <div class="admin-filters-container">
-
                         <select id="admin-filter-block" class="theme-select" onchange="updateAdminSubjectFilter()">
-
                             <option value="all">All Blocks</option>
-
                             <option value="7">Block 7</option>
-
                             <option value="8">Block 8</option>
-
                             <option value="9">Block 9</option>
-
                         </select>
-
                         <select id="admin-filter-subject" class="theme-select" onchange="updateAdminChapterFilter()">
-
                             <option value="all">All Subjects</option>
-
                         </select>
-
                         <select id="admin-filter-chapter" class="theme-select" onchange="filterAdminMCQs()">
-
                             <option value="all">All Chapters</option>
-
                         </select>
-
                         <input type="text" id="admin-search" placeholder="Search keywords..." style="flex:1; margin:0;" onkeyup="filterAdminMCQs()">
-
                     </div>
-
                     <div class="admin-mcq-list" id="admin-mcq-list-container">Loading questions...</div>
-
                 </div>
-
-
 
                 <!-- TAB: UPLOAD -->
-
                 <div id="tab-upload" class="admin-tab-content">
-
                     <div class="admin-section" style="border-top:none; padding-top:0; margin-top:0;">
-
                         <h4><i class="fas fa-file-upload"></i> Bulk Upload</h4>
-
                         <p style="font-size:0.85rem; color:#666;">
-
                             Excel/JSON columns: <code>block, subject, chapter, difficulty, question, optionA, optionB, optionC, optionD, optionE, correctAnswer, explanation</code><br>
-
                             <strong>chapter</strong> field is optional — use the chapter number (e.g. <code>1</code>, <code>2</code>) to tag MCQs to a chapter.
-
                         </p>
-
                         <div style="display:flex; gap:10px;">
-
                             <input type="file" id="excel-file" accept=".xlsx, .xls" style="flex:1;">
-
                             <button onclick="uploadExcel()" class="btn-success">Upload Excel</button>
-
                         </div>
-
                         <hr style="margin: 15px 0;">
-
                         <textarea id="json-input" rows="4" placeholder='[{"block": 9, "subject": "Surgery", "chapter": 3, "difficulty": "hard", "question": "Example?", ...}]'></textarea>
-
                         <button onclick="uploadJSON()" class="btn-primary" style="width: 100%;">Upload JSON</button>
-
                     </div>
-
                 </div>
 
-
-
                 <hr style="margin: 20px 0;">
-
                 <button onclick="showView('block-selection-screen')" class="btn-secondary" style="width: 100%;">Back to App</button>
-
             </div>
-
         </section>
-
     </main>
 
-
-
     <!-- Edit MCQ Modal -->
-
     <div id="edit-modal" class="modal-overlay hidden">
-
         <div class="modal-content">
-
             <h3 style="margin-top:0;">Edit Question</h3>
-
             <input type="hidden" id="edit-id">
-
             <label>Question Text</label><textarea id="edit-q" rows="3"></textarea>
-
             <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
-
                 <div><label>Block</label><input type="number" id="edit-block"></div>
-
                 <div><label>Subject</label><input type="text" id="edit-subject"></div>
-
                 <div><label>Chapter #</label><input type="number" id="edit-chapter" placeholder="Optional"></div>
-
             </div>
-
             <label>Difficulty</label>
-
             <select id="edit-difficulty">
-
                 <option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option>
-
             </select>
-
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
-
                 <div><label>Option A</label><input type="text" id="edit-a"></div>
-
                 <div><label>Option B</label><input type="text" id="edit-b"></div>
-
                 <div><label>Option C</label><input type="text" id="edit-c"></div>
-
                 <div><label>Option D</label><input type="text" id="edit-d"></div>
-
                 <div><label>Option E (Optional)</label><input type="text" id="edit-e"></div>
-
                 <div><label>Correct Answer (A-E)</label><input type="text" id="edit-correct" maxlength="1" style="text-transform: uppercase;"></div>
-
             </div>
-
             <label>Explanation</label><textarea id="edit-exp" rows="3"></textarea>
-
             <div style="display:flex; gap:10px; margin-top:15px;">
-
                 <button class="btn-success" style="flex:1;" onclick="saveEdit()">Save Changes</button>
-
                 <button class="btn-secondary" style="flex:1; margin-top:0;" onclick="document.getElementById('edit-modal').classList.add('hidden')">Cancel</button>
-
             </div>
-
         </div>
-
     </div>
 
-
-
     <script type="module">
-
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-
         import { getFirestore, collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc, setDoc, getDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
 
-
-
         const firebaseConfig = {
-
             apiKey: "AIzaSyDc-yEvFYvP8_OZedCyIqXjpEOnocOe87k",
-
             databaseURL: "https://the-medbytes-4e614-default-rtdb.asia-southeast1.firebasedatabase.app",
-
             authDomain: "the-medbytes-4e614.firebaseapp.com",
-
             projectId: "the-medbytes-4e614",
-
             storageBucket: "the-medbytes-4e614.firebasestorage.app",
-
             messagingSenderId: "508245128582",
-
             appId: "1:508245128582:web:c4285259f6812a30026807"
-
         };
 
-
-
         const app = initializeApp(firebaseConfig);
-
         const auth = getAuth(app);
-
         const db = getFirestore(app);
-
         const rtdb = getDatabase(app);
-
         const googleProvider = new GoogleAuthProvider();
-
         googleProvider.setCustomParameters({ prompt: 'select_account' });
-
-
 
         const commonSubjects = ["Pharmacology", "Pathology", "Medicine", "Forensic Medicine", "Community Medicine", "Surgery", "Behavioral Sciences", "Patient Safety"];
 
-
-
         const mockQuotas = {
-
             7: { "Pharmacology": 55, "Pathology": 50, "Forensic Medicine": 18, "Surgery": 5, "Medicine": 5, "Patient Safety": 3, "Community Medicine": 2, "Behavioral Sciences": 2 },
-
             8: { "Pathology": 55, "Pharmacology": 22, "Surgery": 20, "Medicine": 20, "Forensic Medicine": 15, "Community Medicine": 4, "Behavioral Sciences": 2, "Patient Safety": 2 },
-
             9: { "Community Medicine": 42, "Pathology": 22, "Forensic Medicine": 20, "Pharmacology": 19, "Surgery": 15, "Medicine": 15, "Family Medicine": 5, "Behavioral Sciences": 2 }
-
         };
-
-
 
         let currentQuestions = [];
-
         let currentIndex = 0;
-
         let selectedBlock = null;
-
         let scoreState = { correct: 0, wrong: 0 };
-
         let mistakesLog = [];
-
         let timerInterval;
-
         let timeRemaining = 0;
-
         let isMockExamMode = false;
-
         let isDailyQuiz = false;
-
         let currentQuizSubjects = {}; 
-
         let adminQuestionsCache = []; 
-
         let chaptersCache = {}; // { "7_Pharmacology": [{number:1, name:"..."}, ...] }
-
         let currentUserRef = null;
 
-
-
         // ===================== VIEWS =====================
-
         window.showView = (id) => {
-
             document.getElementById('loading-screen').classList.add('hidden');
-
             document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
-
             document.getElementById(id).classList.remove('hidden');
-
         };
-
-
 
         // ===================== THEME =====================
-
         const themeBtn = document.getElementById('theme-toggle');
-
         themeBtn.onclick = () => {
-
             document.body.classList.toggle('dark-mode');
-
             themeBtn.innerHTML = document.body.classList.contains('dark-mode') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-
         };
-
-
 
         // ===================== AUTH =====================
-
         window.login = async () => {
-
             document.getElementById('loading-screen').classList.remove('hidden'); 
-
             const email = document.getElementById("email").value.trim();
-
             const password = document.getElementById("password").value;
-
             try { await signInWithEmailAndPassword(auth, email, password); } 
-
             catch (e) { document.getElementById('loading-screen').classList.add('hidden'); alert(e.message); }
-
         };
-
-
 
         window.register = async () => {
-
             document.getElementById('loading-screen').classList.remove('hidden'); 
-
             const email = document.getElementById("email").value.trim();
-
             const password = document.getElementById("password").value;
-
             try { await createUserWithEmailAndPassword(auth, email, password); } 
-
             catch (e) { document.getElementById('loading-screen').classList.add('hidden'); alert(e.message); }
-
         };
-
-
 
         window.loginWithGoogle = async () => {
-
             const btn = document.getElementById('google-btn');
-
             if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...'; }
-
             try {
-
                 const result = await signInWithPopup(auth, googleProvider);
-
                 // onAuthStateChanged will handle the rest (create Firestore doc if needed)
-
             } catch (e) {
-
                 if (btn) { btn.disabled = false; btn.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:18px;height:18px;"> Continue with Google'; }
-
                 if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
-
                     alert('Google sign-in failed: ' + e.message);
-
                 }
-
             }
-
         };
-
-
 
         window.handleLogout = () => {
-
             document.getElementById('loading-screen').classList.remove('hidden');
-
             signOut(auth).then(() => {
-
                 localStorage.removeItem('medbytes_session_id');
-
                 location.reload();
-
             });
-
         };
-
-
 
         onAuthStateChanged(auth, async (user) => {
-
             if (user) {
-
                 const displayName = user.displayName ? user.displayName.split(' ')[0].toUpperCase() : user.email.split('@')[0].toUpperCase();
-
                 document.getElementById('user-name-display').innerText = displayName;
-
                 document.getElementById('logout-btn').classList.remove('hidden');
-
                 if(user.email === 'themedbytes@gmail.com') document.getElementById('admin-btn').classList.remove('hidden');
-
                 
-
                 const sessionRef = ref(rtdb, 'sessions/' + user.uid);
-
                 let currentLocalSessionId = localStorage.getItem('medbytes_session_id');
-
                 
-
                 if (!currentLocalSessionId) {
-
                     currentLocalSessionId = Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
-
                     localStorage.setItem('medbytes_session_id', currentLocalSessionId);
-
                     await set(sessionRef, currentLocalSessionId);
-
                 }
-
                 
-
                 onValue(sessionRef, (snapshot) => {
-
                     const dbSessionId = snapshot.val();
-
                     const latestLocalId = localStorage.getItem('medbytes_session_id');
-
                     if (dbSessionId && latestLocalId && dbSessionId !== latestLocalId) {
-
                         alert("You logged in from another device. This session will now be closed.");
-
                         signOut(auth).then(() => {
-
                             localStorage.removeItem('medbytes_session_id');
-
                             location.reload();
-
                         });
-
                     }
-
                 });
-
-
 
                 currentUserRef = doc(db, "users", user.uid);
-
                 const userSnap = await getDoc(currentUserRef);
-
                 const today = new Date().toDateString();
-
                 const yesterday = new Date(Date.now() - 86400000).toDateString();
-
-
 
                 if (!userSnap.exists()) {
-
                     const userName = user.displayName ? user.displayName.split(' ')[0].toUpperCase() : user.email.split('@')[0].toUpperCase();
-
                     await setDoc(currentUserRef, { email: user.email, name: userName, totalCorrect: 0, streak: 0, lastDaily: null, stats: {} });
-
                     document.getElementById('streak-display').innerText = "🔥 0";
-
                     renderXP(0);
-
                 } else {
-
                     let data = userSnap.data();
-
                     let currentStreak = data.streak || 0;
-
                     if (data.lastDaily && data.lastDaily !== today && data.lastDaily !== yesterday) {
-
                         currentStreak = 0;
-
                         await updateDoc(currentUserRef, { streak: 0 });
-
                     }
-
                     document.getElementById('streak-display').innerText = `🔥 ${currentStreak}`;
-
                     renderXP(data.totalCorrect || 0);
-
                     if(data.lastDaily === today) {
-
                         const btn = document.getElementById('daily-quiz-btn');
-
                         btn.disabled = true;
-
                         btn.innerText = "Daily Challenge Completed ✅";
-
                     }
-
                 }
-
                 showView('block-selection-screen');
-
             } else {
-
                 currentUserRef = null;
-
                 showView('auth-screen');
-
             }
-
         });
 
-
-
         // ===================== QUIZ SAVE/RESUME =====================
-
         function getSaveKey() {
-
             return auth.currentUser ? `medbytes_quiz_${auth.currentUser.uid}_${selectedBlock}` : null;
-
         }
-
-
 
         window.checkSavedQuiz = () => {
-
             const key = getSaveKey();
-
             if(key && localStorage.getItem(key)) {
-
                 document.getElementById('resume-quiz-btn').classList.remove('hidden');
-
             } else {
-
                 document.getElementById('resume-quiz-btn').classList.add('hidden');
-
             }
-
         };
-
-
 
         function saveQuizState() {
-
             const key = getSaveKey();
-
             if(!key) return;
-
             const state = {
-
                 currentQuestions, currentIndex, scoreState, mistakesLog,
-
                 currentQuizSubjects, timeRemaining, isMockExamMode, isDailyQuiz,
-
                 title: document.getElementById('quiz-subject-title').innerText
-
             };
-
             localStorage.setItem(key, JSON.stringify(state));
-
         }
-
-
 
         function clearQuizState() {
-
             const key = getSaveKey();
-
             if(key) localStorage.removeItem(key);
-
         }
-
-
 
         window.resumeQuiz = () => {
-
             const key = getSaveKey();
-
             if(!key) return;
-
             const stateStr = localStorage.getItem(key);
-
             if(stateStr) {
-
                 const state = JSON.parse(stateStr);
-
                 currentQuestions = state.currentQuestions;
-
                 currentIndex = state.currentIndex;
-
                 scoreState = state.scoreState;
-
                 mistakesLog = state.mistakesLog;
-
                 currentQuizSubjects = state.currentQuizSubjects;
-
                 isMockExamMode = state.isMockExamMode;
-
                 isDailyQuiz = state.isDailyQuiz;
-
                 document.getElementById('quiz-subject-title').innerText = state.title;
-
                 showView('quiz-screen');
-
                 startTimer(state.timeRemaining, true); 
-
                 loadQuestion();
-
             }
-
         };
-
-
 
         // ===================== ANALYTICS =====================
-
         window.renderAnalytics = async () => {
-
             const panel = document.getElementById('analytics-panel');
-
             if (!currentUserRef) return;
-
             const userSnap = await getDoc(currentUserRef);
-
             if (!userSnap.exists() || !userSnap.data().stats) { panel.classList.add('hidden'); return; }
-
             let stats = userSnap.data().stats;
-
             if(Object.keys(stats).length === 0) { panel.classList.add('hidden'); return; }
-
             panel.classList.remove('hidden');
-
             let weakestSub = ""; let lowestScore = 101; let breakdownHtml = "";
-
             for(let sub in stats) {
-
                 if(stats[sub].total > 4) { 
-
                     let pct = Math.round((stats[sub].correct / stats[sub].total) * 100);
-
                     breakdownHtml += `<div>${sub}: <strong>${pct}%</strong></div>`;
-
                     if(pct < lowestScore) { lowestScore = pct; weakestSub = sub; }
-
                 }
-
             }
-
             if(weakestSub) {
-
                 document.getElementById('weakest-subject-alert').innerHTML = `⚠️ Your weakest subject: <strong>${weakestSub} (${lowestScore}%)</strong>`;
-
                 document.getElementById('analytics-breakdown').innerHTML = breakdownHtml;
-
             } else {
-
                 document.getElementById('weakest-subject-alert').innerHTML = "Answer at least 5 questions in a subject to unlock your weakness profile!";
-
                 document.getElementById('analytics-breakdown').innerHTML = "";
-
             }
-
         };
-
-
 
         // ===================== BLOCK & SUBJECTS =====================
-
         window.selectBlock = (block) => {
-
             selectedBlock = block;
-
             document.getElementById('current-block-id').innerText = block;
-
             const list = document.getElementById('subject-list');
-
             list.innerHTML = '';
-
             let subjects = [...commonSubjects];
-
             if(block === 9) subjects.push("Family Medicine");
-
             subjects.forEach(sub => {
-
                 const div = document.createElement('div');
-
                 div.className = 'subject-card';
-
                 const meta = subjectMeta[sub] || { icon: '📖', color: 'var(--secondary)' };
-
                 const count = adminQuestionsCache.filter ? adminQuestionsCache.filter(q => q.subject === sub && q.block == block).length : '?';
-
                 div.style.setProperty('--subj-color', meta.color);
-
                 div.dataset.color = meta.color;
-
                 div.innerHTML = `
-
                     <span class="subj-icon">${meta.icon}</span>
-
                     <span class="subj-count">${count > 0 ? count + ' Qs' : ''}</span>
-
                     <h4 style="margin:0 0 8px;">${sub}</h4>
-
                     <button class="btn-primary" style="width:100%; margin-bottom:6px;" onclick="openChapterDrill('${sub}')">
-
                         <i class="fas fa-bookmark"></i> By Chapter
-
                     </button>
-
                     <button class="btn-secondary" style="width:100%; margin-top:0;" onclick="startQuiz('${sub}')">
-
                         All Questions
-
                     </button>`;
-
                 list.appendChild(div);
-
             });
-
             renderAnalytics();
-
             checkSavedQuiz(); 
-
             showView('dashboard-screen');
-
         };
-
-
 
         // ===================== CHAPTER DRILL (STUDENT) =====================
-
         window.openChapterDrill = async (subject) => {
-
             window._chapterSubject = subject;
-
             document.getElementById('chapter-block-label').innerText = selectedBlock;
-
             document.getElementById('chapter-subject-label').innerText = subject;
 
-
-
             const chapterKey = `${selectedBlock}_${subject}`;
-
             // Load chapters from Firestore
-
             const chapDoc = await getDoc(doc(db, "chapters", chapterKey));
-
             const chapters = chapDoc.exists() ? (chapDoc.data().list || []) : [];
-
             chapters.sort((a,b) => a.number - b.number);
-
-
 
             const grid = document.getElementById('chapter-drill-grid');
-
             const empty = document.getElementById('chapter-drill-empty');
-
             grid.innerHTML = '';
 
-
-
             if(chapters.length === 0) {
-
                 grid.classList.add('hidden');
-
                 empty.classList.remove('hidden');
-
             } else {
-
                 grid.classList.remove('hidden');
-
                 empty.classList.add('hidden');
-
                 chapters.forEach(ch => {
-
                     const btn = document.createElement('button');
-
                     btn.className = 'chapter-pill';
-
                     btn.innerHTML = `<strong>Ch. ${String(ch.number).padStart(2,'0')}</strong><span>${ch.name || ''}</span>`;
-
                     btn.onclick = () => startChapterQuiz(subject, ch.number, ch.name);
-
                     grid.appendChild(btn);
-
                 });
-
             }
-
             showView('chapter-screen');
-
         };
-
-
 
         // ===================== TIMER =====================
-
         function startTimer(duration, isSeconds = false) {
-
             clearInterval(timerInterval);
-
             timeRemaining = isSeconds ? duration : duration * 60;
-
             updateTimerDisplay();
-
             timerInterval = setInterval(() => {
-
                 timeRemaining--;
-
                 updateTimerDisplay();
-
                 if(timeRemaining % 10 === 0) saveQuizState(); 
-
                 if (timeRemaining <= 0) {
-
                     clearInterval(timerInterval);
-
                     alert("Time is up! Submitting quiz.");
-
                     finishQuiz();
-
                 }
-
             }, 1000);
-
         }
-
-
 
         function updateTimerDisplay() {
-
             const mins = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
-
             const secs = (timeRemaining % 60).toString().padStart(2, '0');
-
             document.getElementById('quiz-timer').innerHTML = `<i class="far fa-clock"></i> ${mins}:${secs}`;
-
             if(timeRemaining < 60) document.getElementById('quiz-timer').style.background = "#c0392b";
-
             else document.getElementById('quiz-timer').style.background = "var(--accent)";
-
         }
-
-
 
         // ===================== QUIZ INIT =====================
-
         function initQuizState(questionsList, title, customTime = null) {
-
             const key = getSaveKey();
-
             if(key && localStorage.getItem(key)) {
-
                 if(!confirm("You have a paused quiz. Starting a new one will discard your saved progress. Continue?")) return;
-
                 clearQuizState();
-
             }
-
             currentQuestions = questionsList;
-
             if (currentQuestions.length === 0) return alert("No questions found for this criteria.");
-
             currentIndex = 0; scoreState = { correct: 0, wrong: 0 }; mistakesLog = []; currentQuizSubjects = {}; 
-
             document.getElementById('quiz-subject-title').innerText = title;
-
             showView('quiz-screen');
-
             const timeLimit = customTime ? customTime : currentQuestions.length;
-
             startTimer(timeLimit);
-
             loadQuestion();
-
         }
-
-
 
         window.startQuiz = async (subject) => {
-
             isMockExamMode = false; isDailyQuiz = false;
-
             const diff = document.getElementById('difficulty-filter').value;
-
             let conditions = [where("subject", "==", subject), where("block", "==", Number(selectedBlock))];
-
             if(diff !== 'all') conditions.push(where("difficulty", "==", diff));
-
             const q = query(collection(db, "mcqs"), ...conditions);
-
             const snapshot = await getDocs(q);
-
             const questions = snapshot.docs.map(doc => doc.data()).sort(() => Math.random() - 0.5);
-
             initQuizState(questions, subject);
-
         };
-
-
 
         window.startChapterQuiz = async (subject, chapterNumber, chapterName) => {
-
             isMockExamMode = false; isDailyQuiz = false;
-
             const diff = document.getElementById('difficulty-filter').value;
-
             let conditions = [
-
                 where("subject", "==", subject),
-
                 where("block", "==", Number(selectedBlock)),
-
                 where("chapter", "==", Number(chapterNumber))
-
             ];
-
             if(diff !== 'all') conditions.push(where("difficulty", "==", diff));
-
             const q = query(collection(db, "mcqs"), ...conditions);
-
             const snapshot = await getDocs(q);
-
             const questions = snapshot.docs.map(d => d.data()).sort(() => Math.random() - 0.5);
-
             const title = `${subject} — Ch.${String(chapterNumber).padStart(2,'0')} ${chapterName || ''}`;
-
             initQuizState(questions, title);
-
         };
-
-
 
         window.searchMCQs = async () => {
-
             const searchTerm = document.getElementById('mcq-search-input').value.trim().toLowerCase();
-
             if(!searchTerm) return alert("Please enter a keyword.");
-
             const q = query(collection(db, "mcqs"), where("block", "==", Number(selectedBlock)));
-
             const snapshot = await getDocs(q);
-
             let results = snapshot.docs.map(doc => doc.data()).filter(item => 
-
                 item.question.toLowerCase().includes(searchTerm) || 
-
                 (item.explanation && item.explanation.toLowerCase().includes(searchTerm))
-
             );
-
             isMockExamMode = false; isDailyQuiz = false;
-
             initQuizState(results, `Search: "${searchTerm}"`);
-
         };
-
-
 
         window.startMockExam = async () => {
-
             document.getElementById('loading-screen').classList.remove('hidden');
-
             const q = query(collection(db, "mcqs"), where("block", "==", Number(selectedBlock)));
-
             const snapshot = await getDocs(q);
-
             let allQuestions = snapshot.docs.map(doc => doc.data());
-
             let mockQuestions = [];
-
             const quotas = mockQuotas[selectedBlock];
 
-
-
             if(quotas) {
-
                 let bySubject = {};
-
                 allQuestions.forEach(q => {
-
                     let sub = q.subject;
-
                     if(sub === "Forensic") sub = "Forensic Medicine"; 
-
                     if(!bySubject[sub]) bySubject[sub] = [];
-
                     bySubject[sub].push(q);
-
                 });
-
                 for (let sub in quotas) {
-
                     let required = quotas[sub];
-
                     let available = (bySubject[sub] || []).sort(() => Math.random() - 0.5); 
-
                     mockQuestions.push(...available.slice(0, Math.min(required, available.length)));
-
                 }
-
             } else {
-
                 mockQuestions = allQuestions.sort(() => Math.random() - 0.5).slice(0, 140);
-
             }
-
             mockQuestions = mockQuestions.sort(() => Math.random() - 0.5);
-
             document.getElementById('loading-screen').classList.add('hidden');
-
             if(mockQuestions.length === 0) return alert("No questions available for a mock exam.");
-
             isMockExamMode = true; isDailyQuiz = false;
-
             initQuizState(mockQuestions, `Mock Exam - Block ${selectedBlock}`, 120);
-
         };
-
-
 
         window.startDailyQuiz = async () => {
-
             const snap = await getDocs(collection(db, "mcqs"));
-
             let allQuestions = snap.docs.map(doc => doc.data());
-
             allQuestions = allQuestions.sort(() => Math.random() - 0.5).slice(0, 10);
-
             if(allQuestions.length === 0) return alert("Not enough questions in database.");
-
             isMockExamMode = false; isDailyQuiz = true;
-
             initQuizState(allQuestions, `🔥 Daily Challenge`, 10);
-
         };
-
-
 
         window.quitQuiz = () => {
-
             if(confirm("Pause quiz? Your progress has been saved locally and you can resume from the dashboard.")) {
-
                 saveQuizState();
-
                 clearInterval(timerInterval);
-
                 checkSavedQuiz();
-
                 showView('dashboard-screen');
-
             }
-
         };
-
-
 
         function loadQuestion() {
-
             const data = currentQuestions[currentIndex];
-
             document.getElementById('quiz-progress').innerText = `${currentIndex + 1} / ${currentQuestions.length}`;
-
             const pct = ((currentIndex) / currentQuestions.length * 100).toFixed(1);
-
             const bar = document.getElementById('quiz-progress-bar');
-
             if (bar) bar.style.width = pct + '%';
-
             document.getElementById('question-text').innerText = data.question;
-
             document.getElementById('explanation-box').classList.add('hidden');
-
             const list = document.getElementById('options-list'); list.innerHTML = '';
-
             saveQuizState(); 
-
             ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
-
                 const optText = data['option' + letter];
-
                 if(!optText) return;
-
                 const btn = document.createElement('button');
-
                 btn.className = 'option-btn'; btn.dataset.letter = letter;
-
                 btn.innerHTML = `<strong>${letter}</strong>: ${optText}`;
-
                 btn.onclick = () => {
-
                     const correct = data.correctAnswer.trim().toUpperCase();
-
                     const isCorrect = (letter === correct);
-
                     if(isCorrect) scoreState.correct++;
-
                     else {
-
                         scoreState.wrong++;
-
                         mistakesLog.push({ question: data.question, yourAnswer: `${letter}: ${optText}`, correctAnswer: `${correct}: ${data['option' + correct]}`, explanation: data.explanation || "No explanation provided." });
-
                     }
-
                     if(!currentQuizSubjects[data.subject]) currentQuizSubjects[data.subject] = { c: 0, t: 0 };
-
                     currentQuizSubjects[data.subject].t++;
-
                     if(isCorrect) currentQuizSubjects[data.subject].c++;
-
                     document.querySelectorAll('.option-btn').forEach(b => {
-
                         b.disabled = true;
-
                         if(b.dataset.letter === correct) b.classList.add('correct');
-
                         if(b.dataset.letter === letter && letter !== correct) b.classList.add('wrong');
-
                     });
-
                     if(!isMockExamMode && !isDailyQuiz) {
-
                         document.getElementById('explanation-text').innerText = data.explanation || "No explanation.";
-
                         document.getElementById('explanation-box').classList.remove('hidden');
-
                     } else {
-
                         setTimeout(loadNextQuestion, 1000);
-
                     }
-
                 };
-
                 list.appendChild(btn);
-
             });
-
         }
-
-
 
         window.loadNextQuestion = () => {
-
             currentIndex++;
-
             if (currentIndex < currentQuestions.length) loadQuestion();
-
             else finishQuiz();
-
         };
-
-
 
         async function finishQuiz() {
-
             clearQuizState(); 
-
             clearInterval(timerInterval);
-
             const total = scoreState.correct + scoreState.wrong;
-
             const percentage = total > 0 ? Math.round((scoreState.correct / total) * 100) : 0;
-
             document.getElementById('final-score-circle').innerText = `${percentage}%`;
-
             animateScoreRing(percentage);
-
             document.getElementById('correct-count').innerText = scoreState.correct;
-
             document.getElementById('wrong-count').innerText = scoreState.wrong;
 
-
-
             if (currentUserRef) {
-
                 const userSnap = await getDoc(currentUserRef);
-
                 let currentStats = userSnap.exists() && userSnap.data().stats ? userSnap.data().stats : {};
-
                 for(let sub in currentQuizSubjects) {
-
                     if(!currentStats[sub]) currentStats[sub] = { correct: 0, total: 0 };
-
                     currentStats[sub].total += currentQuizSubjects[sub].t;
-
                     currentStats[sub].correct += currentQuizSubjects[sub].c;
-
                 }
-
                 let updates = { stats: currentStats };
-
                 if (scoreState.correct > 0) updates.totalCorrect = increment(scoreState.correct);
-
                 await updateDoc(currentUserRef, updates);
-
             }
-
-
 
             if (isDailyQuiz && currentUserRef) {
-
                 const today = new Date().toDateString();
-
                 const yesterday = new Date(Date.now() - 86400000).toDateString();
-
                 const userSnap = await getDoc(currentUserRef);
-
                 if(userSnap.exists()){
-
                     let data = userSnap.data();
-
                     if (data.lastDaily !== today) {
-
                         let newStreak = (data.lastDaily === yesterday) ? (data.streak || 0) + 1 : 1;
-
                         await updateDoc(currentUserRef, { streak: newStreak, lastDaily: today });
-
                         document.getElementById('streak-display').innerText = `🔥 ${newStreak}`;
-
                         const btn = document.getElementById('daily-quiz-btn');
-
                         btn.disabled = true;
-
                         btn.innerText = "Daily Challenge Completed ✅";
-
                     }
-
                 }
-
             }
-
-
 
             const mockBreakdown = document.getElementById('mock-breakdown-section');
-
             if(isMockExamMode || isDailyQuiz) {
-
                 let breakdownHtml = "";
-
                 for(let sub in currentQuizSubjects) {
-
                     let d = currentQuizSubjects[sub];
-
                     let pct = Math.round((d.c / d.t) * 100);
-
                     breakdownHtml += `<p><strong>${sub}:</strong> ${d.c}/${d.t} (${pct}%)</p>`;
-
                 }
-
                 document.getElementById('mock-breakdown-list').innerHTML = breakdownHtml;
-
                 mockBreakdown.classList.remove('hidden');
-
             } else { mockBreakdown.classList.add('hidden'); }
 
-
-
             const reviewSection = document.getElementById('review-section');
-
             const mistakesList = document.getElementById('mistakes-list');
-
             if(mistakesLog.length > 0) {
-
                 reviewSection.classList.remove('hidden');
-
                 mistakesList.innerHTML = mistakesLog.map((m, i) => `
-
                     <div class="mistake-card">
-
                         <p><strong>Q${i+1}:</strong> ${m.question}</p>
-
                         <p style="color: var(--accent);"><strong>❌ You chose:</strong> ${m.yourAnswer}</p>
-
                         <p style="color: var(--success);"><strong>✅ Correct:</strong> ${m.correctAnswer}</p>
-
                         <p style="font-size: 0.9em; margin-top: 10px; border-top: 1px solid #ccc; padding-top: 5px;"><em>${m.explanation}</em></p>
-
                     </div>
-
                 `).join('');
-
             } else { reviewSection.classList.add('hidden'); }
-
             showView('result-screen');
-
         }
-
-
 
         // ===================== ADMIN =====================
-
         window.switchAdminTab = (tabId) => {
-
             document.querySelectorAll('.admin-tab-content').forEach(t => t.classList.remove('active'));
-
             document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
-
             document.getElementById(tabId).classList.add('active');
-
             event.target.classList.add('active');
-
         };
-
-
 
         window.openAdmin = async () => { showView('admin-screen'); await loadAdminData(); await loadChapterList(); };
-
         
-
         async function loadAdminData() {
-
             const snap = await getDocs(collection(db, "mcqs"));
-
             adminQuestionsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
             
-
             let total = adminQuestionsCache.length;
-
             let subjectCounts = {};
-
             adminQuestionsCache.forEach(q => { subjectCounts[q.subject] = (subjectCounts[q.subject] || 0) + 1; });
-
             
-
             let statsHtml = `<div class="stat-box"><h3>${total}</h3><p>Total MCQs</p></div>`;
-
             for(let sub in subjectCounts) { statsHtml += `<div class="stat-box"><h3>${subjectCounts[sub]}</h3><p>${sub}</p></div>`; }
-
             document.getElementById('admin-stats-container').innerHTML = statsHtml;
-
             
-
             updateAdminSubjectFilter();
-
         }
-
-
 
         // ===================== CHAPTER MANAGEMENT (ADMIN) =====================
-
         function getChapterKey() {
-
             const block = document.getElementById('ch-block').value;
-
             const subject = document.getElementById('ch-subject').value;
-
             return `${block}_${subject}`;
-
         }
-
-
 
         window.loadChapterList = async () => {
-
             const key = getChapterKey();
-
             const block = document.getElementById('ch-block').value;
-
             const subject = document.getElementById('ch-subject').value;
-
             const chapDoc = await getDoc(doc(db, "chapters", key));
-
             const chapters = chapDoc.exists() ? (chapDoc.data().list || []) : [];
-
             chapters.sort((a,b) => a.number - b.number);
-
             chaptersCache[key] = chapters;
-
             renderChapterTable(chapters, block, subject);
-
         };
 
-
-
         function renderChapterTable(chapters, block, subject) {
-
             const container = document.getElementById('chapter-list-container');
-
             if(chapters.length === 0) {
-
                 container.innerHTML = `<p style="color:#888; font-size:0.9rem; margin-top:8px;">No chapters yet for Block ${block} → ${subject}. Add one above!</p>`;
-
                 return;
-
             }
-
             let html = `
-
                 <table class="chapter-list-table">
-
                     <thead><tr><th>#</th><th>Chapter Name</th><th>MCQs Tagged</th><th>Action</th></tr></thead>
-
                     <tbody>`;
-
             chapters.forEach(ch => {
-
                 const key = `${block}_${subject}`;
-
                 const tagged = adminQuestionsCache.filter(q => q.block == block && q.subject === subject && q.chapter == ch.number).length;
-
                 html += `<tr>
-
                     <td><span class="chapter-badge">Ch.${String(ch.number).padStart(2,'0')}</span></td>
-
                     <td>${ch.name || '<em style="color:#aaa">Unnamed</em>'}</td>
-
                     <td><strong>${tagged}</strong> MCQs</td>
-
                     <td>
-
                         <button class="btn-danger" style="padding:4px 10px; font-size:0.8rem; margin:0;" 
-
                             onclick="deleteChapter(${ch.number})">
-
                             <i class="fas fa-trash"></i>
-
                         </button>
-
                     </td>
-
                 </tr>`;
-
             });
-
             html += `</tbody></table>`;
-
             container.innerHTML = html;
-
         }
 
-
-
         window.addChapter = async () => {
-
             const number = parseInt(document.getElementById('new-ch-number').value);
-
             const name = document.getElementById('new-ch-name').value.trim();
-
             if(!number || number < 1) return alert("Please enter a valid chapter number.");
-
             
-
             const key = getChapterKey();
-
             const block = document.getElementById('ch-block').value;
-
             const subject = document.getElementById('ch-subject').value;
-
             const existing = chaptersCache[key] || [];
-
-
 
             if(existing.find(c => c.number === number)) return alert(`Chapter ${number} already exists for this subject!`);
 
-
-
             const updated = [...existing, { number, name }];
-
             await setDoc(doc(db, "chapters", key), { block: Number(block), subject, list: updated });
-
             chaptersCache[key] = updated;
-
-
 
             document.getElementById('new-ch-number').value = '';
-
             document.getElementById('new-ch-name').value = '';
-
             alert(`Chapter ${number} "${name}" added to Block ${block} → ${subject}!`);
-
             await loadChapterList();
-
             // Refresh chapter filter in MCQ tab too
-
             await updateAdminChapterFilter();
-
         };
-
-
 
         window.deleteChapter = async (number) => {
-
             if(!confirm(`Delete Chapter ${number}? The MCQs tagged to it won't be deleted, but they'll lose their chapter tag.`)) return;
-
             const key = getChapterKey();
-
             const existing = chaptersCache[key] || [];
-
             const updated = existing.filter(c => c.number !== number);
-
             await setDoc(doc(db, "chapters", key), { list: updated });
-
             chaptersCache[key] = updated;
-
             alert(`Chapter ${number} deleted.`);
-
             await loadChapterList();
-
         };
-
-
 
         // ===================== MCQ ADMIN FILTERS =====================
-
         window.updateAdminSubjectFilter = () => {
-
             const blockFilter = document.getElementById('admin-filter-block').value;
-
             const subjectSelect = document.getElementById('admin-filter-subject');
-
             let subjects = new Set();
-
             adminQuestionsCache.forEach(q => {
-
                 if (blockFilter === 'all' || q.block.toString() === blockFilter) subjects.add(q.subject);
-
             });
-
             subjectSelect.innerHTML = '<option value="all">All Subjects</option>';
-
             Array.from(subjects).sort().forEach(sub => {
-
                 subjectSelect.innerHTML += `<option value="${sub}">${sub}</option>`;
-
             });
-
             updateAdminChapterFilter();
-
         };
-
-
 
         window.updateAdminChapterFilter = async () => {
-
             const blockFilter = document.getElementById('admin-filter-block').value;
-
             const subjectFilter = document.getElementById('admin-filter-subject').value;
-
             const chapterSelect = document.getElementById('admin-filter-chapter');
-
             chapterSelect.innerHTML = '<option value="all">All Chapters</option>';
 
-
-
             if(blockFilter !== 'all' && subjectFilter !== 'all') {
-
                 const key = `${blockFilter}_${subjectFilter}`;
-
                 if(!chaptersCache[key]) {
-
                     const chapDoc = await getDoc(doc(db, "chapters", key));
-
                     chaptersCache[key] = chapDoc.exists() ? (chapDoc.data().list || []) : [];
-
                 }
-
                 const chapters = chaptersCache[key].sort((a,b) => a.number - b.number);
-
                 chapters.forEach(ch => {
-
                     chapterSelect.innerHTML += `<option value="${ch.number}">Ch.${String(ch.number).padStart(2,'0')} ${ch.name || ''}</option>`;
-
                 });
-
             }
-
             filterAdminMCQs();
-
         };
-
-
 
         window.filterAdminMCQs = () => {
-
             const term = document.getElementById('admin-search').value.toLowerCase();
-
             const blockFilter = document.getElementById('admin-filter-block').value;
-
             const subjectFilter = document.getElementById('admin-filter-subject').value;
-
             const chapterFilter = document.getElementById('admin-filter-chapter').value;
 
-
-
             const filtered = adminQuestionsCache.filter(q => {
-
                 const matchTerm = q.question.toLowerCase().includes(term) || q.subject.toLowerCase().includes(term);
-
                 const matchBlock = (blockFilter === 'all') || (q.block.toString() === blockFilter);
-
                 const matchSubject = (subjectFilter === 'all') || (q.subject === subjectFilter);
-
                 const matchChapter = (chapterFilter === 'all') || (String(q.chapter) === String(chapterFilter));
-
                 return matchTerm && matchBlock && matchSubject && matchChapter;
-
             });
-
             renderAdminMCQList(filtered);
-
         };
-
-
 
         // ===================== MULTI-SELECT STATE =====================
-
         let selectModeActive = false;
-
         let selectedIds = new Set();
-
         let currentFilteredList = []; // tracks what's currently rendered
 
-
-
         window.toggleSelectMode = () => {
-
             selectModeActive = !selectModeActive;
-
             selectedIds.clear();
-
             const btn = document.getElementById('select-mode-btn');
-
             if(selectModeActive) {
-
                 btn.classList.add('active');
-
                 btn.innerHTML = '<i class="fas fa-times"></i> Cancel';
-
             } else {
-
                 btn.classList.remove('active');
-
                 btn.innerHTML = '<i class="fas fa-check-square"></i> Select';
-
             }
-
             updateBulkBar();
-
             filterAdminMCQs(); // re-render to show/hide checkboxes
-
         };
-
-
 
         function updateBulkBar() {
-
             const bar = document.getElementById('bulk-action-bar');
-
             const label = document.getElementById('bulk-count-label');
-
             if(selectModeActive && selectedIds.size > 0) {
-
                 bar.classList.remove('hidden');
-
                 label.innerText = `${selectedIds.size} question${selectedIds.size > 1 ? 's' : ''} selected`;
-
             } else {
-
                 bar.classList.add('hidden');
-
             }
-
         }
-
-
 
         window.toggleCheckbox = (id) => {
-
             if(selectedIds.has(id)) selectedIds.delete(id);
-
             else selectedIds.add(id);
-
             // Update visual state of that row
-
             const row = document.querySelector(`.admin-mcq-item[data-id="${id}"]`);
-
             if(row) row.classList.toggle('selected', selectedIds.has(id));
-
             const cb = document.querySelector(`.mcq-checkbox[data-id="${id}"]`);
-
             if(cb) cb.checked = selectedIds.has(id);
-
             updateBulkBar();
-
         };
-
-
 
         window.selectAllVisible = () => {
-
             currentFilteredList.forEach(q => selectedIds.add(q.id));
-
             // Re-render to check all boxes
-
             renderAdminMCQList(currentFilteredList);
-
             updateBulkBar();
-
         };
-
-
 
         window.deselectAll = () => {
-
             selectedIds.clear();
-
             currentFilteredList.forEach(q => {
-
                 const row = document.querySelector(`.admin-mcq-item[data-id="${q.id}"]`);
-
                 if(row) row.classList.remove('selected');
-
                 const cb = document.querySelector(`.mcq-checkbox[data-id="${q.id}"]`);
-
                 if(cb) cb.checked = false;
-
             });
-
             updateBulkBar();
-
         };
-
-
 
         window.deleteSelected = async () => {
-
             if(selectedIds.size === 0) return;
-
             if(!confirm(`Delete ${selectedIds.size} selected question${selectedIds.size > 1 ? 's' : ''}? This cannot be undone.`)) return;
-
             document.getElementById('loading-screen').classList.remove('hidden');
-
             let deleted = 0;
-
             for(const id of selectedIds) {
-
                 try { await deleteDoc(doc(db, "mcqs", id)); deleted++; } 
-
                 catch(e) { console.error("Failed to delete", id, e); }
-
             }
-
             selectedIds.clear();
-
             selectModeActive = false;
-
             const btn = document.getElementById('select-mode-btn');
-
             btn.classList.remove('active');
-
             btn.innerHTML = '<i class="fas fa-check-square"></i> Select';
-
             document.getElementById('bulk-action-bar').classList.add('hidden');
-
             document.getElementById('loading-screen').classList.add('hidden');
-
             alert(`Deleted ${deleted} question${deleted > 1 ? 's' : ''} successfully.`);
-
             await loadAdminData();
-
         };
-
-
 
         function renderAdminMCQList(list) {
-
             currentFilteredList = list;
-
             const container = document.getElementById('admin-mcq-list-container');
-
             if(list.length === 0) { container.innerHTML = "<p>No questions found.</p>"; return; }
-
             let html = "";
-
             list.forEach((q, index) => {
-
                 const chapterBadge = q.chapter 
-
                     ? `<span class="chapter-badge" style="margin-left:4px;">Ch.${String(q.chapter).padStart(2,'0')}</span>` 
-
                     : `<span class="no-chapter-badge" style="margin-left:4px;">No Chapter</span>`;
-
                 const isSelected = selectedIds.has(q.id);
-
                 html += `
-
                 <div class="admin-mcq-item${isSelected ? ' selected' : ''}" data-id="${q.id}" onclick="${selectModeActive ? `toggleCheckbox('${q.id}')` : ''}">
-
                     ${selectModeActive ? `<input type="checkbox" class="mcq-checkbox" data-id="${q.id}" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); toggleCheckbox('${q.id}')">` : ''}
-
                     <div style="flex:1; font-size:0.9rem; cursor:${selectModeActive ? 'pointer' : 'default'};">
-
                         <span style="font-weight: bold; color: var(--secondary); margin-right: 5px;">Q${index + 1}.</span>
-
                         <span class="timer-badge" style="background:var(--secondary); font-size:0.7rem;">Block ${q.block}</span>
-
                         ${chapterBadge}
-
                         <strong> ${q.subject}</strong><br>${q.question.substring(0, 80)}...
-
                     </div>
-
                     ${!selectModeActive ? `
-
                     <div style="display:flex; gap:5px; flex-direction:column;">
-
                         <button class="btn-primary" style="padding:5px 10px; font-size:0.8rem;" onclick="openEditModal('${q.id}')">Edit</button>
-
                         <button class="btn-danger" style="padding:5px 10px; font-size:0.8rem; margin:0;" onclick="deleteMCQ('${q.id}')">Delete</button>
-
                     </div>` : ''}
-
                 </div>`;
-
             });
-
             container.innerHTML = html;
-
         }
-
-
 
         window.deleteMCQ = async (id) => {
-
             if(!confirm("Are you sure you want to delete this question? This cannot be undone.")) return;
-
             try { await deleteDoc(doc(db, "mcqs", id)); alert("Question deleted."); loadAdminData(); } 
-
             catch (e) { alert("Error deleting: " + e.message); }
-
         };
-
-
 
         window.openEditModal = (id) => {
-
             const q = adminQuestionsCache.find(x => x.id === id);
-
             if(!q) return;
-
             document.getElementById('edit-id').value = q.id;
-
             document.getElementById('edit-q').value = q.question;
-
             document.getElementById('edit-block').value = q.block;
-
             document.getElementById('edit-subject').value = q.subject;
-
             document.getElementById('edit-chapter').value = q.chapter || '';
-
             document.getElementById('edit-difficulty').value = q.difficulty || 'medium';
-
             document.getElementById('edit-a').value = q.optionA || '';
-
             document.getElementById('edit-b').value = q.optionB || '';
-
             document.getElementById('edit-c').value = q.optionC || '';
-
             document.getElementById('edit-d').value = q.optionD || '';
-
             document.getElementById('edit-e').value = q.optionE || '';
-
             document.getElementById('edit-correct').value = q.correctAnswer;
-
             document.getElementById('edit-exp').value = q.explanation || '';
-
             document.getElementById('edit-modal').classList.remove('hidden');
-
         };
-
-
 
         window.saveEdit = async () => {
-
             const id = document.getElementById('edit-id').value;
-
             const chapterVal = document.getElementById('edit-chapter').value;
-
             try {
-
                 await updateDoc(doc(db, "mcqs", id), {
-
                     question: document.getElementById('edit-q').value,
-
                     block: Number(document.getElementById('edit-block').value),
-
                     subject: document.getElementById('edit-subject').value.trim(),
-
                     chapter: chapterVal ? Number(chapterVal) : null,
-
                     difficulty: document.getElementById('edit-difficulty').value,
-
                     optionA: document.getElementById('edit-a').value,
-
                     optionB: document.getElementById('edit-b').value,
-
                     optionC: document.getElementById('edit-c').value,
-
                     optionD: document.getElementById('edit-d').value,
-
                     optionE: document.getElementById('edit-e').value,
-
                     correctAnswer: document.getElementById('edit-correct').value.trim().toUpperCase(),
-
                     explanation: document.getElementById('edit-exp').value
-
                 });
-
                 alert("Question updated successfully!");
-
                 document.getElementById('edit-modal').classList.add('hidden');
-
                 loadAdminData();
-
             } catch (e) { alert("Error updating: " + e.message); }
-
         };
-
-
 
         // ===================== UPLOAD =====================
-
         const processUpload = async (dataArray) => {
-
             const snap = await getDocs(collection(db, "mcqs"));
-
             const existingQs = new Set(snap.docs.map(d => d.data().question.trim().toLowerCase()));
-
             let count = 0; let dupes = 0;
-
             
-
             for (const row of dataArray) {
-
                 const qText = row.question ? row.question.trim().toLowerCase() : "";
-
                 if(!qText) continue;
-
                 if (existingQs.has(qText)) { dupes++; continue; }
-
                 try {
-
                     await addDoc(collection(db, "mcqs"), {
-
                         block: Number(row.block),
-
                         subject: row.subject.trim(),
-
                         chapter: row.chapter ? Number(row.chapter) : null,
-
                         difficulty: (row.difficulty || "medium").toLowerCase(),
-
                         question: row.question,
-
                         optionA: String(row.optionA), optionB: String(row.optionB),
-
                         optionC: String(row.optionC), optionD: String(row.optionD),
-
                         optionE: String(row.optionE || ""),
-
                         correctAnswer: String(row.correctAnswer).trim().toUpperCase(),
-
                         explanation: row.explanation || ""
-
                     });
-
                     existingQs.add(qText);
-
                     count++;
-
                 } catch (e) { console.error(e); }
-
             }
-
             alert(`Upload Complete!\nAdded: ${count} new MCQs.\nSkipped: ${dupes} duplicates.`);
-
             loadAdminData(); 
-
         };
-
-
 
         window.uploadExcel = () => {
-
             const file = document.getElementById('excel-file').files[0];
-
             if (!file) return alert("Select file");
-
             const reader = new FileReader();
-
             reader.onload = (e) => {
-
                 const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-
                 const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-
                 processUpload(json);
-
             };
-
             reader.readAsArrayBuffer(file);
-
         };
-
-
 
         window.uploadJSON = () => {
-
             const raw = document.getElementById('json-input').value;
-
             try {
-
                 const data = JSON.parse(raw);
-
                 if(!Array.isArray(data)) throw new Error("Must be an array");
-
                 processUpload(data);
-
             } catch (e) { alert("Invalid JSON format: " + e.message); }
-
         };
 
-
-
         // ===================== LOADING SCREEN SAFETY TIMEOUT =====================
-
         // Force-hide loading screen after 10s to prevent stuck state
-
         const _loadingTimeout = setTimeout(() => {
-
             const ls = document.getElementById('loading-screen');
-
             if (ls && !ls.classList.contains('hidden')) {
-
                 console.warn('Loading timeout — forcing dismiss');
-
                 ls.classList.add('hidden');
-
                 // If no view is showing, show auth
-
                 const anyVisible = document.querySelector('.view:not(.hidden)');
-
                 if (!anyVisible) showView('auth-screen');
-
             }
-
         }, 10000);
 
-
-
         // Update loading sub-text for better UX
-
         const _loadingMessages = ['Connecting to MedBytes', 'Loading question bank...', 'Almost ready...'];
-
         let _lmi = 0;
-
         const _lmInterval = setInterval(() => {
-
             _lmi++;
-
             const el = document.getElementById('loading-sub-text');
-
             if (el && _lmi < _loadingMessages.length) el.innerText = _loadingMessages[_lmi];
-
             else clearInterval(_lmInterval);
-
         }, 2500);
 
-
-
         // ===================== XP / LEVEL SYSTEM =====================
-
         const XP_LEVELS = [
-
             { name: 'Intern', min: 0, max: 49 },
-
             { name: 'Resident', min: 50, max: 199 },
-
             { name: 'Registrar', min: 200, max: 499 },
-
             { name: 'Consultant', min: 500, max: 999 },
-
             { name: 'Professor', min: 1000, max: Infinity }
-
         ];
 
-
-
         function getLevelInfo(xp) {
-
             for (const l of XP_LEVELS) {
-
                 if (xp >= l.min && xp <= l.max) return l;
-
             }
-
             return XP_LEVELS[XP_LEVELS.length - 1];
-
         }
-
-
 
         function renderXP(totalCorrect) {
-
             const lvl = getLevelInfo(totalCorrect || 0);
-
             const el = document.getElementById('xp-label');
-
             if (el) el.innerHTML = `<span class="level-badge">🩺 ${lvl.name}</span> <span class="xp-badge">⚡ ${totalCorrect || 0} XP</span>`;
-
         }
 
-
-
         // ===================== WEAK RETRY MODE =====================
-
         let weakQuestionIds = [];
 
-
-
         window.startWeakRetry = async () => {
-
             if (!currentUserRef) return;
-
             const userSnap = await getDoc(currentUserRef);
-
             if (!userSnap.exists()) return;
-
             const stats = userSnap.data().stats || {};
-
             const weakSubjects = Object.entries(stats)
-
                 .filter(([, v]) => v.total >= 3 && (v.correct / v.total) < 0.6)
-
                 .map(([sub]) => sub);
-
-
 
             if (weakSubjects.length === 0) return alert("No weak subjects detected yet. Complete more quizzes to unlock this!");
 
-
-
             document.getElementById('loading-screen').classList.remove('hidden');
-
             let allWeak = [];
-
             for (const sub of weakSubjects) {
-
                 const q = query(collection(db, "mcqs"), where("subject", "==", sub), where("block", "==", Number(selectedBlock)));
-
                 const snap = await getDocs(q);
-
                 allWeak.push(...snap.docs.map(d => d.data()));
-
             }
-
             allWeak = allWeak.sort(() => Math.random() - 0.5).slice(0, 30);
-
             document.getElementById('loading-screen').classList.add('hidden');
-
             if (allWeak.length === 0) return alert("No questions found for your weak subjects.");
-
             isMockExamMode = false; isDailyQuiz = false;
-
             initQuizState(allWeak, `🔁 Weak Question Retry`);
-
         };
-
-
 
         // ===================== LEADERBOARD =====================
-
         async function loadLeaderboard() {
-
             const container = document.getElementById('leaderboard-list');
-
             if (!container) return;
-
             try {
-
                 const snap = await getDocs(collection(db, "users"));
-
                 let users = snap.docs.map(d => ({ name: d.data().name || d.data().email?.split('@')[0] || 'Anonymous', xp: d.data().totalCorrect || 0, streak: d.data().streak || 0 }));
-
                 users.sort((a, b) => b.xp - a.xp);
-
                 const top = users.slice(0, 8);
-
                 const rankEmojis = ['🥇','🥈','🥉'];
-
                 if (top.length === 0) { container.innerHTML = '<p style="color:#888; font-size:0.9rem;">No data yet. Be the first!</p>'; return; }
-
                 container.innerHTML = top.map((u, i) => `
-
                     <div class="leaderboard-row">
-
                         <span class="leaderboard-rank">${rankEmojis[i] || (i+1)}</span>
-
                         <div class="leaderboard-avatar">${u.name.charAt(0).toUpperCase()}</div>
-
                         <span class="leaderboard-name">${u.name}</span>
-
                         <span class="leaderboard-score">⚡${u.xp} XP</span>
-
                         <span style="color:#f59e0b; font-size:0.82rem; font-weight:600;">🔥${u.streak}</span>
-
                     </div>`).join('');
-
             } catch(e) { console.error(e); container.innerHTML = '<p style="color:#888; font-size:0.85rem;">Leaderboard unavailable.</p>'; }
-
         }
-
-
 
         // ===================== SCORE RING ANIMATION =====================
-
         function animateScoreRing(percentage) {
-
             const circumference = 377; // 2*PI*60
-
             const fill = document.getElementById('score-ring-fill');
-
             if (!fill) return;
-
             const offset = circumference - (percentage / 100) * circumference;
-
             // Color based on score
-
             if (percentage >= 70) fill.style.stroke = 'var(--success)';
-
             else if (percentage >= 50) fill.style.stroke = 'var(--warning)';
-
             else fill.style.stroke = 'var(--accent)';
-
             // Animate after a tick
-
             setTimeout(() => { fill.style.strokeDashoffset = offset; }, 50);
-
         }
 
-
-
         // ===================== SUBJECT ICONS & COLORS =====================
-
         const subjectMeta = {
-
             'Pharmacology':      { icon: '💊', color: '#3498db' },
-
             'Pathology':         { icon: '🔬', color: '#e74c3c' },
-
             'Medicine':          { icon: '🩺', color: '#27ae60' },
-
             'Forensic Medicine': { icon: '⚖️', color: '#2c3e50' },
-
             'Community Medicine':{ icon: '🌍', color: '#16a085' },
-
             'Surgery':           { icon: '🔧', color: '#8e44ad' },
-
             'Behavioral Sciences':{ icon: '🧠', color: '#f39c12' },
-
             'Patient Safety':    { icon: '🛡️', color: '#e67e22' },
-
             'Family Medicine':   { icon: '👨‍👩‍👧', color: '#1abc9c' },
-
         };
-
-
 
         // ===================== BULK ASSIGN CHAPTER =====================
-
         window.bulkAssignChapter = async () => {
-
             if (selectedIds.size === 0) return;
-
             const chNum = prompt(`Assign ${selectedIds.size} selected question(s) to which chapter number?
-
 (Enter a number, e.g. 3)`);
-
             if (!chNum || isNaN(Number(chNum))) return;
-
             const chapter = Number(chNum);
-
             document.getElementById('loading-screen').classList.remove('hidden');
-
             let updated = 0;
-
             for (const id of selectedIds) {
-
                 try {
-
                     await updateDoc(doc(db, "mcqs", id), { chapter });
-
                     updated++;
-
                 } catch(e) { console.error(e); }
-
             }
-
             selectedIds.clear();
-
             selectModeActive = false;
-
             const btn = document.getElementById('select-mode-btn');
-
             btn.classList.remove('active');
-
             btn.innerHTML = '<i class="fas fa-check-square"></i> Select';
-
             document.getElementById('bulk-action-bar').classList.add('hidden');
-
             document.getElementById('loading-screen').classList.add('hidden');
-
             alert(`Assigned ${updated} questions to Chapter ${chapter}.`);
-
             await loadAdminData();
-
         };
-
-
 
         // ===================== DUPLICATE DETECTOR BEFORE UPLOAD =====================
-
         const _origProcessUpload = processUpload;
-
         // Override to show dupe warning in UI before uploading
-
         window.previewUploadDuplicates = async (dataArray) => {
-
             const snap = await getDocs(collection(db, "mcqs"));
-
             const existingQs = new Set(snap.docs.map(d => d.data().question.trim().toLowerCase()));
-
             const dupes = dataArray.filter(row => row.question && existingQs.has(row.question.trim().toLowerCase()));
-
             return dupes;
-
         };
-
-
 
         // Wrap uploadExcel for dupe preview
-
         const _origUploadExcel = window.uploadExcel;
-
         window.uploadExcel = () => {
-
             const file = document.getElementById('excel-file').files[0];
-
             if (!file) return alert("Select file");
-
             const reader = new FileReader();
-
             reader.onload = async (e) => {
-
                 const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-
                 const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-
                 const dupes = await window.previewUploadDuplicates(json);
-
                 if (dupes.length > 0) {
-
                     const proceed = confirm(`⚠️ ${dupes.length} duplicate question(s) detected!\n\nThese will be skipped automatically. Proceed with upload?\n\nFirst duplicate: "${dupes[0].question?.substring(0,80)}..."`);
-
                     if (!proceed) return;
-
                 }
-
                 processUpload(json);
-
             };
-
             reader.readAsArrayBuffer(file);
-
         };
-
-
-
 
 
         // ===================== INLINE CHAPTER EDIT =====================
-
         window.inlineEditChapter = async (id, currentChapter) => {
-
             const newCh = prompt(`Edit chapter for this MCQ\nCurrent: ${currentChapter || 'None'}\nEnter new chapter number (or clear to remove):`);
-
             if (newCh === null) return; // cancelled
-
             const chapter = newCh.trim() === '' ? null : Number(newCh);
-
             if (newCh.trim() !== '' && isNaN(chapter)) return alert('Please enter a valid number.');
-
             try {
-
                 await updateDoc(doc(db, "mcqs", id), { chapter });
-
                 // Update cache
-
                 const idx = adminQuestionsCache.findIndex(q => q.id === id);
-
                 if (idx !== -1) adminQuestionsCache[idx].chapter = chapter;
-
                 filterAdminMCQs();
-
             } catch(e) { alert('Error: ' + e.message); }
-
         };
-
-
 
         // Clear loading timeout once auth resolves
-
         const _origOnAuth = onAuthStateChanged;
-
         // We patch showView to clear the loading timeout
-
         const _origShowView = window.showView;
-
         window.showView = (id) => {
-
             clearTimeout(_loadingTimeout);
-
             clearInterval(_lmInterval);
-
             _origShowView(id);
-
         };
 
-
-
     </script>
-
 </body>
-
 </html>
