@@ -546,6 +546,34 @@
             .subject-card:hover { transform: translateY(-5px) scale(1.01); }
         }
 
+        /* ===== AUTO NEXT PROGRESS TRACK ===== */
+        .auto-next-wrapper {
+            margin-top: 15px;
+            background: var(--bg2);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid var(--border);
+        }
+        .auto-next-bar-container {
+            flex: 1;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            margin: 0 15px;
+            overflow: hidden;
+            position: relative;
+        }
+        .auto-next-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--success), #059669);
+            border-radius: 3px;
+            transition: width 0.1s linear;
+        }
+
         </style>
 </head>
 <body class="light-mode">
@@ -675,9 +703,6 @@
                     <i class="fas fa-search"></i> Search
                 </button>
             </div>
-            <div class="search-bar-container" style="margin-bottom:10px;">
-                <input type="text" id="mcq-search-input" placeholder="Search questions by keyword..." style="margin:0;">
-            </div>
 
             <div class="dash-section-label">📚 Study by Subject</div>
             <div class="subject-grid" id="subject-list"></div>
@@ -715,18 +740,44 @@
                         <span id="quiz-subject-title" style="font-weight:700; font-size:0.9rem; color:var(--text);">Subject</span>
                     </div>
                     <div style="display:flex; align-items:center; gap:8px;">
+                        <button id="quiz-practice-pause" style="background: var(--bg2); color: var(--text); padding: 5px 12px; border-radius: var(--radius-sm); font-size: 0.8rem; border: 1px solid var(--border);" onclick="togglePracticePause()">
+                            <i class="fas fa-pause"></i> Pause
+                        </button>
+                        <button id="quiz-prev-btn" style="background: var(--bg2); color: var(--secondary); padding: 5px 12px; border-radius: var(--radius-sm); font-size: 0.8rem; border: 1px solid var(--border);" onclick="loadPreviousQuestion()" disabled>
+                            <i class="fas fa-chevron-left"></i> Prev
+                        </button>
                         <span id="quiz-timer" class="timer-badge"><i class="far fa-clock"></i> 00:00</span>
                         <span id="quiz-progress" style="color:var(--text-muted); font-size:0.82rem; font-weight:600; background:var(--bg2); padding:4px 10px; border-radius:20px; border:1px solid var(--border);">0 / 0</span>
                     </div>
                 </div>
                 <div class="quiz-progress-bar-wrap"><div class="quiz-progress-bar" id="quiz-progress-bar" style="width:0%"></div></div>
-                <h3 id="question-text" style="font-size:1rem; line-height:1.6; margin:0 0 4px;">Loading...</h3>
-                <div id="options-list"></div>
                 
-                <div id="explanation-box" class="hidden" style="margin-top: 25px; padding: 15px; background: rgba(52, 152, 219, 0.1); border-left: 5px solid var(--secondary); border-radius: 5px;">
-                    <p><strong><i class="fas fa-info-circle"></i> Explanation:</strong></p>
-                    <p id="explanation-text" style="line-height: 1.5;"></p>
-                    <button class="btn-primary" style="width:100%; margin-top: 15px;" onclick="loadNextQuestion()">Next Question <i class="fas fa-arrow-right"></i></button>
+                <div id="quiz-interaction-container">
+                    <h3 id="question-text" style="font-size:1rem; line-height:1.6; margin:0 0 4px;">Loading...</h3>
+                    <div id="options-list"></div>
+                    
+                    <!-- AUTO NEXT TIME COUNTDOWN TRACKER -->
+                    <div id="auto-next-container" class="auto-next-wrapper hidden">
+                        <span style="font-size:0.8rem; font-weight:600; color:var(--text-muted); white-space:nowrap;"><i class="fas fa-bolt"></i> Auto Next MCQ</span>
+                        <div class="auto-next-bar-container">
+                            <div id="auto-next-bar" class="auto-next-bar-fill"></div>
+                        </div>
+                        <button class="btn-primary" style="padding:4px 10px; font-size:0.75rem; margin:0; border-radius:6px;" onclick="skipAutoNextTimer()">Skip</button>
+                    </div>
+
+                    <div id="explanation-box" class="hidden" style="margin-top: 25px; padding: 15px; background: rgba(52, 152, 219, 0.1); border-left: 5px solid var(--secondary); border-radius: 5px;">
+                        <p><strong><i class="fas fa-info-circle"></i> Explanation:</strong></p>
+                        <p id="explanation-text" style="line-height: 1.5;"></p>
+                        <button class="btn-primary" style="width:100%; margin-top: 15px;" onclick="loadNextQuestion()">Next Question <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+                
+                <!-- PAUSE VIEW COVER SCREEN -->
+                <div id="quiz-paused-view" class="hidden" style="text-align:center; padding: 40px 20px;">
+                    <i class="fas fa-pause-circle fa-4x" style="color: var(--warning); margin-bottom:15px;"></i>
+                    <h3>Practice Session Paused</h3>
+                    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">Take a breath, review your notes, and resume when ready.</p>
+                    <button class="btn-success" onclick="togglePracticePause()"><i class="fas fa-play"></i> Resume Practice</button>
                 </div>
             </div>
         </section>
@@ -974,6 +1025,12 @@
         let chaptersCache = {}; // { "7_Pharmacology": [{number:1, name:"..."}, ...] }
         let currentUserRef = null;
 
+        // NEW APP WORKING STATES
+        let isQuizPaused = false;
+        let autoNextTimerInterval = null;
+        let autoNextTimeRemaining = 0;
+        let userSelectionsLog = {}; // Tracking history map index -> letter string chosen
+
         // ===================== VIEWS =====================
         window.showView = (id) => {
             document.getElementById('loading-screen').classList.add('hidden');
@@ -1010,7 +1067,6 @@
             if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...'; }
             try {
                 const result = await signInWithPopup(auth, googleProvider);
-                // onAuthStateChanged will handle the rest (create Firestore doc if needed)
             } catch (e) {
                 if (btn) { btn.disabled = false; btn.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:18px;height:18px;"> Continue with Google'; }
                 if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
@@ -1107,6 +1163,7 @@
             const state = {
                 currentQuestions, currentIndex, scoreState, mistakesLog,
                 currentQuizSubjects, timeRemaining, isMockExamMode, isDailyQuiz,
+                userSelectionsLog,
                 title: document.getElementById('quiz-subject-title').innerText
             };
             localStorage.setItem(key, JSON.stringify(state));
@@ -1130,11 +1187,87 @@
                 currentQuizSubjects = state.currentQuizSubjects;
                 isMockExamMode = state.isMockExamMode;
                 isDailyQuiz = state.isDailyQuiz;
+                userSelectionsLog = state.userSelectionsLog || {};
+                
+                // Reset practice view properties cleanly
+                isQuizPaused = false;
+                document.getElementById('quiz-interaction-container').classList.remove('hidden');
+                document.getElementById('quiz-paused-view').classList.add('hidden');
+                document.getElementById('quiz-practice-pause').innerHTML = '<i class="fas fa-pause"></i> Pause';
+
                 document.getElementById('quiz-subject-title').innerText = state.title;
                 showView('quiz-screen');
                 startTimer(state.timeRemaining, true); 
                 loadQuestion();
             }
+        };
+
+        // ===================== PRACTICE PAUSE & BACKWARDS STEPPING SYSTEM =====================
+        window.togglePracticePause = () => {
+            if (isQuizPaused) {
+                // Resume action context
+                isQuizPaused = false;
+                document.getElementById('quiz-interaction-container').classList.remove('hidden');
+                document.getElementById('quiz-paused-view').classList.add('hidden');
+                document.getElementById('quiz-practice-pause').innerHTML = '<i class="fas fa-pause"></i> Pause';
+                
+                // Restart primary logic interval loop tracking remaining time asset values
+                startTimer(timeRemaining, true);
+                
+                // If an answer was already selected prior to pausing, resume its auto-next countdown
+                if (userSelectionsLog[currentIndex] !== undefined && !isMockExamMode && !isDailyQuiz) {
+                    startAutoNextTimer();
+                }
+            } else {
+                // Pause action context
+                isQuizPaused = true;
+                clearInterval(timerInterval);
+                stopAutoNextTimer();
+                
+                document.getElementById('quiz-interaction-container').classList.add('hidden');
+                document.getElementById('quiz-paused-view').classList.remove('hidden');
+                document.getElementById('quiz-practice-pause').innerHTML = '<i class="fas fa-play"></i> Resume';
+            }
+        };
+
+        window.loadPreviousQuestion = () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                stopAutoNextTimer();
+                loadQuestion();
+            }
+        };
+
+        function startAutoNextTimer() {
+            stopAutoNextTimer();
+            document.getElementById('auto-next-container').classList.remove('hidden');
+            autoNextTimeRemaining = 10;
+            const barFill = document.getElementById('auto-next-bar');
+            barFill.style.width = '100%';
+
+            autoNextTimerInterval = setInterval(() => {
+                autoNextTimeRemaining -= 0.1;
+                const percentage = (autoNextTimeRemaining / 10) * 100;
+                barFill.style.width = percentage + '%';
+
+                if (autoNextTimeRemaining <= 0) {
+                    stopAutoNextTimer();
+                    window.loadNextQuestion();
+                }
+            }, 100);
+        }
+
+        function stopAutoNextTimer() {
+            if (autoNextTimerInterval) {
+                clearInterval(autoNextTimerInterval);
+                autoNextTimerInterval = null;
+            }
+            document.getElementById('auto-next-container').classList.add('hidden');
+        }
+
+        window.skipAutoNextTimer = () => {
+            stopAutoNextTimer();
+            window.loadNextQuestion();
         };
 
         // ===================== ANALYTICS =====================
@@ -1202,7 +1335,6 @@
             document.getElementById('chapter-subject-label').innerText = subject;
 
             const chapterKey = `${selectedBlock}_${subject}`;
-            // Load chapters from Firestore
             const chapDoc = await getDoc(doc(db, "chapters", chapterKey));
             const chapters = chapDoc.exists() ? (chapDoc.data().list || []) : [];
             chapters.sort((a,b) => a.number - b.number);
@@ -1262,7 +1394,16 @@
             }
             currentQuestions = questionsList;
             if (currentQuestions.length === 0) return alert("No questions found for this criteria.");
+            
+            // Clean dynamic structures
             currentIndex = 0; scoreState = { correct: 0, wrong: 0 }; mistakesLog = []; currentQuizSubjects = {}; 
+            userSelectionsLog = {};
+            isQuizPaused = false;
+            
+            document.getElementById('quiz-interaction-container').classList.remove('hidden');
+            document.getElementById('quiz-paused-view').classList.add('hidden');
+            document.getElementById('quiz-practice-pause').innerHTML = '<i class="fas fa-pause"></i> Pause';
+
             document.getElementById('quiz-subject-title').innerText = title;
             showView('quiz-screen');
             const timeLimit = customTime ? customTime : currentQuestions.length;
@@ -1344,7 +1485,7 @@
         window.startDailyQuiz = async () => {
             const snap = await getDocs(collection(db, "mcqs"));
             let allQuestions = snap.docs.map(doc => doc.data());
-            allQuestions = allQuestions.sort(() => Math.random() - 0.5).slice(0, 10);
+            allQuestions = allQuestions.filter(q => q.block == Number(selectedBlock)).sort(() => Math.random() - 0.5).slice(0, 10);
             if(allQuestions.length === 0) return alert("Not enough questions in database.");
             isMockExamMode = false; isDailyQuiz = true;
             initQuizState(allQuestions, `🔥 Daily Challenge`, 10);
@@ -1354,6 +1495,7 @@
             if(confirm("Pause quiz? Your progress has been saved locally and you can resume from the dashboard.")) {
                 saveQuizState();
                 clearInterval(timerInterval);
+                stopAutoNextTimer();
                 checkSavedQuiz();
                 showView('dashboard-screen');
             }
@@ -1365,44 +1507,75 @@
             const pct = ((currentIndex) / currentQuestions.length * 100).toFixed(1);
             const bar = document.getElementById('quiz-progress-bar');
             if (bar) bar.style.width = pct + '%';
+            
+            // Set tracking button rules for backward alignment
+            document.getElementById('quiz-prev-btn').disabled = (currentIndex === 0);
+            
             document.getElementById('question-text').innerText = data.question;
             document.getElementById('explanation-box').classList.add('hidden');
             const list = document.getElementById('options-list'); list.innerHTML = '';
+            
+            // Read previous selections logging history if available
+            const pastSelection = userSelectionsLog[currentIndex];
             saveQuizState(); 
+
             ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
                 const optText = data['option' + letter];
                 if(!optText) return;
                 const btn = document.createElement('button');
                 btn.className = 'option-btn'; btn.dataset.letter = letter;
                 btn.innerHTML = `<strong>${letter}</strong>: ${optText}`;
-                btn.onclick = () => {
-                    const correct = data.correctAnswer.trim().toUpperCase();
-                    const isCorrect = (letter === correct);
-                    if(isCorrect) scoreState.correct++;
-                    else {
-                        scoreState.wrong++;
-                        mistakesLog.push({ question: data.question, yourAnswer: `${letter}: ${optText}`, correctAnswer: `${correct}: ${data['option' + correct]}`, explanation: data.explanation || "No explanation provided." });
-                    }
-                    if(!currentQuizSubjects[data.subject]) currentQuizSubjects[data.subject] = { c: 0, t: 0 };
-                    currentQuizSubjects[data.subject].t++;
-                    if(isCorrect) currentQuizSubjects[data.subject].c++;
-                    document.querySelectorAll('.option-btn').forEach(b => {
-                        b.disabled = true;
-                        if(b.dataset.letter === correct) b.classList.add('correct');
-                        if(b.dataset.letter === letter && letter !== correct) b.classList.add('wrong');
-                    });
-                    if(!isMockExamMode && !isDailyQuiz) {
-                        document.getElementById('explanation-text').innerText = data.explanation || "No explanation.";
-                        document.getElementById('explanation-box').classList.remove('hidden');
-                    } else {
-                        setTimeout(loadNextQuestion, 1000);
-                    }
-                };
+                
+                const correct = data.correctAnswer.trim().toUpperCase();
+
+                // Restore visible selection graphics if user is viewing a past answered question
+                if (pastSelection !== undefined) {
+                    btn.disabled = true;
+                    if (letter === correct) btn.classList.add('correct');
+                    if (letter === pastSelection && pastSelection !== correct) btn.classList.add('wrong');
+                } else {
+                    btn.onclick = () => {
+                        // Kill existing loops instantly upon click tracking confirmation
+                        stopAutoNextTimer();
+                        
+                        userSelectionsLog[currentIndex] = letter;
+                        const isCorrect = (letter === correct);
+                        if(isCorrect) scoreState.correct++;
+                        else {
+                            scoreState.wrong++;
+                            mistakesLog.push({ question: data.question, yourAnswer: `${letter}: ${optText}`, correctAnswer: `${correct}: ${data['option' + correct]}`, explanation: data.explanation || "No explanation provided." });
+                        }
+                        if(!currentQuizSubjects[data.subject]) currentQuizSubjects[data.subject] = { c: 0, t: 0 };
+                        currentQuizSubjects[data.subject].t++;
+                        if(isCorrect) currentQuizSubjects[data.subject].c++;
+                        
+                        document.querySelectorAll('.option-btn').forEach(b => {
+                            b.disabled = true;
+                            if(b.dataset.letter === correct) b.classList.add('correct');
+                            if(b.dataset.letter === letter && letter !== correct) b.classList.add('wrong');
+                        });
+
+                        if(!isMockExamMode && !isDailyQuiz) {
+                            document.getElementById('explanation-text').innerText = data.explanation || "No explanation.";
+                            document.getElementById('explanation-box').classList.remove('hidden');
+                            startAutoNextTimer();
+                        } else {
+                            setTimeout(window.loadNextQuestion, 1000);
+                        }
+                    };
+                }
                 list.appendChild(btn);
             });
+
+            // If question was already answered, keep auto-next visible or show details
+            if (pastSelection !== undefined && !isMockExamMode && !isDailyQuiz) {
+                document.getElementById('explanation-text').innerText = data.explanation || "No explanation.";
+                document.getElementById('explanation-box').classList.remove('hidden');
+            }
         }
 
         window.loadNextQuestion = () => {
+            stopAutoNextTimer();
             currentIndex++;
             if (currentIndex < currentQuestions.length) loadQuestion();
             else finishQuiz();
@@ -1411,6 +1584,7 @@
         async function finishQuiz() {
             clearQuizState(); 
             clearInterval(timerInterval);
+            stopAutoNextTimer();
             const total = scoreState.correct + scoreState.wrong;
             const percentage = total > 0 ? Math.round((scoreState.correct / total) * 100) : 0;
             document.getElementById('final-score-circle').innerText = `${percentage}%`;
@@ -1530,8 +1704,8 @@
                     <thead><tr><th>#</th><th>Chapter Name</th><th>MCQs Tagged</th><th>Action</th></tr></thead>
                     <tbody>`;
             chapters.forEach(ch => {
-                const key = `${block}_${subject}`;
-                const tagged = adminQuestionsCache.filter(q => q.block == block && q.subject === subject && q.chapter == ch.number).length;
+                const blockNum = block;
+                const tagged = adminQuestionsCache.filter(q => q.block == blockNum && q.subject === subject && q.chapter == ch.number).length;
                 html += `<tr>
                     <td><span class="chapter-badge">Ch.${String(ch.number).padStart(2,'0')}</span></td>
                     <td>${ch.name || '<em style="color:#aaa">Unnamed</em>'}</td>
@@ -1549,39 +1723,38 @@
         }
 
         window.addChapter = async () => {
-    const number = parseInt(document.getElementById('new-ch-number').value);
-    const name = document.getElementById('new-ch-name').value.trim();
-    if(!number || number < 1) return alert("Please enter a valid chapter number.");
-    
-    const key = getChapterKey();
-    const block = document.getElementById('ch-block').value;
-    const subject = document.getElementById('ch-subject').value;
-    const existing = chaptersCache[key] || [];
+            const number = parseInt(document.getElementById('new-ch-number').value);
+            const name = document.getElementById('new-ch-name').value.trim();
+            if(!number || number < 1) return alert("Please enter a valid chapter number.");
+            
+            const key = getChapterKey();
+            const block = document.getElementById('ch-block').value;
+            const subject = document.getElementById('ch-subject').value;
+            const existing = chaptersCache[key] || [];
 
-    if(existing.find(c => c.number === number)) return alert(`Chapter ${number} already exists for this subject!`);
+            if(existing.find(c => c.number === number)) return alert(`Chapter ${number} already exists for this subject!`);
 
-    const updated = [...existing, { number, name }];
-    await setDoc(doc(db, "chapters", key), { block: Number(block), subject, list: updated });
-    chaptersCache[key] = updated;
+            const updated = [...existing, { number, name }];
+            await setDoc(doc(db, "chapters", key), { block: Number(block), subject, list: updated });
+            chaptersCache[key] = updated;
 
-    document.getElementById('new-ch-number').value = '';
-    document.getElementById('new-ch-name').value = '';
-    alert(`Chapter ${number} "${name}" added to Block ${block} → ${subject}!`);
-    await loadChapterList();
-    // Refresh chapter filter in MCQ tab too
-    await updateAdminChapterFilter();
-};
+            document.getElementById('new-ch-number').value = '';
+            document.getElementById('new-ch-name').value = '';
+            alert(`Chapter ${number} "${name}" added to Block ${block} → ${subject}!`);
+            await loadChapterList();
+            await updateAdminChapterFilter();
+        };
 
-   window.deleteChapter = async (number) => {
-    if(!confirm(`Delete Chapter ${number}? The MCQs tagged to it won't be deleted, but they'll lose their chapter tag.`)) return;
-    const key = getChapterKey();
-    const existing = chaptersCache[key] || [];
-    const updated = existing.filter(c => c.number !== number);
-    await setDoc(doc(db, "chapters", key), { list: updated });
-    chaptersCache[key] = updated;
-    alert(`Chapter ${number} deleted.`);
-    await loadChapterList();
-};
+        window.deleteChapter = async (number) => {
+            if(!confirm(`Delete Chapter ${number}? The MCQs tagged to it won't be deleted, but they'll lose their chapter tag.`)) return;
+            const key = getChapterKey();
+            const existing = chaptersCache[key] || [];
+            const updated = existing.filter(c => c.number !== number);
+            await setDoc(doc(db, "chapters", key), { list: updated });
+            chaptersCache[key] = updated;
+            alert(`Chapter ${number} deleted.`);
+            await loadChapterList();
+        };
 
         // ===================== MCQ ADMIN FILTERS =====================
         window.updateAdminSubjectFilter = () => {
@@ -1637,7 +1810,7 @@
         // ===================== MULTI-SELECT STATE =====================
         let selectModeActive = false;
         let selectedIds = new Set();
-        let currentFilteredList = []; // tracks what's currently rendered
+        let currentFilteredList = [];
 
         window.toggleSelectMode = () => {
             selectModeActive = !selectModeActive;
@@ -1651,7 +1824,7 @@
                 btn.innerHTML = '<i class="fas fa-check-square"></i> Select';
             }
             updateBulkBar();
-            filterAdminMCQs(); // re-render to show/hide checkboxes
+            filterAdminMCQs();
         };
 
         function updateBulkBar() {
@@ -1668,7 +1841,6 @@
         window.toggleCheckbox = (id) => {
             if(selectedIds.has(id)) selectedIds.delete(id);
             else selectedIds.add(id);
-            // Update visual state of that row
             const row = document.querySelector(`.admin-mcq-item[data-id="${id}"]`);
             if(row) row.classList.toggle('selected', selectedIds.has(id));
             const cb = document.querySelector(`.mcq-checkbox[data-id="${id}"]`);
@@ -1678,7 +1850,6 @@
 
         window.selectAllVisible = () => {
             currentFilteredList.forEach(q => selectedIds.add(q.id));
-            // Re-render to check all boxes
             renderAdminMCQList(currentFilteredList);
             updateBulkBar();
         };
@@ -1845,19 +2016,16 @@
         };
 
         // ===================== LOADING SCREEN SAFETY TIMEOUT =====================
-        // Force-hide loading screen after 10s to prevent stuck state
         const _loadingTimeout = setTimeout(() => {
             const ls = document.getElementById('loading-screen');
             if (ls && !ls.classList.contains('hidden')) {
                 console.warn('Loading timeout — forcing dismiss');
                 ls.classList.add('hidden');
-                // If no view is showing, show auth
                 const anyVisible = document.querySelector('.view:not(.hidden)');
                 if (!anyVisible) showView('auth-screen');
             }
         }, 10000);
 
-        // Update loading sub-text for better UX
         const _loadingMessages = ['Connecting to MedBytes', 'Loading question bank...', 'Almost ready...'];
         let _lmi = 0;
         const _lmInterval = setInterval(() => {
@@ -1890,8 +2058,6 @@
         }
 
         // ===================== WEAK RETRY MODE =====================
-        let weakQuestionIds = [];
-
         window.startWeakRetry = async () => {
             if (!currentUserRef) return;
             const userSnap = await getDoc(currentUserRef);
@@ -1941,15 +2107,13 @@
 
         // ===================== SCORE RING ANIMATION =====================
         function animateScoreRing(percentage) {
-            const circumference = 377; // 2*PI*60
+            const circumference = 377;
             const fill = document.getElementById('score-ring-fill');
             if (!fill) return;
             const offset = circumference - (percentage / 100) * circumference;
-            // Color based on score
             if (percentage >= 70) fill.style.stroke = 'var(--success)';
             else if (percentage >= 50) fill.style.stroke = 'var(--warning)';
             else fill.style.stroke = 'var(--accent)';
-            // Animate after a tick
             setTimeout(() => { fill.style.strokeDashoffset = offset; }, 50);
         }
 
@@ -1969,8 +2133,7 @@
         // ===================== BULK ASSIGN CHAPTER =====================
         window.bulkAssignChapter = async () => {
             if (selectedIds.size === 0) return;
-            const chNum = prompt(`Assign ${selectedIds.size} selected question(s) to which chapter number?
-(Enter a number, e.g. 3)`);
+            const chNum = prompt(`Assign ${selectedIds.size} selected question(s) to which chapter number?\n(Enter a number, e.g. 3)`);
             if (!chNum || isNaN(Number(chNum))) return;
             const chapter = Number(chNum);
             document.getElementById('loading-screen').classList.remove('hidden');
@@ -1993,8 +2156,6 @@
         };
 
         // ===================== DUPLICATE DETECTOR BEFORE UPLOAD =====================
-        const _origProcessUpload = processUpload;
-        // Override to show dupe warning in UI before uploading
         window.previewUploadDuplicates = async (dataArray) => {
             const snap = await getDocs(collection(db, "mcqs"));
             const existingQs = new Set(snap.docs.map(d => d.data().question.trim().toLowerCase()));
@@ -2002,8 +2163,6 @@
             return dupes;
         };
 
-        // Wrap uploadExcel for dupe preview
-        const _origUploadExcel = window.uploadExcel;
         window.uploadExcel = () => {
             const file = document.getElementById('excel-file').files[0];
             if (!file) return alert("Select file");
@@ -2021,30 +2180,29 @@
             reader.readAsArrayBuffer(file);
         };
 
-
         // ===================== INLINE CHAPTER EDIT =====================
         window.inlineEditChapter = async (id, currentChapter) => {
             const newCh = prompt(`Edit chapter for this MCQ\nCurrent: ${currentChapter || 'None'}\nEnter new chapter number (or clear to remove):`);
-            if (newCh === null) return; // cancelled
+            if (newCh === null) return;
             const chapter = newCh.trim() === '' ? null : Number(newCh);
             if (newCh.trim() !== '' && isNaN(chapter)) return alert('Please enter a valid number.');
             try {
                 await updateDoc(doc(db, "mcqs", id), { chapter });
-                // Update cache
                 const idx = adminQuestionsCache.findIndex(q => q.id === id);
                 if (idx !== -1) adminQuestionsCache[idx].chapter = chapter;
                 filterAdminMCQs();
             } catch(e) { alert('Error: ' + e.message); }
         };
 
-        // Clear loading timeout once auth resolves
-        const _origOnAuth = onAuthStateChanged;
-        // We patch showView to clear the loading timeout
-        const _origShowView = window.showView;
         window.showView = (id) => {
             clearTimeout(_loadingTimeout);
             clearInterval(_lmInterval);
-            _origShowView(id);
+            document.getElementById('loading-screen').classList.add('hidden');
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            if(id === 'block-selection-screen' || id === 'dashboard-screen') {
+                loadLeaderboard();
+            }
         };
 
     </script>
